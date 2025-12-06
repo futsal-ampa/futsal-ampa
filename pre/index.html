@@ -78,7 +78,7 @@
         }
         .install-app-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
 
-        /* ADMIN ZONE RESTAURADA */
+        /* ADMIN ZONE */
         #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .admin-title { color: #e11d48; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
         .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 0.8rem; margin: 5px 0; cursor: pointer; font-weight: bold; width: 100%; }
@@ -114,7 +114,8 @@
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         .countdown-text { text-align: right; font-size: 0.7rem; color: #ef4444; font-weight: bold; margin-top: 5px; font-family: monospace; }
         
-        h3 { font-size: 0.95rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
+        /* LISTAS */
+        h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
         .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
         
         .player-checkbox { position: relative; background: var(--card-bg); padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; font-weight: 600; user-select: none; }
@@ -131,15 +132,16 @@
         .guest-label.selected { background-color: #fffbeb; border-color: var(--accent); color: #b45309; border-style: solid; }
         .invited-by { font-size: 0.6rem; color: #78350f; font-weight: normal; width: 100%; text-align: left; padding-left: 20px; }
 
-        .order-badge { position: absolute; top: -8px; right: -8px; background: var(--brand-blue); color: white; font-size: 0.65rem; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transform: scale(0); transition: transform 0.2s; }
+        .order-badge { position: absolute; top: -8px; right: -8px; background: var(--brand-blue); color: white; font-size: 0.6rem; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transform: scale(0); transition: transform 0.2s; }
         .player-checkbox.selected .order-badge { transform: scale(1); }
         .player-checkbox.reserve .order-badge { background: var(--reserve); }
 
-        .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-top: 40px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
+        /* BOTONES DE ACCIÓN GRANDES */
+        .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
         .action-btn:active { transform: scale(0.98); }
         .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
 
-        .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; margin-bottom: 20px; display: none; }
+        .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .notify-btn.urgent { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; animation: pulseBtn 2s infinite; }
@@ -147,7 +149,9 @@
 
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
 
+        /* HISTORIAL */
         .log-container { margin-top: 30px; background: #f1f5f9; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
+        .log-title { font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
         .log-entry { font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: #475569; display: flex; justify-content: space-between; }
         .log-entry:last-child { border-bottom: none; }
         .log-time { font-size: 0.7rem; color: #94a3b8; }
@@ -358,13 +362,16 @@
   };
     // -------------------------------------------------------------
 
-    const ADMIN_PIN = "1234";
+    // ⚠️ SEGURIDAD ADMIN
+    // Ahora el PIN se crea en base de datos la primera vez.
+    // Si no existe, se creará uno por defecto (9386).
 
-    let app, db, matchRef;
+    let app, db, matchRef, adminRef;
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         matchRef = doc(db, "partidos", "semana_actual"); 
+        adminRef = doc(db, "config", "admin_settings");
     } catch (e) { console.error(e); }
 
     // JUGADORES INICIALES (Fallback)
@@ -387,7 +394,7 @@
     let currentData = { 
         matchDate: null, 
         lockTime: "18:00", 
-        pinMode: true, 
+        pinMode: true, // Default ON
         voteMode: true,
         selectedPlayers: [], 
         selectedGuests: [], 
@@ -404,7 +411,7 @@
     const MAX_PLAYERS = 18;
     let timerInterval = null;
     let isTimerRunning = false;
-    let hasBeeped = false; // Bandera para sonido único
+    let hasBeeped = false; 
 
     // --- INICIALIZACIÓN ---
     document.getElementById('date-input').valueAsDate = new Date();
@@ -538,14 +545,14 @@
         await updateDoc(matchRef, { bannedIndices: currentBans });
     };
 
-    // --- TIMER LOGIC (SYNC) ---
+    // --- TIMER LOGIC (SYNC FIX) ---
     window.toggleTimer = async () => {
         if (currentData.timerState === 'running') {
-            // PAUSA: Calculamos restante y guardamos
+            // PAUSA: Guardar lo que falta
             const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000));
             await updateDoc(matchRef, { timerState: 'paused', timerLeft: left });
         } else {
-            // INICIO: Calculamos fin y guardamos
+            // INICIO: Guardar hora fin absoluta
             const target = Date.now() + (currentData.timerLeft * 1000);
             await updateDoc(matchRef, { timerState: 'running', timerEnd: target });
         }
@@ -572,6 +579,7 @@
             }
             updateUI(currentData);
         } else {
+            // Init default
             initialPlayers.sort((a, b) => a.name.localeCompare(b.name));
             setDoc(matchRef, { 
                 matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
@@ -582,12 +590,12 @@
             });
         }
     });
-    
-    // TIMER LOCAL LOOP
+
+    // CHECK & TIMER LOOP
     setInterval(() => {
         if(currentData.matchDate) checkTimeLock(currentData.matchDate, currentData.lockTime);
 
-        // CHECK AUTO RESET (10:00 AM NEXT DAY)
+        // AUTO RESET (10:00 AM NEXT DAY)
         if (currentData.matchDate) {
             const matchDate = new Date(currentData.matchDate);
             const now = new Date();
@@ -597,13 +605,12 @@
             if (now >= resetTime) resetCurrentMatch(true); // Force reset
         }
         
-        // UPDATE CRONO DISPLAY
+        // UI TIMER UPDATE
         const display = document.getElementById('timer-display');
         const btn = document.getElementById('timer-start-btn');
         const statusText = document.getElementById('timer-status-text');
         
         if(currentData.timerState === 'running') {
-            // Calculate time left based on server target time
             const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
             const m = Math.floor(left / 60).toString().padStart(2, '0');
             const s = (left % 60).toString().padStart(2, '0');
@@ -622,7 +629,7 @@
                 statusText.innerText = "TIEMPO CUMPLIDO";
                 btn.innerText = "FIN";
                 
-                // Play sound ONCE
+                // SONIDO (SOLO UNA VEZ)
                 if (!hasBeeped) {
                     const context = new (window.AudioContext || window.webkitAudioContext)();
                     const osc = context.createOscillator();
@@ -636,7 +643,7 @@
                 hasBeeped = false;
             }
         } else {
-            // Paused or Stopped
+            // Pausado o parado
             const m = Math.floor(currentData.timerLeft / 60).toString().padStart(2, '0');
             const s = (currentData.timerLeft % 60).toString().padStart(2, '0');
             display.innerText = `${m}:${s}`;
@@ -694,6 +701,7 @@
             container.appendChild(div);
         });
 
+        // RENDER GUESTS
         guestsDB.forEach((g, idx) => {
             const div = document.createElement('div');
             div.className = 'player-checkbox guest-label';
@@ -860,11 +868,11 @@
         const dateInput = document.getElementById('date-input').value;
         if (!dateInput) return alert("Selecciona fecha.");
         
-        const selected = new Date(dateInput);
-        const today = new Date();
-        today.setHours(0,0,0,0);
-        if(selected < today) return alert("Error: No puedes seleccionar un día pasado.");
+        // 1. Check/Init Security
+        const adminSnap = await getDoc(adminRef);
+        if(!adminSnap.exists()) await setDoc(adminRef, { pin: "9386" });
 
+        // Identificar autor
         const myIdx = localStorage.getItem('futsal_my_index');
         const roster = currentData.roster || initialPlayers;
         const author = (myIdx && roster[myIdx]) ? roster[myIdx].name : "Admin";
@@ -875,8 +883,8 @@
                 matchDate: dateInput, 
                 // KEEP PREVIOUS SETTINGS
                 lockTime: currentData.lockTime || "18:00",
-                pinMode: currentData.pinMode,
-                voteMode: currentData.voteMode,
+                pinMode: currentData.pinMode !== false, // default true if undefined
+                voteMode: currentData.voteMode !== false,
                 selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
                 scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
                 teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
@@ -1013,13 +1021,18 @@
 
     // ADMIN
     let tapCount = 0; let tapTimer = null;
-    window.secretAdminTap = () => {
+    window.secretAdminTap = async () => {
         tapCount++; clearTimeout(tapTimer);
         tapTimer = setTimeout(() => { tapCount = 0; }, 2000);
         if (tapCount >= 5) {
             const entered = prompt("🔑 PIN Admin:");
-            if(entered === ADMIN_PIN) document.getElementById('admin-zone').style.display = 'block';
-            else alert("Error");
+            // Check DB
+            const adminSnap = await getDoc(adminRef);
+            if(adminSnap.exists() && adminSnap.data().pin === entered) {
+                 document.getElementById('admin-zone').style.display = 'block';
+            } else {
+                 alert("Error de acceso");
+            }
             tapCount = 0;
         }
     };
