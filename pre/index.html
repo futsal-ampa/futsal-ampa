@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal 16.1</title>
+    <title>AMPA Futsal v2.1</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -20,7 +20,6 @@
         .match-date-display { color: var(--accent); font-size: 0.8rem; margin-top: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         .container { width: 90%; max-width: 600px; padding: 15px 0; padding-bottom: 80px; flex: 1; }
         
-        /* UI COMPONENTS */
         #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
         .toast { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: auto; border-left: 4px solid var(--accent); }
         .toast.show { opacity: 1; transform: translateY(0); }
@@ -33,8 +32,6 @@
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
         .modal-btn.cancel { background: #e2e8f0; color: #475569; } .modal-btn.confirm { background: var(--brand-dark); color: white; }
-        
-        /* CARDS & STATUS */
         .match-info-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .res-date { font-weight: 800; font-size: 1rem; color: var(--brand-dark); text-transform: uppercase; margin-bottom: 5px; }
         .res-time { font-weight: 800; color: var(--brand-blue); font-size: 1.1rem; margin-bottom: 5px; display: block; }
@@ -46,8 +43,22 @@
         .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         .countdown-text { text-align: right; font-size: 0.7rem; color: #ef4444; font-weight: bold; margin-top: 5px; font-family: monospace; }
-        
-        /* PLAYERS */
+        .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
+        .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
+        .timer-display.finished { color: #ef4444; border-color: #ef4444; font-size: 1.8rem; line-height: 1; animation: blink 0.5s infinite; }
+        .timer-status-text { font-size: 0.7rem; color: #94a3b8; margin-bottom: 10px; height: 15px; font-weight: bold; text-transform: uppercase; }
+        .timer-btn-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
+        .t-btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; width: 100px; }
+        .t-start { background: #22c55e; color: white; } .t-stop { background: #ef4444; color: white; } .t-reset { background: #64748b; color: white; }
+        .scoreboard { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 8px; margin-top: 10px; }
+        .score-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .score-val { font-size: 1.5rem; font-weight: bold; color: white; }
+        .score-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        .sb-blanco { color: #ffffff; } .sb-negro { color: #94a3b8; } .sb-rojo { color: #f87171; }
+        .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
+        .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
+        #user-greeting { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; font-size: 0.85rem; display: none; animation: fadeIn 0.5s; }
         h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
         .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         .player-checkbox { position: relative; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.85rem; font-weight: 600; user-select: none; }
@@ -63,8 +74,6 @@
         .guest-label { border-style: dashed; flex-direction: column; align-items: flex-start; gap: 2px; }
         .guest-label.selected { background-color: #fffbeb; border-color: var(--accent); color: #b45309; border-style: solid; }
         .invited-by { font-size: 0.6rem; color: #78350f; font-weight: normal; width: 100%; text-align: left; padding-left: 20px; }
-
-        /* BUTTONS */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
         .action-btn:active { transform: scale(0.98); }
         .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
@@ -72,50 +81,37 @@
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .notify-btn.urgent { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; animation: pulseBtn 2s infinite; }
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
-        .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
-        .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
-        
-        /* LOGS */
         .log-container { margin-top: 30px; background: #f1f5f9; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
         .log-title { font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
         .log-entry { font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: #475569; display: flex; justify-content: space-between; }
         .log-entry:last-child { border-bottom: none; }
         .log-time { font-size: 0.7rem; color: #94a3b8; }
-
-        /* GAME ZONE */
-        .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
-        .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
-        .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
-        .timer-display.finished { color: #ef4444; border-color: #ef4444; font-size: 1.8rem; line-height: 1; animation: blink 0.5s infinite; }
-        .timer-status-text { font-size: 0.7rem; color: #94a3b8; margin-bottom: 10px; height: 15px; font-weight: bold; text-transform: uppercase; }
-        .timer-btn-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
-        .t-btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; width: 100px; }
-        .t-start { background: #22c55e; color: white; } .t-stop { background: #ef4444; color: white; } .t-reset { background: #64748b; color: white; }
-        .scoreboard { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 8px; margin-top: 10px; }
-        .score-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .score-val { font-size: 1.5rem; font-weight: bold; color: white; }
-        .score-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; font-weight: bold; }
-        .sb-blanco { color: #ffffff; } .sb-negro { color: #94a3b8; } .sb-rojo { color: #f87171; }
-
-        /* TEAMS */
         .teams-container { display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; margin-top: 20px; }
         .team-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
         .team-header { padding: 15px; text-align: center; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
         .team-list li { padding: 10px 20px; border-bottom: 1px solid #f1f5f9; font-size: 1rem; color: #334155; display: flex; align-items: center; }
+        .team-list li:last-child { border-bottom: none; }
+        .team-list li::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #cbd5e1; margin-right: 12px; }
         .team-blanco .team-header { background: #ffffff; color: #1e293b; border-bottom: 2px solid #cbd5e1; }
+        .team-blanco { border: 2px solid #cbd5e1; }
         .team-negro .team-header { background: #1e293b; color: white; }
+        .team-negro { border: 2px solid #1e293b; }
         .team-rojo .team-header { background: #ef4444; color: white; }
-
-        /* ADMIN */
+        .team-rojo { border: 2px solid #ef4444; }
         #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .admin-title { color: #e11d48; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
         .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 0.8rem; margin: 5px 0; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px; }
-        .admin-btn-blue { background-color: var(--brand-blue); } .admin-btn-dark { background-color: #334155; } .admin-btn-green { background-color: #16a34a; } .admin-btn-yellow { background-color: #eab308; color: #422006; }
+        .admin-btn-blue { background-color: var(--brand-blue); }
+        .admin-btn-dark { background-color: #334155; }
+        .admin-btn-green { background-color: #16a34a; }
+        .admin-btn-yellow { background-color: #eab308; color: #422006; }
         .pin-toggle-btn { width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; font-size: 0.8rem; }
-        .pin-on { background-color: #22c55e; color: white; } .pin-off { background-color: #ef4444; color: white; }
+        .pin-on { background-color: #22c55e; color: white; }
+        .pin-off { background-color: #ef4444; color: white; }
         .chip-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 5px; margin-bottom: 15px; padding-top: 5px; border-top: 1px solid #fca5a5; }
         .chip { background: white; border: 1px solid #ccc; color: #555; padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .chip-reset { border-color: #eab308; color: #a16207; } .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
+        .chip-reset { border-color: #eab308; color: #a16207; } .chip-reset:hover { background: #eab308; color: white; }
+        .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
         .new-player-form { background: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: flex; gap: 5px; align-items: center; }
         .new-player-form input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
         .new-player-form select { width: 30%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
@@ -124,12 +120,9 @@
         .time-control input { width: auto; margin: 0; padding: 8px; font-size: 1rem; border: 1px solid #ccc; }
         .time-control button { width: auto; margin: 0; padding: 8px 15px; font-size: 0.8rem; }
 
-        .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; }
-        .error-message { color: #ef4444; font-size: 1rem; margin-top: 15px; max-width: 80%; text-align: center; }
+        .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; font-weight: bold; }
         #setup-panel { background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 20px; }
         input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
-        #user-greeting { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; font-size: 0.85rem; display: none; animation: fadeIn 0.5s; }
-
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -139,13 +132,10 @@
 </head>
 <body>
 
-<div id="loader" class="loading-overlay">
-    <div>Conectando...</div>
-    <div id="loader-error" class="error-message"></div>
-</div>
+<div id="loader" class="loading-overlay">Conectando...</div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal 16.1</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.1</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -273,21 +263,12 @@ const firebaseConfig = {
     // -------------------------------------------------------------
 
     let app, db, matchRef, configRef;
-    
-    function showFatalError(err) {
-        const loader = document.getElementById('loader');
-        const errDiv = document.getElementById('loader-error');
-        loader.style.display = 'flex';
-        errDiv.innerText = `Error: ${err.message}.`;
-        console.error("FATAL:", err);
-    }
-
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         matchRef = doc(db, "partidos", "semana_actual");
         configRef = doc(db, "config", "admin_settings"); 
-    } catch (e) { showFatalError(e); }
+    } catch (e) { console.error(e); }
 
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3 },
@@ -323,8 +304,7 @@ const firebaseConfig = {
     ];
 
     let currentData = { 
-        matchDate: null, lockTime: "18:00", 
-        pinMode: true, voteMode: true,
+        matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
         selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
         bannedIndices: [], teams: null, logs: [], pins: {}, unlockVotes: [],
         scores: [0,0,0], timerState: 'stopped', timerEnd: 0, timerLeft: 300,
@@ -334,7 +314,7 @@ const firebaseConfig = {
     let timerInterval = null;
     let hasBeeped = false;
 
-    // GLOBALIZE FUNCTIONS
+    // --- UTILS ---
     window.showToast = (msg, type = 'info') => {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -379,7 +359,7 @@ const firebaseConfig = {
                 timerState: 'stopped', timerLeft: 300, roster: initialPlayers 
             });
         }
-    }, (error) => showFatalError(error));
+    });
 
     function updateUI(data) {
         const activeRoster = data.roster || initialPlayers;
@@ -404,9 +384,13 @@ const firebaseConfig = {
             const lockIcon = (data.pinMode !== false && pins[p.id]) ? '<span class="lock-icon">🔒</span>' : '';
             
             let badgeContent = '';
-            if(isSelected) { div.classList.add('selected'); badgeContent = data.selectedPlayers.indexOf(p.id) + 1; }
-            if(isBanned) div.classList.add('banned');
+            if(isSelected) {
+                div.classList.add('selected');
+                badgeContent = data.selectedPlayers.indexOf(p.id) + 1;
+            }
+
             div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
+            if(isBanned) div.classList.add('banned');
             if(!isBanned) div.onclick = () => window.toggleSelection('player', p.id, p.name);
             container.appendChild(div);
         });
@@ -657,146 +641,6 @@ const firebaseConfig = {
         } else cd.innerText = "Cierre alcanzado";
     }
 
-    // --- ADMIN ---
-    window.startNewMatch = async () => {
-        const dateInput = document.getElementById('date-input').value;
-        if (!dateInput) return window.showToast("Selecciona fecha", "error");
-        
-        const selected = new Date(dateInput);
-        const today = new Date(); today.setHours(0,0,0,0);
-        if(selected < today) return window.showToast("Día pasado no válido", "error");
-
-        const adminSnap = await getDoc(configRef);
-        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
-
-        showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
-             const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-             const myId = localStorage.getItem('futsal_my_id');
-             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
-
-             // Share BEFORE saving to avoid popup block
-             window.shareConvocation(dateInput);
-
-             await setDoc(matchRef, { 
-                matchDate: dateInput, 
-                // KEEP PREVIOUS CONFIG
-                lockTime: currentData.lockTime || "18:00",
-                pinMode: currentData.pinMode !== false,
-                voteMode: currentData.voteMode !== false,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
-                pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
-            }, { merge: true });
-        });
-    };
-
-    window.resetCurrentMatch = async () => {
-        if(currentData.matchDate && currentData.teams) {
-             const histRef = collection(db, "history");
-             await addDoc(histRef, { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
-        }
-        showConfirm("¿Reiniciar?", "Se guardará historial y limpiará lista.", async () => {
-             await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
-             window.hideAdmin();
-        });
-    };
-
-    window.changeLockTime = async () => {
-        const t = document.getElementById('admin-time-input').value;
-        await updateDoc(matchRef, { lockTime: t });
-    };
-
-    window.togglePinMode = async () => {
-        const s = currentData.pinMode === false ? true : false;
-        await updateDoc(matchRef, { pinMode: s });
-    };
-    window.toggleVoteMode = async () => {
-        const s = currentData.voteMode === false ? true : false;
-        await updateDoc(matchRef, { voteMode: s });
-    };
-
-    window.addNewPlayer = async () => {
-        const name = document.getElementById('new-player-name').value;
-        const level = parseInt(document.getElementById('new-player-level').value);
-        if(!name) return window.showToast("Falta nombre", "error");
-        
-        const id = name.toLowerCase().replace(/\s/g, '_');
-        const newPlayer = { id: id, name: name, level: level };
-        await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
-        window.showToast("Jugador añadido", "success");
-    };
-    
-    window.toggleBan = async (id, name) => {
-        let list = [...(currentData.bannedIndices || [])];
-        if(list.includes(id)) {
-            list = list.filter(i => i !== id);
-            window.showToast(`${name} desbloqueado`, "success");
-        } else {
-            list.push(id);
-            if(currentData.selectedPlayers.includes(id)) {
-                let s = currentData.selectedPlayers.filter(i => i !== id);
-                await updateDoc(matchRef, { selectedPlayers: s });
-            }
-            window.showToast(`${name} bloqueado`, "error");
-        }
-        await updateDoc(matchRef, { bannedIndices: list });
-    };
-    window.resetPin = async (id, name) => {
-        showConfirm("Reset PIN", `¿Borrar PIN de ${name}?`, async () => {
-            let p = {...currentData.pins}; delete p[id];
-            await updateDoc(matchRef, { pins: p });
-            window.showToast("PIN reseteado", "success");
-        });
-    };
-    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
-    window.showStats = async () => {
-        const hRef = collection(db, "history");
-        const snap = await getDocs(hRef);
-        window.showToast(`Partidos en histórico: ${snap.size}`, "info");
-    };
-    window.forceGeneration = () => {
-        // CORRECCIÓN: Usar length directamente
-        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-        if(total < 8) return window.showToast("Mínimo 8", "error");
-        
-        showConfirm("Forzar Creación", "¿Crear equipos ignorando la hora?", () => {
-             triggerGeneration(total <= 12 ? 2 : 3);
-             window.hideAdmin();
-        });
-    };
-    window.forceReset = async () => {
-        showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => {
-             await setDoc(matchRef, { 
-                matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0],
-                timerState: 'stopped', roster: initialPlayers
-            });
-            window.hideAdmin();
-        });
-    };
-    
-    // UI HELPERS
-    document.getElementById('date-input').valueAsDate = new Date();
-    
-    let taps = 0;
-    window.secretAdminTap = async () => {
-        taps++; setTimeout(() => taps = 0, 2000);
-        if(taps === 5) {
-            const entered = prompt("🔑 PIN Admin:");
-            const snap = await getDoc(configRef);
-            const valid = snap.exists() ? snap.data().pin : "9386";
-            
-            showConfirm("Acceso Admin", "Introduce PIN Maestro", (val) => {
-                if(val === valid) document.getElementById('admin-zone').style.display = 'block';
-                else window.showToast("Acceso denegado", "error");
-            }, true);
-            taps = 0;
-        }
-    };
-    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
-
     window.shareConvocation = (d) => {
         const date = d ? new Date(d) : new Date(currentData.matchDate);
         const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
@@ -816,15 +660,56 @@ const firebaseConfig = {
          });
          window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
     };
-
-    // Shuffle & Render
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+    
+    let taps = 0;
+    window.secretAdminTap = async () => {
+        taps++; setTimeout(() => taps = 0, 2000);
+        if(taps === 5) {
+            const entered = prompt("🔑 PIN Admin:");
+            const snap = await getDoc(configRef);
+            const valid = snap.exists() ? snap.data().pin : "9386";
+            
+            showConfirm("Acceso Admin", "Introduce PIN Maestro", (val) => {
+                if(val === valid) document.getElementById('admin-zone').style.display = 'block';
+                else window.showToast("Acceso denegado", "error");
+            }, true);
+            taps = 0;
         }
-        return array;
-    }
+    };
+    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
+    window.showStats = async () => {
+        const hRef = collection(db, "history");
+        const snap = await getDocs(hRef);
+        window.showToast(`Partidos en histórico: ${snap.size}`, "info");
+    };
+    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
+    window.forceGeneration = () => {
+        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
+        if(total < 8) return window.showToast("Mínimo 8", "error");
+        
+        showConfirm("Forzar Creación", "¿Crear equipos ignorando la hora?", () => {
+             triggerGeneration(total <= 12 ? 2 : 3);
+             window.hideAdmin();
+        });
+    };
+    window.forceReset = async () => {
+        showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => {
+             await setDoc(matchRef, { 
+                matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+                teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0],
+                timerState: 'stopped', roster: initialPlayers
+            });
+            window.hideAdmin();
+        });
+    };
+
+    // Install PWA
+    let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
+    window.installApp = async () => {
+        if(defPrompt) { defPrompt.prompt(); defPrompt = null; }
+        else window.showToast("Usa menú navegador -> Instalar", "info");
+    };
 
 </script>
 </body>
