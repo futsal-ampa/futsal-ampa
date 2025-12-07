@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal - LIVE</title>
+    <title>AMPA Futsal v2.0</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -12,169 +12,103 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS GENERALES --- */
         :root {
             --brand-dark: #1e293b; --brand-blue: #2563eb; 
             --bg-color: #f1f5f9; --card-bg: #ffffff;
             --text-main: #334155; --accent: #f59e0b;
             --whatsapp: #25d366; --danger: #ef4444;
             --disabled: #94a3b8; --gold: #fbbf24;
-            --reserve: #f97316;
+            --reserve: #f97316; --success: #22c55e;
         }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        header { background-color: var(--brand-dark); width: 100%; padding: 20px 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; user-select: none; }
+        /* HEADER */
+        header { background-color: var(--brand-dark); width: 100%; padding: 15px 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; user-select: none; }
         h1 { text-align: center; color: white; font-size: 1.1rem; margin: 0; font-weight: 800; text-transform: uppercase; line-height: 1.2; cursor: pointer; }
         .match-date-display { color: var(--accent); font-size: 0.8rem; margin-top: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         
-        .container { width: 90%; max-width: 600px; padding: 15px 0; padding-bottom: 60px; flex: 1; }
+        .container { width: 90%; max-width: 600px; padding: 15px 0; padding-bottom: 80px; flex: 1; }
         
-        /* SALUDO */
-        #user-greeting { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; font-size: 0.85rem; display: none; animation: fadeIn 0.5s; }
+        /* UX MEJORADA: TOAST & MODAL */
+        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
+        .toast { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: auto; border-left: 4px solid var(--accent); }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.success { border-left-color: var(--success); }
 
-        /* TARJETA DE INFO DE PARTIDO */
-        .match-info-card {
-            background: white; border-radius: 12px; padding: 15px;
-            text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px; border: 1px solid #e2e8f0;
-        }
-        .res-date { font-weight: 800; font-size: 1rem; color: var(--brand-dark); text-transform: uppercase; margin-bottom: 5px; }
-        .res-time { font-weight: 800; color: var(--brand-blue); font-size: 1.1rem; margin-bottom: 5px; display: block; }
-        .res-location { font-size: 0.8rem; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 5px; }
-
-        /* ZONA DE JUEGO (CRONO) */
-        .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
+        #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1500; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-box { background: white; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: var(--brand-dark); }
+        .modal-text { font-size: 0.9rem; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+        .modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        .modal-btn.cancel { background: #e2e8f0; color: #475569; }
+        .modal-btn.confirm { background: var(--brand-dark); color: white; }
         
-        .timer-display {
-            font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80;
-            background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155;
-            margin-bottom: 5px; letter-spacing: 2px; min-height: 80px; display: flex; align-items: center; justify-content: center;
-        }
-        .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
-        .timer-display.finished { color: #ef4444; border-color: #ef4444; font-size: 1.8rem; line-height: 1; animation: blink 0.5s infinite; }
-        .timer-status-text { font-size: 0.7rem; color: #94a3b8; margin-bottom: 10px; height: 15px; font-weight: bold; text-transform: uppercase; }
-        
-        .timer-btn-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
-        .t-btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; width: 100px; }
-        .t-start { background: #22c55e; color: white; }
-        .t-stop { background: #ef4444; color: white; }
-        .t-reset { background: #64748b; color: white; }
-
-        /* MARCADOR */
-        .scoreboard { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 8px; margin-top: 10px; }
-        .score-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .score-team { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
-        .score-val { font-size: 1.5rem; font-weight: bold; color: white; }
-        .score-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; font-weight: bold; }
-        .sb-blanco { color: #ffffff; } .sb-negro { color: #94a3b8; } .sb-rojo { color: #f87171; }
-
-        /* BOTÓN INSTALAR APP */
-        .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
-        .install-app-btn {
-            background: white; border: 1px solid #cbd5e1; color: #475569;
-            padding: 6px 12px; border-radius: 20px; font-size: 0.7rem;
-            font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s;
-        }
-        .install-app-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
-
-        /* ADMIN ZONE */
-        #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .admin-title { color: #e11d48; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
-        .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 0.8rem; margin: 5px 0; cursor: pointer; font-weight: bold; width: 100%; }
-        .admin-btn-blue { background-color: var(--brand-blue); }
-        .admin-btn-dark { background-color: #334155; }
-        .admin-btn-green { background-color: #16a34a; }
-        .admin-btn-yellow { background-color: #eab308; color: #422006; }
-        
-        .pin-toggle-btn { width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; font-size: 0.8rem; }
-        .pin-on { background-color: #22c55e; color: white; }
-        .pin-off { background-color: #ef4444; color: white; }
-
-        .chip-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 5px; margin-bottom: 15px; padding-top: 5px; border-top: 1px solid #fca5a5; }
-        .chip { background: white; border: 1px solid #ccc; color: #555; padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .chip-reset { border-color: #eab308; color: #a16207; } .chip-reset:hover { background: #eab308; color: white; }
-        .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
-
-        .new-player-form { background: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: flex; gap: 5px; align-items: center; }
-        .new-player-form input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
-        .new-player-form select { width: 30%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
-        .new-player-btn { background: #16a34a; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        .time-control { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px; }
-        .time-control input { width: auto; margin: 0; padding: 8px; font-size: 1rem; border: 1px solid #ccc; }
-        .time-control button { width: auto; margin: 0; padding: 8px 15px; font-size: 0.8rem; }
-
-        /* BARRA ESTADO */
-        .status-bar { background: white; padding: 15px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        /* ESTILOS CLÁSICOS (Mantenidos) */
+        .status-bar { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .status-label { font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
-        .status-count { font-size: 1.5rem; font-weight: 800; color: var(--brand-dark); }
-        .progress-track { width: 100%; height: 10px; background-color: #e2e8f0; border-radius: 5px; overflow: hidden; }
+        .status-count { font-size: 1.4rem; font-weight: 800; color: var(--brand-dark); }
+        .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
-        .countdown-text { text-align: right; font-size: 0.7rem; color: #ef4444; font-weight: bold; margin-top: 5px; font-family: monospace; }
         
-        /* LISTAS */
-        h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
-        .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-        
-        .player-checkbox { position: relative; background: var(--card-bg); padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; font-weight: 600; user-select: none; }
+        .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        .player-checkbox { position: relative; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.85rem; font-weight: 600; user-select: none; }
         .player-checkbox.selected { background-color: #eff6ff; border-color: var(--brand-blue); color: var(--brand-blue); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1); }
         .player-checkbox.reserve { background-color: #fff7ed; border-color: var(--reserve); color: var(--reserve); }
         .player-checkbox.banned { opacity: 0.5; background-color: #f1f5f9; cursor: not-allowed; border-color: #cbd5e1; }
         .player-checkbox.banned::after { content: '⛔'; position: absolute; right: 10px; }
-        
-        .lock-icon { font-size: 0.8em; margin-left: auto; opacity: 0.6; }
         .player-checkbox.is-me { border: 2px solid var(--gold); background-color: #fffbeb; }
-        .player-checkbox input { display: none; }
+        .lock-icon { font-size: 0.8em; margin-left: auto; opacity: 0.6; }
+        .order-badge { position: absolute; top: -6px; right: -6px; background: var(--brand-blue); color: white; font-size: 0.6rem; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .player-checkbox.reserve .order-badge { background: var(--reserve); }
+        
         .guest-label { border-style: dashed; flex-direction: column; align-items: flex-start; gap: 2px; }
-        .guest-label .guest-name { display: flex; width: 100%; align-items: center; }
         .guest-label.selected { background-color: #fffbeb; border-color: var(--accent); color: #b45309; border-style: solid; }
         .invited-by { font-size: 0.6rem; color: #78350f; font-weight: normal; width: 100%; text-align: left; padding-left: 20px; }
 
-        .order-badge { position: absolute; top: -8px; right: -8px; background: var(--brand-blue); color: white; font-size: 0.6rem; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transform: scale(0); transition: transform 0.2s; }
-        .player-checkbox.selected .order-badge { transform: scale(1); }
-        .player-checkbox.reserve .order-badge { background: var(--reserve); }
-
-        /* BOTONES DE ACCIÓN GRANDES */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
-        .action-btn:active { transform: scale(0.98); }
         .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
-
-        .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         
-        .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
-        .notify-btn.urgent { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; animation: pulseBtn 2s infinite; }
-        @keyframes pulseBtn { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-
-        .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
-
-        /* HISTORIAL */
         .log-container { margin-top: 30px; background: #f1f5f9; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
         .log-title { font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
         .log-entry { font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: #475569; display: flex; justify-content: space-between; }
-        .log-entry:last-child { border-bottom: none; }
-        .log-time { font-size: 0.7rem; color: #94a3b8; }
 
+        /* ZONA JUEGO */
+        .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
+        .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; }
+        .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
+        .timer-display.finished { color: #ef4444; border-color: #ef4444; font-size: 1.8rem; animation: blink 0.5s infinite; }
+        .t-btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin: 0 5px; }
+        .t-start { background: #22c55e; color: white; } .t-stop { background: #ef4444; color: white; } .t-reset { background: #64748b; color: white; }
+
+        .scoreboard { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 8px; margin-top: 10px; }
+        .score-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .score-val { font-size: 1.5rem; font-weight: bold; color: white; }
+        .score-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        .sb-blanco { color: #ffffff; } .sb-negro { color: #94a3b8; } .sb-rojo { color: #f87171; }
+
+        /* TEAMS */
         .teams-container { display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; margin-top: 20px; }
         .team-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
         .team-header { padding: 15px; text-align: center; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
         .team-list li { padding: 10px 20px; border-bottom: 1px solid #f1f5f9; font-size: 1rem; color: #334155; display: flex; align-items: center; }
-        .team-list li:last-child { border-bottom: none; }
-        .team-list li::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #cbd5e1; margin-right: 12px; }
         .team-blanco .team-header { background: #ffffff; color: #1e293b; border-bottom: 2px solid #cbd5e1; }
-        .team-blanco { border: 2px solid #cbd5e1; }
         .team-negro .team-header { background: #1e293b; color: white; }
-        .team-negro { border: 2px solid #1e293b; }
         .team-rojo .team-header { background: #ef4444; color: white; }
-        .team-rojo { border: 2px solid #ef4444; }
-        
+
+        /* ADMIN & LOADING */
+        #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; }
+        .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 0.8rem; margin: 5px 0; cursor: pointer; font-weight: bold; width: 100%; }
+        .admin-btn-blue { background-color: var(--brand-blue); } .admin-btn-green { background-color: #16a34a; }
         .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; font-weight: bold; }
-        #time-lock-msg { text-align: center; color: #94a3b8; font-size: 0.75rem; margin-bottom: 20px; display: block; height: 20px; }
         #setup-panel { background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 20px; }
         input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
-        
+
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulseTimer { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
@@ -185,7 +119,7 @@
 <div id="loader" class="loading-overlay">Conectando...</div>
 
 <header>
-    <h1 onclick="secretAdminTap()">AMPA Futsal 25/26</h1>
+    <h1 onclick="secretAdminTap()">AMPA Futsal v2.0</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -194,48 +128,12 @@
     <div id="user-greeting"></div>
 
     <div id="admin-zone">
-        <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE</div>
+        <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE v2.0</div>
         
-        <button class="admin-btn admin-btn-green" onclick="resetCurrentMatch()">🔄 Reiniciar Partido (Nuevo Día)</button>
-
-        <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🛡️ Seguridad & Votación:</div>
-        <div style="display:flex; gap:5px;">
-            <button id="pin-mode-btn" class="pin-toggle-btn" onclick="togglePinMode()">PIN...</button>
-            <button id="vote-mode-btn" class="pin-toggle-btn" onclick="toggleVoteMode()">VOTO...</button>
-        </div>
-
-        <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; text-align:left;">🕒 Hora Creación Equipos:</div>
-        <div class="time-control">
-            <input type="time" id="admin-time-input" value="18:00">
-            <button class="admin-btn admin-btn-blue" style="margin:0" onclick="changeLockTime()">Actualizar</button>
-        </div>
-
-        <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; text-align:left;">➕ Alta Nuevo Jugador:</div>
-        <div class="new-player-form">
-            <input type="text" id="new-player-name" placeholder="Nombre">
-            <select id="new-player-level">
-                <option value="1">Nivel 1</option>
-                <option value="2" selected>Nivel 2</option>
-                <option value="3">Nivel 3</option>
-            </select>
-            <button class="new-player-btn" onclick="addNewPlayer()">+</button>
-        </div>
-
-        <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🚫 GESTIÓN DE BAJAS (Bloquear/Desbloquear)</div>
-        <div id="ban-list" class="chip-list">
-            <div style="font-size:0.7rem; color:#999; width:100%;">Cargando...</div>
-        </div>
-
-        <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🔐 GESTIÓN DE PINS (Reset Individual)</div>
-        <div id="pin-list" class="chip-list">
-            <div style="font-size:0.7rem; color:#999; width:100%;">Cargando...</div>
-        </div>
-
-        <button class="admin-btn admin-btn-yellow" onclick="voteToUnlock()">🙋 Votar Desbloqueo (Yo)</button>
+        <button class="admin-btn admin-btn-green" onclick="resetCurrentMatch()">🔄 Reiniciar Partido (Guardar Historial)</button>
         <button class="admin-btn admin-btn-blue" onclick="forceGeneration()">⚡ Forzar Creación Ya</button>
         <button class="admin-btn" onclick="undoTeams()">🔙 Deshacer Equipos</button>
-        <button class="admin-btn" style="margin-top:15px;" onclick="forceReset()">🔥 Borrado TOTAL (Reset App)</button>
-        
+        <button class="admin-btn" onclick="showStats()">📊 Ver Ranking (Beta)</button>
         <div style="margin-top:10px; font-size:0.7rem; cursor:pointer; text-decoration:underline" onclick="hideAdmin()">Cerrar</div>
     </div>
 
@@ -244,37 +142,21 @@
         <p style="color:#64748b; margin-bottom:20px;">Elige la fecha para abrir la convocatoria:</p>
         <input type="date" id="date-input">
         <button class="action-btn" onclick="startNewMatch()">ABRIR CONVOCATORIA</button>
-        
-        <div class="install-center">
-            <button class="install-app-btn" onclick="installApp()">📲 Instalar App</button>
-        </div>
     </div>
 
     <div id="active-match-panel" style="display:none;">
-        <button id="notify-btn" class="notify-btn" onclick="shareConvocation()">📢 Reenviar aviso al Grupo</button>
-
         <div class="status-bar">
             <div class="status-header">
-                <div>
-                    <span class="status-label">CONVOCADOS</span>
-                    <span class="status-sub" id="status-text">Máx 18</span>
-                </div>
+                <div><span class="status-label">CONVOCADOS</span> <span class="status-sub" id="status-text">Máx 18</span></div>
                 <span class="status-count" id="player-count">0 / 18</span>
             </div>
-            <div class="progress-track">
-                <div id="progress-fill" class="progress-fill"></div>
-            </div>
-            <div id="countdown-display" class="countdown-text"></div>
+            <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+            <div id="countdown-display" style="text-align:right; font-size:0.7rem; color:#ef4444; font-weight:bold; margin-top:5px;"></div>
         </div>
         
         <div id="selection-phase">
-            <div class="install-center">
-                <button class="install-app-btn" onclick="installApp()">📲 Instalar App</button>
-            </div>
-
             <h3>PLANTILLA</h3>
             <div class="player-group" id="player-container"></div>
-
             <h3>Invitados</h3>
             <div class="player-group" id="guest-container"></div>
 
@@ -283,70 +165,52 @@
                 <div id="activity-log"></div>
             </div>
 
-            <button id="vote-btn" class="vote-btn" onclick="voteToUnlock()">🔓 Solicitar Desbloqueo Anticipado (0/3)</button>
-
+            <button id="vote-btn" style="width:100%; background:#fef08a; padding:10px; border-radius:8px; border:1px solid #facc15; font-weight:bold; margin:10px 0; display:none;" onclick="voteToUnlock()">🔓 Solicitar Desbloqueo (0/3)</button>
             <button id="btn-create" class="action-btn" onclick="attemptGeneration()">CREAR EQUIPOS</button>
-            <span id="time-lock-msg" class="time-lock-msg"></span>
+            <span id="time-lock-msg" style="text-align:center; display:block; color:#94a3b8; font-size:0.75rem; margin-bottom:20px;"></span>
         </div>
 
         <div id="results-phase" style="display:none;">
-            
             <div class="game-controls">
                 <div style="font-size:0.8rem; font-weight:bold; margin-bottom:5px; color:#94a3b8;">TIEMPO DE JUEGO</div>
-                <div class="timer-status-text" id="timer-status-text"></div>
+                <div id="timer-status-text" style="font-size:0.7rem; color:#94a3b8; margin-bottom:5px; height:15px; font-weight:bold;"></div>
                 <div id="timer-display" class="timer-display">05:00</div>
                 <div class="timer-btn-row">
                     <button class="t-btn t-start" onclick="toggleTimer()" id="timer-start-btn">▶ INICIO</button>
                     <button class="t-btn t-reset" onclick="resetTimer()">↺ RESET</button>
                 </div>
-
                 <div id="scoreboard" class="scoreboard" style="display:none;">
-                    <div class="score-box">
-                        <span class="score-team sb-blanco">BLANCO</span>
-                        <span id="sc-blanco" class="score-val">0</span>
-                        <div>
-                            <button class="score-btn" onclick="updateScore(0, 1)">+</button>
-                            <button class="score-btn" onclick="updateScore(0, -1)">-</button>
-                        </div>
-                    </div>
-                    <div class="score-box">
-                        <span class="score-team sb-negro">NEGRO</span>
-                        <span id="sc-negro" class="score-val">0</span>
-                        <div>
-                            <button class="score-btn" onclick="updateScore(1, 1)">+</button>
-                            <button class="score-btn" onclick="updateScore(1, -1)">-</button>
-                        </div>
-                    </div>
-                    <div class="score-box">
-                        <span class="score-team sb-rojo">ROJO</span>
-                        <span id="sc-rojo" class="score-val">0</span>
-                        <div>
-                            <button class="score-btn" onclick="updateScore(2, 1)">+</button>
-                            <button class="score-btn" onclick="updateScore(2, -1)">-</button>
-                        </div>
-                    </div>
+                    <div class="score-box"><span class="score-team sb-blanco">BLANCO</span><span id="sc-blanco" class="score-val">0</span><div><button class="score-btn" onclick="updateScore(0, 1)">+</button><button class="score-btn" onclick="updateScore(0, -1)">-</button></div></div>
+                    <div class="score-box"><span class="score-team sb-negro">NEGRO</span><span id="sc-negro" class="score-val">0</span><div><button class="score-btn" onclick="updateScore(1, 1)">+</button><button class="score-btn" onclick="updateScore(1, -1)">-</button></div></div>
+                    <div class="score-box"><span class="score-team sb-rojo">ROJO</span><span id="sc-rojo" class="score-val">0</span><div><button class="score-btn" onclick="updateScore(2, 1)">+</button><button class="score-btn" onclick="updateScore(2, -1)">-</button></div></div>
                 </div>
             </div>
 
             <h3 style="text-align: center; color: #2563eb;">¡EQUIPOS CONFIRMADOS!</h3>
-            
             <div class="match-info-card">
                 <div id="res-date" class="res-date"></div>
                 <div class="res-time">⏰ 20:30h</div>
-                <div class="res-location">📍 Pabellón Colegio Virgen de la Vega, Benavente</div>
+                <div class="res-location">📍 Pabellón Colegio Virgen de la Vega</div>
             </div>
-
             <div class="teams-container" id="teams-result"></div>
-            <button class="whatsapp-btn" style="display:flex" onclick="shareTeamsOnWhatsapp()">
-                📲 Enviar Equipos al Grupo
-            </button>
+            <button style="width:100%; background:#25d366; color:white; border:none; padding:16px; border-radius:12px; font-weight:800; cursor:pointer;" onclick="shareTeamsOnWhatsapp()">📲 Enviar Equipos al Grupo</button>
         </div>
     </div>
 </div>
 
+<div id="modal-overlay">
+    <div class="modal-box">
+        <div id="modal-title" class="modal-title"></div>
+        <div id="modal-text" class="modal-text"></div>
+        <div id="modal-actions" class="modal-actions"></div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // -------------------------------------------------------------
     // ⚠️ PEGA AQUÍ TUS CLAVES DE FIREBASE ⚠️
@@ -362,85 +226,249 @@
   };
     // -------------------------------------------------------------
 
-    // ⚠️ SEGURIDAD ADMIN
-    // Ahora el PIN se crea en base de datos la primera vez.
-    // Si no existe, se creará uno por defecto (9386).
-
-    let app, db, matchRef, adminRef;
+    let app, db, matchRef, configRef;
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
-        matchRef = doc(db, "partidos", "semana_actual"); 
-        adminRef = doc(db, "config", "admin_settings");
+        matchRef = doc(db, "partidos", "semana_actual");
+        configRef = doc(db, "config", "admin_settings"); 
     } catch (e) { console.error(e); }
 
-    // JUGADORES INICIALES (Fallback)
+    // ROSTER INICIAL (ID basado en nombre slug)
     const initialPlayers = [
-        { name: "Willi", level: 3 }, { name: "Jhon", level: 3 }, { name: "Santi", level: 3 },
-        { name: "Ivan", level: 3 }, { name: "Gus", level: 3 }, { name: "Fabián", level: 3 },
-        { name: "Arturo", level: 3 }, { name: "Abraham", level: 2 }, { name: "Iván N", level: 2 },
-        { name: "Adrián", level: 2 }, { name: "Yusto", level: 2 }, { name: "José", level: 2 },
-        { name: "Toño", level: 2 }, { name: "Rafa", level: 2 }, { name: "Edu", level: 2 },
-        { name: "Jesús S", level: 1 }, { name: "Norvey", level: 1 }, { name: "Richard", level: 1 },
-        { name: "Rubén", level: 1 }, { name: "Eloy", level: 1 }, { name: "Luis", level: 1 },
-        { name: "Alfredo", level: 1 }
+        { id: "willi", name: "Willi", level: 3 },
+        { id: "jhon", name: "Jhon", level: 3 },
+        { id: "santi", name: "Santi", level: 3 },
+        { id: "ivan", name: "Ivan", level: 3 },
+        { id: "gus", name: "Gus", level: 3 },
+        { id: "fabian", name: "Fabián", level: 3 },
+        { id: "arturo", name: "Arturo", level: 3 },
+        { id: "abraham", name: "Abraham", level: 2 },
+        { id: "ivan_n", name: "Iván N", level: 2 },
+        { id: "adrian", name: "Adrián", level: 2 },
+        { id: "yusto", name: "Yusto", level: 2 },
+        { id: "jose", name: "José", level: 2 },
+        { id: "tono", name: "Toño", level: 2 },
+        { id: "rafa", name: "Rafa", level: 2 },
+        { id: "edu", name: "Edu", level: 2 },
+        { id: "jesus_s", name: "Jesús S", level: 1 },
+        { id: "norvey", name: "Norvey", level: 1 },
+        { id: "richard", name: "Richard", level: 1 },
+        { id: "ruben", name: "Rubén", level: 1 },
+        { id: "eloy", name: "Eloy", level: 1 },
+        { id: "luis", name: "Luis", level: 1 },
+        { id: "alfredo", name: "Alfredo", level: 1 }
     ];
 
     const guestsDB = [
-        { name: "Invitado 1" }, { name: "Invitado 2" }, { name: "Invitado 3" }, 
-        { name: "Invitado 4" }, { name: "Invitado 5" }
+        { id: "guest_1", name: "Invitado 1" }, 
+        { id: "guest_2", name: "Invitado 2" }, 
+        { id: "guest_3", name: "Invitado 3" }, 
+        { id: "guest_4", name: "Invitado 4" }, 
+        { id: "guest_5", name: "Invitado 5" }
     ];
 
     let currentData = { 
         matchDate: null, 
-        lockTime: "18:00", 
-        pinMode: true, // Default ON
-        voteMode: true,
+        lockTime: "18:00",
         selectedPlayers: [], 
         selectedGuests: [], 
-        bannedIndices: [], 
         guestInviters: {}, 
         teams: null, 
         logs: [], 
         pins: {}, 
         unlockVotes: [],
-        roster: [],
         scores: [0,0,0],
-        timerState: 'stopped', timerEnd: 0, timerLeft: 300
+        timerState: 'stopped', timerEnd: 0, timerLeft: 300,
+        roster: []
     };
-    const MAX_PLAYERS = 18;
-    let timerInterval = null;
-    let isTimerRunning = false;
-    let hasBeeped = false; 
+    
+    let hasBeeped = false;
+
+    // --- UTILS UX ---
+    function showToast(msg, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerText = msg;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function showConfirm(title, text, onConfirm) {
+        const modal = document.getElementById('modal-overlay');
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-text').innerText = text;
+        const actions = document.getElementById('modal-actions');
+        actions.innerHTML = '';
+        
+        const btnCancel = document.createElement('button');
+        btnCancel.className = 'modal-btn cancel';
+        btnCancel.innerText = 'Cancelar';
+        btnCancel.onclick = () => { modal.style.display = 'none'; };
+        
+        const btnConfirm = document.createElement('button');
+        btnConfirm.className = 'modal-btn confirm';
+        btnConfirm.innerText = 'Confirmar';
+        btnConfirm.onclick = () => { modal.style.display = 'none'; onConfirm(); };
+        
+        actions.appendChild(btnCancel);
+        actions.appendChild(btnConfirm);
+        modal.style.display = 'flex';
+    }
 
     // --- INICIALIZACIÓN ---
     document.getElementById('date-input').valueAsDate = new Date();
-
-    const mySavedIndex = localStorage.getItem('futsal_my_index');
-    const mySavedType = localStorage.getItem('futsal_my_type');
     
-    // --- LOGICA PWA ---
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-    });
-    window.installApp = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            deferredPrompt = null;
+    // --- FIREBASE SYNC ---
+    onSnapshot(matchRef, (docSnap) => {
+        document.getElementById('loader').style.display = 'none';
+        if (docSnap.exists()) {
+            currentData = docSnap.data();
+            if (!currentData.roster || currentData.roster.length === 0) {
+                updateDoc(matchRef, { roster: initialPlayers });
+            }
+            updateUI(currentData);
         } else {
-            alert("ℹ️ PARA INSTALAR:\n\n🤖 Android: Menú (3 puntos) -> 'Instalar aplicación'.\n\n🍎 iPhone: Botón Compartir -> 'Añadir a pantalla de inicio'.");
+            // First run init
+            setDoc(matchRef, { 
+                matchDate: null, lockTime: "18:00", 
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+                teams: null, logs: [], pins: {}, unlockVotes: [], scores:[0,0,0], 
+                timerState: 'stopped', timerLeft: 300, roster: initialPlayers 
+            });
         }
-    };
+    });
 
-    // --- LOGICA SELECCIÓN ---
-    window.toggleSelection = async (type, index, name) => {
-        if (type === 'player' && currentData.bannedIndices && currentData.bannedIndices.includes(index)) {
-            return alert("⛔ Este jugador está bloqueado temporalmente.");
+    // --- UPDATE UI ---
+    function updateUI(data) {
+        const activeRoster = data.roster || initialPlayers;
+        const container = document.getElementById('player-container');
+        const guestContainer = document.getElementById('guest-container');
+        
+        container.innerHTML = ''; guestContainer.innerHTML = '';
+
+        // Saludo
+        const myId = localStorage.getItem('futsal_my_id');
+        if (myId) {
+            const me = activeRoster.find(p => p.id === myId);
+            if(me) {
+                document.getElementById('user-greeting').innerText = `👋 ¡Hola, ${me.name}!`;
+                document.getElementById('user-greeting').style.display = 'block';
+            }
         }
 
+        // Render Players
+        activeRoster.forEach((p) => {
+            const div = document.createElement('div');
+            div.className = 'player-checkbox';
+            if (p.id === myId) div.classList.add('is-me');
+            
+            const isSelected = data.selectedPlayers?.includes(p.id);
+            const pins = data.pins || {};
+            const lockIcon = pins[p.id] ? '<span class="lock-icon">🔒</span>' : '';
+            
+            let badgeContent = '';
+            if(isSelected) {
+                div.classList.add('selected');
+                badgeContent = data.selectedPlayers.indexOf(p.id) + 1;
+            }
+
+            div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
+            div.onclick = () => window.toggleSelection('player', p.id, p.name);
+            container.appendChild(div);
+        });
+
+        // Render Guests
+        guestsDB.forEach((g) => {
+            const div = document.createElement('div');
+            div.className = 'player-checkbox guest-label';
+            const isSelected = data.selectedGuests?.includes(g.id);
+            const inviter = (data.guestInviters && data.guestInviters[g.id]) ? data.guestInviters[g.id] : null;
+            
+            if(isSelected) div.classList.add('selected');
+            let badgeContent = isSelected ? 'G' : '';
+            
+            let html = `<div class="guest-name"><span class="order-badge">${badgeContent}</span> ${g.name}</div>`;
+            if (isSelected && inviter) { html += `<div class="invited-by">↳ por ${inviter}</div>`; }
+            div.innerHTML = html;
+            div.onclick = () => window.toggleSelection('guest', g.id, g.name);
+            guestContainer.appendChild(div);
+        });
+
+        const setupPanel = document.getElementById('setup-panel');
+        const activePanel = document.getElementById('active-match-panel');
+        const headerDate = document.getElementById('header-date');
+
+        if (!data.matchDate) {
+            setupPanel.style.display = 'block'; activePanel.style.display = 'none';
+            headerDate.innerText = "PRÓXIMO PARTIDO";
+        } else {
+            setupPanel.style.display = 'none'; activePanel.style.display = 'block';
+            const d = new Date(data.matchDate);
+            headerDate.innerText = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+            document.getElementById('res-date').innerText = headerDate.innerText;
+        }
+
+        const total = (data.selectedPlayers?.length || 0) + (data.selectedGuests?.length || 0);
+        document.getElementById('player-count').innerText = `${total} / 18`;
+        const bar = document.getElementById('progress-fill');
+        bar.style.width = `${Math.min((total/18)*100, 100)}%`;
+        if(total < 8) bar.style.backgroundColor = "#ef4444";
+        else if (total < 12) bar.style.backgroundColor = "#eab308";
+        else bar.style.backgroundColor = "#22c55e";
+
+        // Votes
+        const votes = data.unlockVotes ? data.unlockVotes.length : 0;
+        const voteBtn = document.getElementById('vote-btn');
+        if (!data.teams && total >= 8) {
+            voteBtn.style.display = 'block';
+            voteBtn.innerText = `🔓 Solicitar Desbloqueo (${votes}/3)`;
+            if(votes >= 3) {
+                 voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true;
+            }
+        } else voteBtn.style.display = 'none';
+
+        // Logs
+        const logDiv = document.getElementById('activity-log');
+        if (data.logs && data.logs.length > 0) {
+            logDiv.innerHTML = "";
+            [...data.logs].reverse().slice(0, 15).forEach(logStr => {
+                const parts = logStr.split('|');
+                if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
+            });
+        }
+
+        // Teams
+        let teamsData = data.teams;
+        if (typeof teamsData === 'string') { try { teamsData = JSON.parse(teamsData); } catch(e){} }
+
+        if (teamsData && teamsData.length > 0) {
+            document.getElementById('selection-phase').style.display = 'none';
+            document.getElementById('results-phase').style.display = 'block';
+            
+            if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex';
+            else document.getElementById('scoreboard').style.display = 'none';
+            
+            const sc = data.scores || [0,0,0];
+            document.getElementById('sc-blanco').innerText = sc[0];
+            document.getElementById('sc-negro').innerText = sc[1];
+            document.getElementById('sc-rojo').innerText = sc[2];
+
+            renderTeams(teamsData);
+        } else {
+            document.getElementById('selection-phase').style.display = 'block';
+            document.getElementById('results-phase').style.display = 'none';
+            checkTimeLock(data.matchDate, data.lockTime);
+        }
+    }
+
+    // --- LOGICA ---
+    window.toggleSelection = async (type, id, name) => {
         let newPlayers = [...(currentData.selectedPlayers || [])];
         let newGuests = [...(currentData.selectedGuests || [])];
         let currentPins = {...(currentData.pins || {})};
@@ -448,547 +476,235 @@
         
         const now = new Date();
         const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        let logAction = "";
-        const pinKey = `${type}-${index}`;
-
+        
         let inviterName = "";
         if (type === 'guest') {
-            const userIndex = localStorage.getItem('futsal_my_index');
-            const userType = localStorage.getItem('futsal_my_type');
-            if (!userIndex || userType !== 'player' || !newPlayers.includes(parseInt(userIndex))) {
-                return alert("⛔ Solo los jugadores confirmados (en verde) pueden traer invitados.");
-            }
+            const userIndex = localStorage.getItem('futsal_my_id');
+            if (!userIndex || !newPlayers.includes(userIndex)) return showToast("⛔ Solo jugadores confirmados pueden invitar.", "error");
             const roster = currentData.roster || initialPlayers;
-            if(roster[userIndex]) inviterName = roster[userIndex].name;
-        }
-
-        // SEGURIDAD PIN
-        if (type === 'player' && currentData.pinMode !== false) { 
-            if (currentPins[pinKey]) {
-                const enteredPin = prompt(`🔒 ${name} está protegido.\nIntroduce PIN:`);
-                if (enteredPin !== currentPins[pinKey]) return alert("⛔ PIN Incorrecto.");
-            } else {
-                const newPin = prompt(`🛡️ SEGURIDAD\nCrea un PIN de 4 números para ${name}:`);
-                if (!newPin || newPin.length < 3) return alert("Pon un PIN para seguridad.");
-                currentPins[pinKey] = newPin;
-            }
+            const inviterObj = roster.find(p => p.id === userIndex);
+            if(inviterObj) inviterName = inviterObj.name;
         }
 
         if (type === 'player') {
-            if (newPlayers.includes(index)) {
-                if(!confirm(`¿Confirmas salida de ${name}?`)) return;
-                newPlayers = newPlayers.filter(i => i !== index);
-                logAction = `❌ ${name} sale`;
+            if (currentPins[id]) {
+                const entered = prompt(`🔒 PIN para ${name}:`);
+                if (entered !== currentPins[id]) return showToast("⛔ PIN Incorrecto", "error");
             } else {
-                if ((newPlayers.length + newGuests.length) >= MAX_PLAYERS) return alert("⛔ CUPOS COMPLETOS (Máx 18). Espera.");
-                if(!confirm(`¿Confirmas asistencia para ${name}?`)) return;
-                
-                newPlayers.push(index);
-                logAction = `✅ ${name} entra`;
-                localStorage.setItem('futsal_my_index', index);
-                localStorage.setItem('futsal_my_type', 'player');
+                const newPin = prompt(`🛡️ Crea un PIN para ${name}:`);
+                if (!newPin || newPin.length < 3) return showToast("Debes poner un PIN", "error");
+                currentPins[id] = newPin;
+            }
+
+            if (newPlayers.includes(id)) {
+                showConfirm("¿Desmarcarse?", `¿Seguro que quieres borrar a ${name}?`, async () => {
+                    newPlayers = newPlayers.filter(i => i !== id);
+                    await updateDoc(matchRef, { selectedPlayers: newPlayers, logs: arrayUnion(`❌ ${name} sale|${timeStr}`) });
+                    showToast(`${name} eliminado`, "info");
+                });
+            } else {
+                if ((newPlayers.length + newGuests.length) >= 18) return showToast("⛔ CUPOS COMPLETOS", "error");
+                showConfirm("¿Confirmar asistencia?", `Te vas a apuntar como ${name}.`, async () => {
+                    newPlayers.push(id);
+                    localStorage.setItem('futsal_my_id', id);
+                    await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} entra|${timeStr}`) });
+                    showToast(`¡Bienvenido ${name}!`, "success");
+                });
             }
         } else {
-            if (newGuests.includes(index)) {
-                if(!confirm(`¿Borrar a ${name}?`)) return;
-                newGuests = newGuests.filter(i => i !== index);
-                delete newGuestInviters[index]; 
-                logAction = `❌ ${name} sale (invitado por ${inviterName})`;
+             if (newGuests.includes(id)) {
+                showConfirm("¿Borrar invitado?", `¿Quitar a ${name}?`, async () => {
+                    newGuests = newGuests.filter(i => i !== id);
+                    delete newGuestInviters[id];
+                    await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} sale|${timeStr}`) });
+                });
             } else {
-                if ((newPlayers.length + newGuests.length) >= MAX_PLAYERS) return alert("⛔ CUPOS COMPLETOS (Máx 18). Espera.");
-                if(!confirm(`¿Añadir invitado?`)) return;
-                newGuests.push(index);
-                newGuestInviters[index] = inviterName; 
-                logAction = `✅ ${name} invitado (por ${inviterName})`;
+                if ((newPlayers.length + newGuests.length) >= 18) return showToast("⛔ CUPOS COMPLETOS", "error");
+                showConfirm("¿Añadir invitado?", `Añadir a ${name} (por ${inviterName})`, async () => {
+                    newGuests.push(id);
+                    newGuestInviters[id] = inviterName;
+                    await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`✅ ${name} invitado por ${inviterName}|${timeStr}`) });
+                });
             }
         }
-
-        await updateDoc(matchRef, { 
-            selectedPlayers: newPlayers, 
-            selectedGuests: newGuests,
-            guestInviters: newGuestInviters,
-            pins: currentPins,
-            logs: arrayUnion(`${logAction}|${timeStr}`) 
-        });
     };
 
     window.voteToUnlock = async () => {
-        const myIdx = localStorage.getItem('futsal_my_index');
-        if (!myIdx) return alert("Solo jugadores apuntados.");
-        if (!currentData.selectedPlayers.includes(parseInt(myIdx))) return alert("Debes estar convocado.");
-        if (currentData.unlockVotes && currentData.unlockVotes.includes(parseInt(myIdx))) return alert("Ya has votado.");
-        if(confirm("¿Votas para desbloquear YA?")) await updateDoc(matchRef, { unlockVotes: arrayUnion(parseInt(myIdx)) });
+        const myId = localStorage.getItem('futsal_my_id');
+        if (!myId || !currentData.selectedPlayers.includes(myId)) return showToast("Solo convocados pueden votar.", "error");
+        if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return showToast("Ya has votado.", "info");
+        
+        showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => {
+            await updateDoc(matchRef, { unlockVotes: arrayUnion(myId) });
+            showToast("Voto registrado", "success");
+        });
     };
 
-    window.togglePinMode = async () => {
-        const newState = currentData.pinMode === false ? true : false;
-        if(confirm(`¿Cambiar seguridad PIN a ${newState ? 'ACTIVADO' : 'DESACTIVADO'}?`)) await updateDoc(matchRef, { pinMode: newState });
-    }
-    window.toggleVoteMode = async () => {
-        const newState = currentData.voteMode === false ? true : false;
-        if(confirm(`¿${newState ? 'ACTIVAR' : 'DESACTIVAR'} votación?`)) await updateDoc(matchRef, { voteMode: newState });
-    }
-
-    window.togglePlayerBan = async (index, name) => {
-        let currentBans = [...(currentData.bannedIndices || [])];
-        if (currentBans.includes(index)) {
-            currentBans = currentBans.filter(i => i !== index);
-            if(!confirm(`¿Desbloquear a ${name}?`)) return;
-        } else {
-            currentBans.push(index);
-            if(!confirm(`¿BLOQUEAR a ${name}?`)) return;
-            if (currentData.selectedPlayers.includes(index)) {
-                const newSelected = currentData.selectedPlayers.filter(i => i !== index);
-                await updateDoc(matchRef, { selectedPlayers: newSelected });
-            }
-        }
-        await updateDoc(matchRef, { bannedIndices: currentBans });
-    };
-
-    // --- TIMER LOGIC (SYNC FIX) ---
-    window.toggleTimer = async () => {
-        if (currentData.timerState === 'running') {
-            // PAUSA: Guardar lo que falta
-            const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000));
-            await updateDoc(matchRef, { timerState: 'paused', timerLeft: left });
-        } else {
-            // INICIO: Guardar hora fin absoluta
-            const target = Date.now() + (currentData.timerLeft * 1000);
-            await updateDoc(matchRef, { timerState: 'running', timerEnd: target });
-        }
-    };
-
-    window.resetTimer = async () => {
-        await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 });
-    };
-
-    // --- SCOREBOARD ---
-    window.updateScore = async (teamIndex, delta) => {
-        let newScores = [...(currentData.scores || [0,0,0])];
-        newScores[teamIndex] = Math.max(0, newScores[teamIndex] + delta);
-        await updateDoc(matchRef, { scores: newScores });
-    };
-
-    onSnapshot(matchRef, (docSnap) => {
-        document.getElementById('loader').style.display = 'none';
-        if (docSnap.exists()) {
-            currentData = docSnap.data();
-            if (!currentData.roster || currentData.roster.length === 0) {
-                initialPlayers.sort((a, b) => a.name.localeCompare(b.name));
-                updateDoc(matchRef, { roster: initialPlayers });
-            }
-            updateUI(currentData);
-        } else {
-            // Init default
-            initialPlayers.sort((a, b) => a.name.localeCompare(b.name));
-            setDoc(matchRef, { 
-                matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
-                selectedPlayers: [], selectedGuests: [], bannedIndices: [], guestInviters: {}, 
-                teams: null, logs: [], pins: {}, unlockVotes: [],
-                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                roster: initialPlayers 
-            });
-        }
-    });
-
-    // CHECK & TIMER LOOP
+    // --- TIMERS & LOGIC ---
     setInterval(() => {
-        if(currentData.matchDate) checkTimeLock(currentData.matchDate, currentData.lockTime);
-
-        // AUTO RESET (10:00 AM NEXT DAY)
         if (currentData.matchDate) {
+            checkTimeLock(currentData.matchDate, currentData.lockTime);
+            
             const matchDate = new Date(currentData.matchDate);
             const now = new Date();
             const resetTime = new Date(matchDate);
-            resetTime.setDate(resetTime.getDate() + 1); // Día siguiente
+            resetTime.setDate(resetTime.getDate() + 1); // Next day
             resetTime.setHours(10, 0, 0, 0); // 10:00 AM
-            if (now >= resetTime) resetCurrentMatch(true); // Force reset
+            
+            if (now >= resetTime) {
+                // AUTO RESET
+                 updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null });
+            }
         }
         
-        // UI TIMER UPDATE
-        const display = document.getElementById('timer-display');
-        const btn = document.getElementById('timer-start-btn');
-        const statusText = document.getElementById('timer-status-text');
-        
         if(currentData.timerState === 'running') {
+            const display = document.getElementById('timer-display');
+            const btn = document.getElementById('timer-start-btn');
+            const txt = document.getElementById('timer-status-text');
+            
             const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
             const m = Math.floor(left / 60).toString().padStart(2, '0');
             const s = (left % 60).toString().padStart(2, '0');
             display.innerText = `${m}:${s}`;
+            btn.innerText = "⏸ PAUSA"; btn.classList.add('t-stop');
             
-            btn.innerText = "⏸ PAUSA";
-            btn.className = "t-btn t-stop";
-            
-            if(left <= 60 && left > 0) {
-                display.classList.add('last-minute');
-                statusText.innerText = "¡ÚLTIMO MINUTO!";
-            } else if (left <= 0) {
-                display.classList.remove('last-minute');
-                display.classList.add('finished');
-                display.innerText = "ÚLTIMA JUGADA";
-                statusText.innerText = "TIEMPO CUMPLIDO";
-                btn.innerText = "FIN";
-                
-                // SONIDO (SOLO UNA VEZ)
-                if (!hasBeeped) {
-                    const context = new (window.AudioContext || window.webkitAudioContext)();
-                    const osc = context.createOscillator();
-                    osc.type = 'sine'; osc.frequency.value = 800; osc.connect(context.destination);
-                    osc.start(); setTimeout(() => osc.stop(), 1500);
-                    hasBeeped = true;
+            if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; }
+            else if(left <= 0) { 
+                display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN";
+                if(!hasBeeped) {
+                     const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                     const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000);
+                     hasBeeped = true;
                 }
-            } else {
-                display.classList.remove('last-minute', 'finished');
-                statusText.innerText = "";
-                hasBeeped = false;
             }
+        }
+    }, 1000);
+    
+    window.toggleTimer = async () => {
+        if (currentData.timerState === 'running') {
+            const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000));
+            await updateDoc(matchRef, { timerState: 'paused', timerLeft: left });
         } else {
-            // Pausado o parado
-            const m = Math.floor(currentData.timerLeft / 60).toString().padStart(2, '0');
-            const s = (currentData.timerLeft % 60).toString().padStart(2, '0');
-            display.innerText = `${m}:${s}`;
-            btn.innerText = "▶ INICIO";
-            btn.className = "t-btn t-start";
-            display.classList.remove('last-minute', 'finished');
-            statusText.innerText = currentData.timerState === 'paused' ? "PAUSADO" : "";
-            hasBeeped = false;
+            const target = Date.now() + (currentData.timerLeft * 1000);
+            await updateDoc(matchRef, { timerState: 'running', timerEnd: target });
         }
+    };
+    window.resetTimer = async () => {
+        await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 });
+        hasBeeped = false;
+        document.getElementById('timer-display').classList.remove('finished', 'last-minute');
+        document.getElementById('timer-display').innerText = "05:00";
+    };
+    window.updateScore = async (idx, delta) => {
+        let s = [...(currentData.scores || [0,0,0])];
+        s[idx] = Math.max(0, s[idx] + delta);
+        await updateDoc(matchRef, { scores: s });
+    };
 
-    }, 500);
-
-    function updateUI(data) {
-        // ADMIN BUTTONS
-        const pinBtn = document.getElementById('pin-mode-btn');
-        if (data.pinMode !== false) { pinBtn.innerText = "🟢 PIN ACTIVADO (Seguro)"; pinBtn.className = "pin-toggle-btn pin-on"; } 
-        else { pinBtn.innerText = "🔴 PIN DESACTIVADO (Libre)"; pinBtn.className = "pin-toggle-btn pin-off"; }
-
-        const voteAdminBtn = document.getElementById('vote-mode-btn');
-        if (data.voteMode !== false) { voteAdminBtn.innerText = "🟢 VOTACIÓN ACTIVA"; voteAdminBtn.className = "pin-toggle-btn pin-on"; } 
-        else { voteAdminBtn.innerText = "🔴 VOTACIÓN DESACTIVADA"; voteAdminBtn.className = "pin-toggle-btn pin-off"; }
-
-        const activeRoster = data.roster || initialPlayers;
-        const container = document.getElementById('player-container');
-        const guestContainer = document.getElementById('guest-container');
-        
-        container.innerHTML = '';
-        guestContainer.innerHTML = '';
-
-        if (mySavedIndex !== null && mySavedType === 'player' && activeRoster[mySavedIndex]) {
-            const pName = activeRoster[mySavedIndex].name;
-            document.getElementById('user-greeting').innerText = `👋 ¡Hola, ${pName}!`;
-            document.getElementById('user-greeting').style.display = 'block';
-        }
-
-        // RENDER PLAYERS
-        activeRoster.forEach((p, idx) => {
-            const div = document.createElement('div');
-            div.className = 'player-checkbox';
-            if (mySavedType === 'player' && parseInt(mySavedIndex) === idx) div.classList.add('is-me');
-            div.id = `p-${idx}`;
-            
-            const isSelected = data.selectedPlayers?.includes(idx);
-            const isBanned = data.bannedIndices?.includes(idx);
-            const pins = data.pins || {};
-            const key = `player-${idx}`;
-            const lockIcon = (data.pinMode !== false && pins[key]) ? '<span class="lock-icon">🔒</span>' : '';
-            const badgeContent = isSelected ? (data.selectedPlayers.indexOf(idx) + 1) : '';
-            
-            if(isSelected) div.classList.add('selected');
-            if(isBanned) div.classList.add('banned');
-            
-            div.innerHTML = `<span class="order-badge" id="badge-p-${idx}">${badgeContent}</span> ${p.name} ${lockIcon}`;
-            if (!isBanned) div.onclick = () => window.toggleSelection('player', idx, p.name);
-            container.appendChild(div);
-        });
-
-        // RENDER GUESTS
-        guestsDB.forEach((g, idx) => {
-            const div = document.createElement('div');
-            div.className = 'player-checkbox guest-label';
-            div.id = `g-${idx}`;
-            const isSelected = data.selectedGuests?.includes(idx);
-            const inviter = (data.guestInviters && data.guestInviters[idx]) ? data.guestInviters[idx] : null;
-            const pins = data.pins || {};
-            const key = `guest-${idx}`;
-            const lockIcon = (data.pinMode !== false && pins[key]) ? '<span class="lock-icon">🔒</span>' : '';
-            if(isSelected) { div.classList.add('selected'); }
-            const badgeContent = isSelected ? 'G' : '';
-            let html = `<div class="guest-name"><span class="order-badge" id="badge-g-${idx}">${badgeContent}</span> ${g.name} ${lockIcon}</div>`;
-            if (isSelected && inviter) { html += `<div class="invited-by">↳ por ${inviter}</div>`; }
-            div.innerHTML = html;
-            div.onclick = () => window.toggleSelection('guest', idx, g.name);
-            guestContainer.appendChild(div);
-        });
-
-        const setupPanel = document.getElementById('setup-panel');
-        const activePanel = document.getElementById('active-match-panel');
-        const headerDate = document.getElementById('header-date');
-        const notifyBtn = document.getElementById('notify-btn');
-
-        if (!data.matchDate) {
-            setupPanel.style.display = 'block'; activePanel.style.display = 'none';
-            headerDate.innerText = "PRÓXIMO PARTIDO";
-            return;
-        }
-
-        setupPanel.style.display = 'none'; activePanel.style.display = 'block';
-        const dateObj = new Date(data.matchDate);
-        headerDate.innerText = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-        
-        document.getElementById('res-date').innerText = headerDate.innerText;
-        document.getElementById('admin-time-input').value = data.lockTime || "18:00";
-
-        const total = (data.selectedPlayers?.length || 0) + (data.selectedGuests?.length || 0);
-        document.getElementById('player-count').innerText = `${total} / 18`;
-        
-        const bar = document.getElementById('progress-fill');
-        const percentage = Math.min((total / MAX_PLAYERS) * 100, 100);
-        bar.style.width = `${percentage}%`;
-        if(total < 8) bar.style.backgroundColor = "#ef4444";
-        else if (total < 12) bar.style.backgroundColor = "#eab308";
-        else bar.style.backgroundColor = "#22c55e";
-
-        const votes = data.unlockVotes ? data.unlockVotes.length : 0;
-        const voteBtn = document.getElementById('vote-btn');
-        if (!data.teams && total >= 8 && data.voteMode !== false) {
-             voteBtn.style.display = 'block';
-             voteBtn.innerText = `🔓 Solicitar Desbloqueo Anticipado (${votes}/3)`;
-             if (votes >= 3) {
-                 voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado por Consenso"; voteBtn.disabled = true;
-             }
-        } else voteBtn.style.display = 'none';
-
-        // ADMIN LISTS
-        const pins = data.pins || {};
-        const pinListDiv = document.getElementById('pin-list');
-        const banListDiv = document.getElementById('ban-list');
-        pinListDiv.innerHTML = ""; banListDiv.innerHTML = ""; 
-        
-        activeRoster.forEach((p, idx) => {
-            const isBanned = data.bannedIndices?.includes(idx);
-            const banClass = isBanned ? 'chip-ban is-banned' : 'chip-ban';
-            const banText = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
-            banListDiv.innerHTML += `<div class="chip ${banClass}" onclick="togglePlayerBan(${idx}, '${p.name}')">${banText}</div>`;
-        });
-
-        Object.keys(pins).forEach(key => {
-            let name = "??";
-            const [type, idxStr] = key.split('-');
-            const idx = parseInt(idxStr);
-            if(type === 'player' && activeRoster[idx]) name = activeRoster[idx].name;
-            pinListDiv.innerHTML += `<div class="chip chip-reset" onclick="resetSinglePin('${key}', '${name}')">🔐 Reset ${name}</div>`;
-        });
-        if(pinListDiv.innerHTML === "") pinListDiv.innerHTML = `<div style="font-size:0.7rem; color:#999; width:100%;">Sin contraseñas</div>`;
-
-        // LOGS
-        const logDiv = document.getElementById('activity-log');
-        if (data.logs && data.logs.length > 0) {
-            logDiv.innerHTML = "";
-            [...data.logs].reverse().slice(0, 15).forEach(logStr => {
-                const parts = logStr.split('|');
-                if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span style="color:#94a3b8;font-size:0.7em">${parts[1]}</span></div>`;
-            });
-        } else logDiv.innerHTML = `<div style="text-align:center; color:#ccc; font-size:0.8rem">Sin actividad</div>`;
-
-        let teamsData = data.teams;
-        if (typeof teamsData === 'string') { try { teamsData = JSON.parse(teamsData); } catch(e){} }
-
-        if (teamsData && teamsData.length > 0) {
-            document.getElementById('selection-phase').style.display = 'none';
-            document.getElementById('results-phase').style.display = 'block';
-            notifyBtn.style.display = 'none';
-            
-            if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex';
-            else document.getElementById('scoreboard').style.display = 'none';
-
-            renderTeams(teamsData);
-        } else {
-            document.getElementById('selection-phase').style.display = 'block';
-            document.getElementById('results-phase').style.display = 'none';
-            notifyBtn.style.display = 'flex';
-            checkTimeLock(data.matchDate, data.lockTime);
-        }
-    }
-
-    function checkTimeLock(matchDateString, lockTimeString) {
-        const btnCreate = document.getElementById('btn-create');
-        const msg = document.getElementById('time-lock-msg');
-        const notifyBtn = document.getElementById('notify-btn');
-        const countdownDiv = document.getElementById('countdown-display');
-        
+    function checkTimeLock(dateStr, lockTimeStr) {
+        const btn = document.getElementById('btn-create');
         const now = new Date();
-        const targetTime = new Date(matchDateString);
-        const [hours, minutes] = (lockTimeString || "18:00").split(':');
-        targetTime.setHours(hours, minutes, 0, 0);
+        const target = new Date(dateStr);
+        const [h, m] = (lockTimeStr || "18:00").split(':');
+        target.setHours(h, m, 0, 0);
         
-        if (now < targetTime) {
-            const diff = targetTime - now;
-            const h = Math.floor(diff / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
-            countdownDiv.innerText = `Cierre en: ${h}h ${m}m ${s}s`;
-        } else countdownDiv.innerText = "Cierre alcanzado";
-
-        const urgentTime = new Date(targetTime);
-        urgentTime.setMinutes(targetTime.getMinutes() - 45);
-        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-
-        if (now >= urgentTime && now < targetTime && total < 10) {
-            const missing = 10 - total;
-            notifyBtn.innerHTML = `⚠️ URGENTE: FALTAN ${missing}`;
-            notifyBtn.classList.add('urgent');
-            notifyBtn.onclick = () => sharePanic(missing);
-        } else {
-            notifyBtn.innerHTML = "📢 Reenviar aviso al Grupo";
-            notifyBtn.classList.remove('urgent');
-            notifyBtn.onclick = () => shareConvocation();
-        }
-
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         
-        if (now >= targetTime || votes >= 3) {
-            btnCreate.disabled = false;
-            btnCreate.innerHTML = "CREAR EQUIPOS";
-            msg.innerText = "";
+        if (now >= target || votes >= 3) {
+            btn.disabled = false; btn.innerText = "CREAR EQUIPOS"; 
         } else {
-            btnCreate.disabled = true;
-            btnCreate.innerHTML = "🔒 CREAR EQUIPOS";
-            msg.innerText = `Disponible a las ${lockTimeString} (o con 3 votos)`;
+            btn.disabled = true; btn.innerText = "🔒 CREAR EQUIPOS";
         }
+        
+        const cd = document.getElementById('countdown-display');
+        if(now < target) {
+            const diff = target - now;
+            const hh = Math.floor(diff/(1000*60*60));
+            const mm = Math.floor((diff%(1000*60*60))/(1000*60));
+            cd.innerText = `Cierre en: ${hh}h ${mm}m`;
+        } else cd.innerText = "Cierre alcanzado";
     }
 
-    window.sharePanic = (missing) => {
-        const appUrl = window.location.href;
-        const lockTime = currentData.lockTime || "18:00";
-        const text = `⚠️ *¡ATENCIÓN! CIERRE INMINENTE* ⚠️\n\nFaltan *${missing} JUGADORES* para ser 10.\nCierre a las ${lockTime}h.\n\n👇 *APÚNTATE YA:*\n${appUrl}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-    };
-
+    // --- ADMIN ---
     window.startNewMatch = async () => {
         const dateInput = document.getElementById('date-input').value;
-        if (!dateInput) return alert("Selecciona fecha.");
+        if (!dateInput) return showToast("Selecciona fecha", "error");
         
-        // 1. Check/Init Security
-        const adminSnap = await getDoc(adminRef);
-        if(!adminSnap.exists()) await setDoc(adminRef, { pin: "9386" });
+        const selected = new Date(dateInput);
+        const today = new Date(); today.setHours(0,0,0,0);
+        if(selected < today) return showToast("Día pasado no válido", "error");
 
-        // Identificar autor
-        const myIdx = localStorage.getItem('futsal_my_index');
-        const roster = currentData.roster || initialPlayers;
-        const author = (myIdx && roster[myIdx]) ? roster[myIdx].name : "Admin";
-        const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        const adminSnap = await getDoc(configRef);
+        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
 
-        if(confirm("¿Confirmar?")) {
-            await setDoc(matchRef, { 
+        showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
+             const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+             const myId = localStorage.getItem('futsal_my_id');
+             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
+
+             await setDoc(matchRef, { 
                 matchDate: dateInput, 
-                // KEEP PREVIOUS SETTINGS
-                lockTime: currentData.lockTime || "18:00",
-                pinMode: currentData.pinMode !== false, // default true if undefined
-                voteMode: currentData.voteMode !== false,
+                lockTime: "18:00",
                 selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
                 teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
-                pins: currentData.pins || {}, unlockVotes: [] 
+                pins: currentData.pins || {}, unlockVotes: [], scores: [0,0,0],
+                timerState: 'stopped', timerLeft: 300, roster: currentData.roster || initialPlayers
             }, { merge: true });
-            window.shareConvocation(dateInput);
-        }
-    };
-
-    // REINICIAR SOLO PARTIDO (FORCE = TRUE IS AUTO)
-    window.resetCurrentMatch = async (force = false) => {
-        if(force || confirm("¿Empezar semana nueva? (Borra selecciones, mantiene jugadores)")) {
-            await updateDoc(matchRef, { 
-                matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                teams: null, logs: [], scores: [0,0,0], timerState: 'stopped', unlockVotes: [] 
-            });
-            if(!force) window.hideAdmin();
-        }
-    };
-
-    window.changeLockTime = async () => {
-        const newTime = document.getElementById('admin-time-input').value;
-        if(confirm(`¿Cambiar cierre a las ${newTime}?`)) {
-            await updateDoc(matchRef, { lockTime: newTime });
-            window.hideAdmin();
-        }
-    };
-
-    window.addNewPlayer = async () => {
-        const name = document.getElementById('new-player-name').value;
-        const level = parseInt(document.getElementById('new-player-level').value);
-        if(!name) return alert("Pon un nombre");
-        if(confirm(`¿Añadir a ${name}?`)) {
-            const newPlayer = { name: name, level: level };
-            await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
-            alert("Jugador añadido.");
-            document.getElementById('new-player-name').value = '';
-        }
-    };
-
-    window.shareConvocation = (optionalDate) => {
-        let dateStr = "";
-        const d = optionalDate ? new Date(optionalDate) : new Date(currentData.matchDate);
-        dateStr = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-        const time = currentData.lockTime || "18:00";
-        const appUrl = window.location.href;
-        const text = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 Fecha: ${dateStr.toUpperCase()}\n⏰ Hora Cierre: ${time}h\n\n👇 *Apúntate aquí:*\n${appUrl}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-    };
-
-    window.shareTeamsOnWhatsapp = () => {
-        const teams = window.currentTeamsForCopy;
-        if(!teams) return;
-        const emojis = ['⚪', '⚫', '🔴'];
-        const names = ['BLANCO', 'NEGRO', 'ROJO'];
-        const d = new Date(currentData.matchDate);
-        const dateStr = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-        let text = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${dateStr.toUpperCase()} - 20:30h\n`;
-        text += `📍 Pabellón Colegio Virgen de la Vega, Benavente\n\n`;
-        
-        teams.forEach((team, idx) => {
-            text += `${emojis[idx]} *EQUIPO ${names[idx]}* (${team.length})\n`;
-            team.forEach(p => text += `- ${p.name}\n`);
-            text += "\n";
         });
-        text += `🔗 Ver en la web: ${window.location.href}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    };
+
+    window.resetCurrentMatch = async () => {
+        if(currentData.matchDate && currentData.teams) {
+             const histRef = collection(db, "history");
+             await addDoc(histRef, { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
+        }
+        showConfirm("¿Reiniciar?", "Se guardará historial y limpiará lista.", async () => {
+             await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
+             window.hideAdmin();
+        });
     };
 
     window.attemptGeneration = () => {
         const targetTime = new Date(currentData.matchDate);
         const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
         targetTime.setHours(hours, minutes, 0, 0);
+        
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
-
-        const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
-
-        if (new Date() < targetTime && !canUnlockByVote) return alert(`Espera a las ${currentData.lockTime} o votad 3 personas.`);
+        const canUnlock = (votes >= 3);
+        
+        if (new Date() < targetTime && !canUnlock) return showToast(`Espera a las ${currentData.lockTime} o votad.`, "error");
+        
         const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-        if (total < 8) return alert("Mínimo 8.");
-        if (total <= 12) triggerGeneration(2); else triggerGeneration(3);
+        if (total < 8) return showToast("Mínimo 8 jugadores", "error");
+        
+        triggerGeneration(total <= 12 ? 2 : 3);
     };
 
     window.triggerGeneration = async (numTeams) => {
         document.getElementById('loader').style.display = 'flex';
         const roster = currentData.roster || initialPlayers;
-        const sPlayers = (currentData.selectedPlayers || []).map(i => roster[i]);
-        const sGuests = (currentData.selectedGuests || []).map(i => ({...guestsDB[i], level: 0, isGuest: true}));
-        let l3 = shuffle([...sPlayers.filter(p => p.level === 3)]);
-        let l2 = shuffle([...sPlayers.filter(p => p.level === 2)]);
-        let l1 = shuffle([...sPlayers.filter(p => p.level === 1)]);
-        let lg = shuffle([...sGuests]);
+        const sPlayers = (currentData.selectedPlayers || []).map(id => roster.find(p => p.id === id)).filter(Boolean);
+        const sGuests = (currentData.selectedGuests || []).map(id => {
+            const g = guestsDB.find(g => g.id === id);
+            return g ? {...g, level: 0, isGuest: true} : null;
+        }).filter(Boolean);
+
+        let l3 = shuffle(sPlayers.filter(p => p.level === 3));
+        let l2 = shuffle(sPlayers.filter(p => p.level === 2));
+        let l1 = shuffle(sPlayers.filter(p => p.level === 1));
+        let lg = shuffle(sGuests);
+        
         let pool = [...l3, ...l2, ...l1, ...lg];
         let teams = Array.from({ length: numTeams }, () => []);
-        pool.forEach((player, i) => { teams[i % numTeams].push(player); });
+        pool.forEach((p, i) => teams[i % numTeams].push(p));
         teams.forEach(t => shuffle(t));
-        const teamsString = JSON.stringify(teams);
         
-        const myIdx = localStorage.getItem('futsal_my_index');
-        const author = (myIdx && roster[myIdx]) ? roster[myIdx].name : "Sistema";
-        const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        const myId = localStorage.getItem('futsal_my_id');
+        const author = roster.find(p => p.id === myId)?.name || "Sistema";
+        const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
 
         await updateDoc(matchRef, { 
-            teams: teamsString,
+            teams: JSON.stringify(teams),
             logs: arrayUnion(`⚽ Equipos generados por ${author}|${now}`)
         });
         document.getElementById('loader').style.display = 'none';
@@ -1019,41 +735,49 @@
         window.currentTeamsForCopy = teams;
     }
 
-    // ADMIN
-    let tapCount = 0; let tapTimer = null;
+    window.shareTeamsOnWhatsapp = () => {
+         const t = window.currentTeamsForCopy; if(!t) return;
+         const d = new Date(currentData.matchDate);
+         const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+         let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`;
+         const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴'];
+         t.forEach((team, i) => {
+             txt += `${em[i]} *${names[i]}* (${team.length})\n`;
+             team.forEach(p => txt += `- ${p.name}\n`);
+             txt += `\n`;
+         });
+         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    };
+
+    let taps = 0;
     window.secretAdminTap = async () => {
-        tapCount++; clearTimeout(tapTimer);
-        tapTimer = setTimeout(() => { tapCount = 0; }, 2000);
-        if (tapCount >= 5) {
+        taps++; setTimeout(() => taps = 0, 2000);
+        if(taps === 5) {
             const entered = prompt("🔑 PIN Admin:");
-            // Check DB
-            const adminSnap = await getDoc(adminRef);
-            if(adminSnap.exists() && adminSnap.data().pin === entered) {
-                 document.getElementById('admin-zone').style.display = 'block';
-            } else {
-                 alert("Error de acceso");
-            }
-            tapCount = 0;
+            const snap = await getDoc(configRef);
+            const valid = snap.exists() ? snap.data().pin : "9386";
+            if(entered === valid) document.getElementById('admin-zone').style.display = 'block';
+            else showToast("Error", "error");
+            taps = 0;
         }
     };
     window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
-    window.undoTeams = async () => confirm("¿Deshacer?") && (await updateDoc(matchRef, { teams: null }), window.hideAdmin());
-    
-    // RESET TOTAL
-    window.forceReset = async () => confirm("⚠ PELIGRO: ESTO BORRA PINS Y TODO. ¿SEGURO?") && (await setDoc(matchRef, { matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true, selectedPlayers: [], selectedGuests: [], bannedIndices: [], guestInviters: {}, teams: null, logs: [], pins: {}, unlockVotes: [], scores:[0,0,0], timerState: 'stopped', timerLeft: 300, roster: initialPlayers }), window.hideAdmin());
-    
-    window.forceGeneration = () => {
-         const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-         if (total < 8) return alert("Mínimo 8.");
-         if(confirm("¿Forzar?")) { (total <= 12) ? triggerGeneration(2) : triggerGeneration(3); window.hideAdmin(); }
+    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
+    window.forceGeneration = () => triggerGeneration((currentData.selectedPlayers.length + currentData.selectedGuests.length) <= 12 ? 2 : 3);
+    window.showStats = async () => {
+        const hRef = collection(db, "history");
+        const snap = await getDocs(hRef);
+        // Simple alert for now as requested
+        alert(`Partidos jugados en histórico: ${snap.size}`);
     };
-    window.resetSinglePin = async (key, name) => {
-        if(confirm(`¿Quitar la contraseña a ${name}?`)) {
-            const newPins = {...currentData.pins};
-            delete newPins[key];
-            await updateDoc(matchRef, { pins: newPins });
-        }
+
+    // Install PWA
+    let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
+    window.installApp = async () => {
+        if(defPrompt) { defPrompt.prompt(); defPrompt = null; }
+        else alert("Usa el menú del navegador -> Instalar aplicación");
     };
+
 </script>
 </body>
 </html>
