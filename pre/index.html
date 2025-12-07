@@ -63,6 +63,7 @@
         .player-checkbox.is-me { border: 2px solid var(--gold); background-color: #fffbeb; }
         .lock-icon { font-size: 0.8em; margin-left: auto; opacity: 0.6; }
         .order-badge { position: absolute; top: -6px; right: -6px; background: var(--brand-blue); color: white; font-size: 0.6rem; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .player-checkbox.selected .order-badge { transform: scale(1); }
         .player-checkbox.reserve .order-badge { background: var(--reserve); }
         
         .guest-label { border-style: dashed; flex-direction: column; align-items: flex-start; gap: 2px; }
@@ -72,13 +73,16 @@
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
         .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
         
+        .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
+        .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
+        
         .log-container { margin-top: 30px; background: #f1f5f9; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
         .log-title { font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
         .log-entry { font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: #475569; display: flex; justify-content: space-between; }
 
         /* ZONA JUEGO */
         .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
-        .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; }
+        .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
         .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
         .timer-display.finished { color: #ef4444; border-color: #ef4444; font-size: 1.8rem; animation: blink 0.5s infinite; }
         .t-btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin: 0 5px; }
@@ -107,6 +111,17 @@
         #setup-panel { background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 20px; }
         input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
 
+        /* MENSAJE CIERRE */
+        #time-lock-msg { text-align: center; display:block; color:#94a3b8; font-size:0.75rem; margin-bottom:20px; }
+
+        /* COMPONENTES ADMIN */
+        .pin-list, .chip-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; margin-bottom: 15px; border-top: 1px solid #fca5a5; padding-top: 10px; }
+        .chip { background: white; border: 1px solid #ccc; color: #555; padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
+        .new-player-form { background: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: flex; gap: 5px; align-items: center; }
+        .new-player-form input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .new-player-form select { width: 30%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .new-player-btn { background: #16a34a; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -131,9 +146,41 @@
         <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE v2.0</div>
         
         <button class="admin-btn admin-btn-green" onclick="resetCurrentMatch()">🔄 Reiniciar Partido (Guardar Historial)</button>
-        <button class="admin-btn admin-btn-blue" onclick="forceGeneration()">⚡ Forzar Creación Ya</button>
+        
+        <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🛡️ Seguridad & Votación:</div>
+        <div style="display:flex; gap:5px;">
+            <button id="pin-mode-btn" class="admin-btn" style="margin:0" onclick="togglePinMode()">PIN...</button>
+            <button id="vote-mode-btn" class="admin-btn" style="margin:0" onclick="toggleVoteMode()">VOTO...</button>
+        </div>
+
+        <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🕒 Hora Cierre:</div>
+        <div style="display:flex; gap:10px; background:white; padding:10px; border-radius:8px;">
+            <input type="time" id="admin-time-input" value="18:00" style="padding:5px;">
+            <button class="admin-btn admin-btn-blue" style="margin:0; width:auto;" onclick="changeLockTime()">Guardar</button>
+        </div>
+
+        <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">➕ Alta Jugador:</div>
+        <div class="new-player-form">
+            <input type="text" id="new-player-name" placeholder="Nombre">
+            <select id="new-player-level">
+                <option value="1">Nivel 1</option>
+                <option value="2" selected>Nivel 2</option>
+                <option value="3">Nivel 3</option>
+            </select>
+            <button class="new-player-btn" onclick="addNewPlayer()">+</button>
+        </div>
+
+        <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🚫 BLOQUEAR JUGADORES</div>
+        <div id="ban-list" class="chip-list"><div style="font-size:0.7rem; color:#999;">Cargando...</div></div>
+
+        <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🔐 RESET PINS</div>
+        <div id="pin-list" class="chip-list"><div style="font-size:0.7rem; color:#999;">Cargando...</div></div>
+
+        <button class="admin-btn admin-btn-blue" style="margin-top:20px;" onclick="forceGeneration()">⚡ Forzar Creación Ya</button>
         <button class="admin-btn" onclick="undoTeams()">🔙 Deshacer Equipos</button>
         <button class="admin-btn" onclick="showStats()">📊 Ver Ranking (Beta)</button>
+        <button class="admin-btn" style="margin-top:15px; background:#000;" onclick="forceReset()">🔥 RESET TOTAL (Peligro)</button>
+
         <div style="margin-top:10px; font-size:0.7rem; cursor:pointer; text-decoration:underline" onclick="hideAdmin()">Cerrar</div>
     </div>
 
@@ -142,9 +189,12 @@
         <p style="color:#64748b; margin-bottom:20px;">Elige la fecha para abrir la convocatoria:</p>
         <input type="date" id="date-input">
         <button class="action-btn" onclick="startNewMatch()">ABRIR CONVOCATORIA</button>
+        <div class="install-center"><button class="install-app-btn" onclick="installApp()">📲 Instalar App</button></div>
     </div>
 
     <div id="active-match-panel" style="display:none;">
+        <button id="notify-btn" class="whatsapp-btn" style="margin-bottom:20px; background:#dcfce7; color:#166534; border:1px solid #86efac;" onclick="shareConvocation()">📢 Reenviar aviso al Grupo</button>
+
         <div class="status-bar">
             <div class="status-header">
                 <div><span class="status-label">CONVOCADOS</span> <span class="status-sub" id="status-text">Máx 18</span></div>
@@ -155,8 +205,11 @@
         </div>
         
         <div id="selection-phase">
+            <div class="install-center"><button class="install-app-btn" onclick="installApp()">📲 Instalar App</button></div>
+
             <h3>PLANTILLA</h3>
             <div class="player-group" id="player-container"></div>
+
             <h3>Invitados</h3>
             <div class="player-group" id="guest-container"></div>
 
@@ -167,7 +220,7 @@
 
             <button id="vote-btn" style="width:100%; background:#fef08a; padding:10px; border-radius:8px; border:1px solid #facc15; font-weight:bold; margin:10px 0; display:none;" onclick="voteToUnlock()">🔓 Solicitar Desbloqueo (0/3)</button>
             <button id="btn-create" class="action-btn" onclick="attemptGeneration()">CREAR EQUIPOS</button>
-            <span id="time-lock-msg" style="text-align:center; display:block; color:#94a3b8; font-size:0.75rem; margin-bottom:20px;"></span>
+            <span id="time-lock-msg"></span>
         </div>
 
         <div id="results-phase" style="display:none;">
@@ -180,9 +233,9 @@
                     <button class="t-btn t-reset" onclick="resetTimer()">↺ RESET</button>
                 </div>
                 <div id="scoreboard" class="scoreboard" style="display:none;">
-                    <div class="score-box"><span class="score-team sb-blanco">BLANCO</span><span id="sc-blanco" class="score-val">0</span><div><button class="score-btn" onclick="updateScore(0, 1)">+</button><button class="score-btn" onclick="updateScore(0, -1)">-</button></div></div>
-                    <div class="score-box"><span class="score-team sb-negro">NEGRO</span><span id="sc-negro" class="score-val">0</span><div><button class="score-btn" onclick="updateScore(1, 1)">+</button><button class="score-btn" onclick="updateScore(1, -1)">-</button></div></div>
-                    <div class="score-box"><span class="score-team sb-rojo">ROJO</span><span id="sc-rojo" class="score-val">0</span><div><button class="score-btn" onclick="updateScore(2, 1)">+</button><button class="score-btn" onclick="updateScore(2, -1)">-</button></div></div>
+                    <div class="score-box"><span class="score-team sb-blanco">BLANCO</span><span id="sc-blanco" class="score-val">0</span><div><button class="score-btn" type="button" onclick="updateScore(0, 1)">+</button><button class="score-btn" type="button" onclick="updateScore(0, -1)">-</button></div></div>
+                    <div class="score-box"><span class="score-team sb-negro">NEGRO</span><span id="sc-negro" class="score-val">0</span><div><button class="score-btn" type="button" onclick="updateScore(1, 1)">+</button><button class="score-btn" type="button" onclick="updateScore(1, -1)">-</button></div></div>
+                    <div class="score-box"><span class="score-team sb-rojo">ROJO</span><span id="sc-rojo" class="score-val">0</span><div><button class="score-btn" type="button" onclick="updateScore(2, 1)">+</button><button class="score-btn" type="button" onclick="updateScore(2, -1)">-</button></div></div>
                 </div>
             </div>
 
@@ -193,7 +246,7 @@
                 <div class="res-location">📍 Pabellón Colegio Virgen de la Vega</div>
             </div>
             <div class="teams-container" id="teams-result"></div>
-            <button style="width:100%; background:#25d366; color:white; border:none; padding:16px; border-radius:12px; font-weight:800; cursor:pointer;" onclick="shareTeamsOnWhatsapp()">📲 Enviar Equipos al Grupo</button>
+            <button class="whatsapp-btn" style="display:flex; justify-content:center;" onclick="shareTeamsOnWhatsapp()">📲 Enviar Equipos al Grupo</button>
         </div>
     </div>
 </div>
@@ -213,17 +266,17 @@
     import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // -------------------------------------------------------------
-    // ⚠️ PEGA AQUÍ TUS CLAVES DE FIREBASE ⚠️
+    // ⚠️ PEGA AQUÍ TUS CLAVES DE FIREBASE (BETA) ⚠️
     // -------------------------------------------------------------
-  const firebaseConfig = {
-    apiKey: "AIzaSyAaL3Rs5SI4lVRYHMFYDPrFgXdtfuSNYJg",
-    authDomain: "ampa-c551f.firebaseapp.com",
-    projectId: "ampa-c551f",
-    storageBucket: "ampa-c551f.firebasestorage.app",
-    messagingSenderId: "762603084994",
-    appId: "1:762603084994:web:0dbc8d1c838fbe34a36f5b",
-    measurementId: "G-GGNSDCHWWC"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAaL3Rs5SI4lVRYHMFYDPrFgXdtfuSNYJg",
+  authDomain: "ampa-c551f.firebaseapp.com",
+  projectId: "ampa-c551f",
+  storageBucket: "ampa-c551f.firebasestorage.app",
+  messagingSenderId: "762603084994",
+  appId: "1:762603084994:web:0dbc8d1c838fbe34a36f5b",
+  measurementId: "G-GGNSDCHWWC"
+};
     // -------------------------------------------------------------
 
     let app, db, matchRef, configRef;
@@ -270,19 +323,16 @@
 
     let currentData = { 
         matchDate: null, 
-        lockTime: "18:00",
-        selectedPlayers: [], 
-        selectedGuests: [], 
-        guestInviters: {}, 
-        teams: null, 
-        logs: [], 
-        pins: {}, 
-        unlockVotes: [],
-        scores: [0,0,0],
+        lockTime: "18:00", // Default v12
+        pinMode: true, voteMode: true,
+        selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+        bannedIndices: [], // Indices se mantiene por compatibilidad visual, pero usaremos IDs en futuro
+        teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0],
         timerState: 'stopped', timerEnd: 0, timerLeft: 300,
         roster: []
     };
     
+    let timerInterval = null;
     let hasBeeped = false;
 
     // --- UTILS UX ---
@@ -336,8 +386,8 @@
         } else {
             // First run init
             setDoc(matchRef, { 
-                matchDate: null, lockTime: "18:00", 
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+                matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, bannedIndices: [],
                 teams: null, logs: [], pins: {}, unlockVotes: [], scores:[0,0,0], 
                 timerState: 'stopped', timerLeft: 300, roster: initialPlayers 
             });
@@ -369,17 +419,20 @@
             if (p.id === myId) div.classList.add('is-me');
             
             const isSelected = data.selectedPlayers?.includes(p.id);
+            const isBanned = data.bannedIndices?.includes(p.id);
             const pins = data.pins || {};
-            const lockIcon = pins[p.id] ? '<span class="lock-icon">🔒</span>' : '';
+            const lockIcon = (data.pinMode !== false && pins[p.id]) ? '<span class="lock-icon">🔒</span>' : '';
             
             let badgeContent = '';
             if(isSelected) {
                 div.classList.add('selected');
                 badgeContent = data.selectedPlayers.indexOf(p.id) + 1;
             }
+            
+            if(isBanned) div.classList.add('banned');
 
             div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
-            div.onclick = () => window.toggleSelection('player', p.id, p.name);
+            if(!isBanned) div.onclick = () => window.toggleSelection('player', p.id, p.name);
             container.appendChild(div);
         });
 
@@ -400,6 +453,7 @@
             guestContainer.appendChild(div);
         });
 
+        // Panels
         const setupPanel = document.getElementById('setup-panel');
         const activePanel = document.getElementById('active-match-panel');
         const headerDate = document.getElementById('header-date');
@@ -411,9 +465,12 @@
             setupPanel.style.display = 'none'; activePanel.style.display = 'block';
             const d = new Date(data.matchDate);
             headerDate.innerText = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-            document.getElementById('res-date').innerText = headerDate.innerText;
+            
+            // Update Card
+            document.querySelector('.res-date').innerText = headerDate.innerText;
         }
 
+        // Count & Progress
         const total = (data.selectedPlayers?.length || 0) + (data.selectedGuests?.length || 0);
         document.getElementById('player-count').innerText = `${total} / 18`;
         const bar = document.getElementById('progress-fill');
@@ -422,10 +479,37 @@
         else if (total < 12) bar.style.backgroundColor = "#eab308";
         else bar.style.backgroundColor = "#22c55e";
 
+        // ADMIN BUTTONS UI
+        const pinBtn = document.getElementById('pin-mode-btn');
+        if (data.pinMode !== false) { pinBtn.innerText = "🟢 PIN ACTIVADO"; pinBtn.className = "admin-btn pin-on"; } 
+        else { pinBtn.innerText = "🔴 PIN DESACTIVADO"; pinBtn.className = "admin-btn pin-off"; }
+
+        const voteAdminBtn = document.getElementById('vote-mode-btn');
+        if (data.voteMode !== false) { voteAdminBtn.innerText = "🟢 VOTOS ACTIVOS"; voteAdminBtn.className = "admin-btn pin-on"; } 
+        else { voteAdminBtn.innerText = "🔴 VOTOS OFF"; voteAdminBtn.className = "admin-btn pin-off"; }
+
+        document.getElementById('admin-time-input').value = data.lockTime || "18:00";
+
+        // Admin Lists
+        const banList = document.getElementById('ban-list');
+        const pinList = document.getElementById('pin-list');
+        banList.innerHTML = ""; pinList.innerHTML = "";
+        
+        activeRoster.forEach(p => {
+             const isBanned = data.bannedIndices?.includes(p.id);
+             const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
+             const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
+             banList.innerHTML += `<div class="${banClass}" onclick="toggleBan('${p.id}', '${p.name}')">${text}</div>`;
+             
+             if(data.pins && data.pins[p.id]) {
+                 pinList.innerHTML += `<div class="chip chip-reset" onclick="resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
+             }
+        });
+
         // Votes
         const votes = data.unlockVotes ? data.unlockVotes.length : 0;
         const voteBtn = document.getElementById('vote-btn');
-        if (!data.teams && total >= 8) {
+        if (!data.teams && total >= 8 && data.voteMode !== false) {
             voteBtn.style.display = 'block';
             voteBtn.innerText = `🔓 Solicitar Desbloqueo (${votes}/3)`;
             if(votes >= 3) {
@@ -443,17 +527,19 @@
             });
         }
 
-        // Teams
+        // Teams & Scoreboard
         let teamsData = data.teams;
         if (typeof teamsData === 'string') { try { teamsData = JSON.parse(teamsData); } catch(e){} }
 
         if (teamsData && teamsData.length > 0) {
             document.getElementById('selection-phase').style.display = 'none';
             document.getElementById('results-phase').style.display = 'block';
+            document.getElementById('notify-btn').style.display = 'none';
             
             if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex';
             else document.getElementById('scoreboard').style.display = 'none';
             
+            // Update scores
             const sc = data.scores || [0,0,0];
             document.getElementById('sc-blanco').innerText = sc[0];
             document.getElementById('sc-negro').innerText = sc[1];
@@ -463,6 +549,7 @@
         } else {
             document.getElementById('selection-phase').style.display = 'block';
             document.getElementById('results-phase').style.display = 'none';
+            document.getElementById('notify-btn').style.display = 'flex';
             checkTimeLock(data.matchDate, data.lockTime);
         }
     }
@@ -486,7 +573,8 @@
             if(inviterObj) inviterName = inviterObj.name;
         }
 
-        if (type === 'player') {
+        // SEGURIDAD PIN
+        if (type === 'player' && currentData.pinMode !== false) {
             if (currentPins[id]) {
                 const entered = prompt(`🔒 PIN para ${name}:`);
                 if (entered !== currentPins[id]) return showToast("⛔ PIN Incorrecto", "error");
@@ -495,7 +583,9 @@
                 if (!newPin || newPin.length < 3) return showToast("Debes poner un PIN", "error");
                 currentPins[id] = newPin;
             }
+        }
 
+        if (type === 'player') {
             if (newPlayers.includes(id)) {
                 showConfirm("¿Desmarcarse?", `¿Seguro que quieres borrar a ${name}?`, async () => {
                     newPlayers = newPlayers.filter(i => i !== id);
@@ -566,11 +656,12 @@
             const m = Math.floor(left / 60).toString().padStart(2, '0');
             const s = (left % 60).toString().padStart(2, '0');
             display.innerText = `${m}:${s}`;
-            btn.innerText = "⏸ PAUSA"; btn.classList.add('t-stop');
+            btn.innerText = "⏸ PAUSA";
+            btn.classList.add('t-stop');
             
             if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; }
             else if(left <= 0) { 
-                display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN";
+                display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; 
                 if(!hasBeeped) {
                      const ctx = new (window.AudioContext || window.webkitAudioContext)();
                      const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000);
@@ -603,17 +694,19 @@
 
     function checkTimeLock(dateStr, lockTimeStr) {
         const btn = document.getElementById('btn-create');
+        const msg = document.getElementById('time-lock-msg');
         const now = new Date();
         const target = new Date(dateStr);
         const [h, m] = (lockTimeStr || "18:00").split(':');
         target.setHours(h, m, 0, 0);
         
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
+        const canUnlock = (currentData.voteMode !== false && votes >= 3);
         
-        if (now >= target || votes >= 3) {
-            btn.disabled = false; btn.innerText = "CREAR EQUIPOS"; 
+        if (now >= target || canUnlock) {
+            btn.disabled = false; btn.innerText = "CREAR EQUIPOS"; msg.innerText = "";
         } else {
-            btn.disabled = true; btn.innerText = "🔒 CREAR EQUIPOS";
+            btn.disabled = true; btn.innerText = "🔒 CREAR EQUIPOS"; msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
         }
         
         const cd = document.getElementById('countdown-display');
@@ -625,116 +718,13 @@
         } else cd.innerText = "Cierre alcanzado";
     }
 
-    // --- ADMIN ---
-    window.startNewMatch = async () => {
-        const dateInput = document.getElementById('date-input').value;
-        if (!dateInput) return showToast("Selecciona fecha", "error");
-        
-        const selected = new Date(dateInput);
-        const today = new Date(); today.setHours(0,0,0,0);
-        if(selected < today) return showToast("Día pasado no válido", "error");
-
-        const adminSnap = await getDoc(configRef);
-        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
-
-        showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
-             const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-             const myId = localStorage.getItem('futsal_my_id');
-             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
-
-             await setDoc(matchRef, { 
-                matchDate: dateInput, 
-                lockTime: "18:00",
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
-                pins: currentData.pins || {}, unlockVotes: [], scores: [0,0,0],
-                timerState: 'stopped', timerLeft: 300, roster: currentData.roster || initialPlayers
-            }, { merge: true });
-        });
+    // SHARES
+    window.shareConvocation = (d) => {
+        const date = d ? new Date(d) : new Date(currentData.matchDate);
+        const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     };
-
-    window.resetCurrentMatch = async () => {
-        if(currentData.matchDate && currentData.teams) {
-             const histRef = collection(db, "history");
-             await addDoc(histRef, { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
-        }
-        showConfirm("¿Reiniciar?", "Se guardará historial y limpiará lista.", async () => {
-             await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
-             window.hideAdmin();
-        });
-    };
-
-    window.attemptGeneration = () => {
-        const targetTime = new Date(currentData.matchDate);
-        const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
-        targetTime.setHours(hours, minutes, 0, 0);
-        
-        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
-        const canUnlock = (votes >= 3);
-        
-        if (new Date() < targetTime && !canUnlock) return showToast(`Espera a las ${currentData.lockTime} o votad.`, "error");
-        
-        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-        if (total < 8) return showToast("Mínimo 8 jugadores", "error");
-        
-        triggerGeneration(total <= 12 ? 2 : 3);
-    };
-
-    window.triggerGeneration = async (numTeams) => {
-        document.getElementById('loader').style.display = 'flex';
-        const roster = currentData.roster || initialPlayers;
-        const sPlayers = (currentData.selectedPlayers || []).map(id => roster.find(p => p.id === id)).filter(Boolean);
-        const sGuests = (currentData.selectedGuests || []).map(id => {
-            const g = guestsDB.find(g => g.id === id);
-            return g ? {...g, level: 0, isGuest: true} : null;
-        }).filter(Boolean);
-
-        let l3 = shuffle(sPlayers.filter(p => p.level === 3));
-        let l2 = shuffle(sPlayers.filter(p => p.level === 2));
-        let l1 = shuffle(sPlayers.filter(p => p.level === 1));
-        let lg = shuffle(sGuests);
-        
-        let pool = [...l3, ...l2, ...l1, ...lg];
-        let teams = Array.from({ length: numTeams }, () => []);
-        pool.forEach((p, i) => teams[i % numTeams].push(p));
-        teams.forEach(t => shuffle(t));
-        
-        const myId = localStorage.getItem('futsal_my_id');
-        const author = roster.find(p => p.id === myId)?.name || "Sistema";
-        const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-
-        await updateDoc(matchRef, { 
-            teams: JSON.stringify(teams),
-            logs: arrayUnion(`⚽ Equipos generados por ${author}|${now}`)
-        });
-        document.getElementById('loader').style.display = 'none';
-    };
-
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    function renderTeams(teams) {
-        const resDiv = document.getElementById('teams-result');
-        resDiv.innerHTML = '';
-        const names = ['BLANCO', 'NEGRO', 'ROJO'];
-        const classes = ['team-blanco', 'team-negro', 'team-rojo'];
-        teams.forEach((team, idx) => {
-            let html = `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`;
-            team.forEach(p => {
-                const name = p.isGuest ? `<span class="guest-result">${p.name}</span>` : p.name;
-                html += `<li>${name}</li>`;
-            });
-            html += `</ul></div>`;
-            resDiv.innerHTML += html;
-        });
-        window.currentTeamsForCopy = teams;
-    }
-
     window.shareTeamsOnWhatsapp = () => {
          const t = window.currentTeamsForCopy; if(!t) return;
          const d = new Date(currentData.matchDate);
@@ -748,7 +738,8 @@
          });
          window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
     };
-
+    
+    // ADMIN TOOLS
     let taps = 0;
     window.secretAdminTap = async () => {
         taps++; setTimeout(() => taps = 0, 2000);
@@ -762,13 +753,60 @@
         }
     };
     window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
-    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
-    window.forceGeneration = () => triggerGeneration((currentData.selectedPlayers.length + currentData.selectedGuests.length) <= 12 ? 2 : 3);
     window.showStats = async () => {
         const hRef = collection(db, "history");
         const snap = await getDocs(hRef);
-        // Simple alert for now as requested
-        alert(`Partidos jugados en histórico: ${snap.size}`);
+        alert(`Partidos en histórico: ${snap.size} (Estadísticas completas en v2.1)`);
+    };
+    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
+    window.forceGeneration = () => triggerGeneration((currentData.selectedPlayers.length + currentData.selectedGuests.length) <= 12 ? 2 : 3);
+    window.changeLockTime = async () => {
+        const t = document.getElementById('admin-time-input').value;
+        await updateDoc(matchRef, { lockTime: t });
+    };
+    
+    // ADMIN TOGGLES
+    window.togglePinMode = async () => {
+        const newState = currentData.pinMode === false ? true : false;
+        await updateDoc(matchRef, { pinMode: newState });
+    };
+    window.toggleVoteMode = async () => {
+        const newState = currentData.voteMode === false ? true : false;
+        await updateDoc(matchRef, { voteMode: newState });
+    };
+    window.addNewPlayer = async () => {
+        const name = document.getElementById('new-player-name').value;
+        const level = parseInt(document.getElementById('new-player-level').value);
+        if(!name) return showToast("Falta nombre", "error");
+        
+        const id = name.toLowerCase().replace(/\s/g, '_');
+        const newPlayer = { id: id, name: name, level: level };
+        await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
+        showToast("Jugador añadido", "success");
+    };
+    
+    window.toggleBan = async (id, name) => {
+        let list = [...(currentData.bannedIndices || [])];
+        if(list.includes(id)) {
+            list = list.filter(i => i !== id);
+            showToast(`${name} desbloqueado`, "success");
+        } else {
+            list.push(id);
+            // remove from selection if banned
+            if(currentData.selectedPlayers.includes(id)) {
+                let s = currentData.selectedPlayers.filter(i => i !== id);
+                await updateDoc(matchRef, { selectedPlayers: s });
+            }
+            showToast(`${name} bloqueado`, "error");
+        }
+        await updateDoc(matchRef, { bannedIndices: list });
+    };
+    window.resetPin = async (id, name) => {
+        if(confirm(`¿Resetear PIN de ${name}?`)) {
+            let p = {...currentData.pins}; delete p[id];
+            await updateDoc(matchRef, { pins: p });
+            showToast("PIN reseteado", "success");
+        }
     };
 
     // Install PWA
