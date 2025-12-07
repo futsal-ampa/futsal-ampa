@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal</title>
+    <title>AMPA Futsal v2.0</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -23,7 +23,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* HEADER */
         header { background-color: var(--brand-dark); width: 100%; padding: 15px 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; user-select: none; }
         h1 { text-align: center; color: white; font-size: 1.1rem; margin: 0; font-weight: 800; text-transform: uppercase; line-height: 1.2; cursor: pointer; }
         .match-date-display { color: var(--accent); font-size: 0.8rem; margin-top: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
@@ -47,8 +46,9 @@
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
         .modal-btn.cancel { background: #e2e8f0; color: #475569; }
         .modal-btn.confirm { background: var(--brand-dark); color: white; }
+        .modal-btn.danger { background: var(--danger); color: white; }
 
-        /* COMPONENTES UI */
+        /* UI ELEMENTS */
         .match-info-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .res-date { font-weight: 800; font-size: 1rem; color: var(--brand-dark); text-transform: uppercase; margin-bottom: 5px; }
         .res-time { font-weight: 800; color: var(--brand-blue); font-size: 1.1rem; margin-bottom: 5px; display: block; }
@@ -102,19 +102,17 @@
         .guest-label.selected { background-color: #fffbeb; border-color: var(--accent); color: #b45309; border-style: solid; }
         .invited-by { font-size: 0.6rem; color: #78350f; font-weight: normal; width: 100%; text-align: left; padding-left: 20px; }
 
-        /* BOTONES DE ACCIÓN GRANDES */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
         .action-btn:active { transform: scale(0.98); }
         .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
         
         .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         
-        .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .notify-btn.urgent { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; animation: pulseBtn 2s infinite; }
         
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
 
-        /* HISTORIAL */
         .log-container { margin-top: 30px; background: #f1f5f9; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
         .log-title { font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
         .log-entry { font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: #475569; display: flex; justify-content: space-between; }
@@ -133,23 +131,24 @@
         .admin-title { color: #e11d48; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
         .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 0.8rem; margin: 5px 0; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px; }
         .admin-btn-blue { background-color: var(--brand-blue); }
+        .admin-btn-dark { background-color: #334155; }
         .admin-btn-green { background-color: #16a34a; }
         .admin-btn-yellow { background-color: #eab308; color: #422006; }
         
         .pin-toggle-btn { width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; font-size: 0.8rem; }
         .pin-on { background-color: #22c55e; color: white; }
         .pin-off { background-color: #ef4444; color: white; }
-
-        .chip-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 5px; margin-bottom: 15px; padding-top: 5px; border-top: 1px solid #fca5a5; }
-        .chip { background: white; border: 1px solid #ccc; color: #555; padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .chip-reset { border-color: #eab308; color: #a16207; } 
-        .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
-
+        
         .new-player-form { background: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: flex; gap: 5px; align-items: center; }
         .new-player-form input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
         .new-player-form select { width: 30%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
         .new-player-btn { background: #16a34a; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
+        
+        .chip-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 5px; margin-bottom: 15px; padding-top: 5px; border-top: 1px solid #fca5a5; }
+        .chip { background: white; border: 1px solid #ccc; color: #555; padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .chip-reset { border-color: #eab308; color: #a16207; } .chip-reset:hover { background: #eab308; color: white; }
+        .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
+        
         .time-control { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px; }
         .time-control input { width: auto; margin: 0; padding: 8px; font-size: 1rem; border: 1px solid #ccc; }
         .time-control button { width: auto; margin: 0; padding: 8px 15px; font-size: 0.8rem; }
@@ -159,8 +158,8 @@
         input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
 
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes pulseTimer { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
@@ -170,7 +169,7 @@
 <div id="loader" class="loading-overlay">Conectando...</div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.0</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -179,7 +178,7 @@
     <div id="user-greeting"></div>
 
     <div id="admin-zone">
-        <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE</div>
+        <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE v2.0</div>
         <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">🔄 Reiniciar Partido (Nuevo Día)</button>
         
         <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🛡️ Seguridad & Votación:</div>
@@ -318,6 +317,7 @@ const firebaseConfig = {
         configRef = doc(db, "config", "admin_settings"); 
     } catch (e) { console.error(e); }
 
+    // ROSTER INICIAL (ID basado en nombre slug)
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3 },
         { id: "jhon", name: "Jhon", level: 3 },
@@ -352,17 +352,25 @@ const firebaseConfig = {
     ];
 
     let currentData = { 
-        matchDate: null, lockTime: "18:00", 
+        matchDate: null, 
+        lockTime: "18:00", 
         pinMode: true, voteMode: true,
-        selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-        bannedIndices: [], teams: null, logs: [], pins: {}, unlockVotes: [],
-        scores: [0,0,0], timerState: 'stopped', timerEnd: 0, timerLeft: 300,
+        selectedPlayers: [], selectedGuests: [], 
+        bannedIndices: [], // Store IDs in v2.0 logic
+        guestInviters: {}, 
+        teams: null, 
+        logs: [], 
+        pins: {}, 
+        unlockVotes: [],
+        scores: [0,0,0],
+        timerState: 'stopped', timerEnd: 0, timerLeft: 300,
         roster: []
     };
     
     let timerInterval = null;
     let hasBeeped = false;
 
+    // --- UTILS UX ---
     function showToast(msg, type = 'info') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -370,7 +378,10 @@ const firebaseConfig = {
         toast.innerText = msg;
         container.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     function showConfirm(title, text, onConfirm, showInput = false) {
@@ -387,15 +398,20 @@ const firebaseConfig = {
         modal.style.display = 'flex';
     }
 
+    // --- INICIALIZACIÓN ---
     document.getElementById('date-input').valueAsDate = new Date();
     
+    // --- FIREBASE SYNC ---
     onSnapshot(matchRef, (docSnap) => {
         document.getElementById('loader').style.display = 'none';
         if (docSnap.exists()) {
             currentData = docSnap.data();
-            if (!currentData.roster || currentData.roster.length === 0) updateDoc(matchRef, { roster: initialPlayers });
+            if (!currentData.roster || currentData.roster.length === 0) {
+                updateDoc(matchRef, { roster: initialPlayers });
+            }
             updateUI(currentData);
         } else {
+            // First run init
             setDoc(matchRef, { 
                 matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
                 selectedPlayers: [], selectedGuests: [], guestInviters: {}, bannedIndices: [],
@@ -405,41 +421,57 @@ const firebaseConfig = {
         }
     });
 
+    // --- UPDATE UI ---
     function updateUI(data) {
         const activeRoster = data.roster || initialPlayers;
         const container = document.getElementById('player-container');
         const guestContainer = document.getElementById('guest-container');
+        
         container.innerHTML = ''; guestContainer.innerHTML = '';
 
+        // Saludo
         const myId = localStorage.getItem('futsal_my_id');
         if (myId) {
             const me = activeRoster.find(p => p.id === myId);
-            if(me) { document.getElementById('user-greeting').innerText = `👋 ¡Hola, ${me.name}!`; document.getElementById('user-greeting').style.display = 'block'; }
+            if(me) {
+                document.getElementById('user-greeting').innerText = `👋 ¡Hola, ${me.name}!`;
+                document.getElementById('user-greeting').style.display = 'block';
+            }
         }
 
+        // Render Players
         activeRoster.forEach((p) => {
             const div = document.createElement('div');
             div.className = 'player-checkbox';
             if (p.id === myId) div.classList.add('is-me');
+            
             const isSelected = data.selectedPlayers?.includes(p.id);
             const isBanned = data.bannedIndices?.includes(p.id);
             const pins = data.pins || {};
             const lockIcon = (data.pinMode !== false && pins[p.id]) ? '<span class="lock-icon">🔒</span>' : '';
+            
             let badgeContent = '';
-            if(isSelected) { div.classList.add('selected'); badgeContent = data.selectedPlayers.indexOf(p.id) + 1; }
+            if(isSelected) {
+                div.classList.add('selected');
+                badgeContent = data.selectedPlayers.indexOf(p.id) + 1;
+            }
             if(isBanned) div.classList.add('banned');
+
             div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
             if(!isBanned) div.onclick = () => window.toggleSelection('player', p.id, p.name);
             container.appendChild(div);
         });
 
+        // Render Guests
         guestsDB.forEach((g) => {
             const div = document.createElement('div');
             div.className = 'player-checkbox guest-label';
             const isSelected = data.selectedGuests?.includes(g.id);
             const inviter = (data.guestInviters && data.guestInviters[g.id]) ? data.guestInviters[g.id] : null;
+            
             if(isSelected) div.classList.add('selected');
             let badgeContent = isSelected ? 'G' : '';
+            
             let html = `<div class="guest-name"><span class="order-badge">${badgeContent}</span> ${g.name}</div>`;
             if (isSelected && inviter) { html += `<div class="invited-by">↳ por ${inviter}</div>`; }
             div.innerHTML = html;
@@ -450,8 +482,11 @@ const firebaseConfig = {
         const setupPanel = document.getElementById('setup-panel');
         const activePanel = document.getElementById('active-match-panel');
         const headerDate = document.getElementById('header-date');
-        if (!data.matchDate) { setupPanel.style.display = 'block'; activePanel.style.display = 'none'; headerDate.innerText = "PRÓXIMO PARTIDO"; } 
-        else {
+
+        if (!data.matchDate) {
+            setupPanel.style.display = 'block'; activePanel.style.display = 'none';
+            headerDate.innerText = "PRÓXIMO PARTIDO";
+        } else {
             setupPanel.style.display = 'none'; activePanel.style.display = 'block';
             const d = new Date(data.matchDate);
             headerDate.innerText = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -466,29 +501,42 @@ const firebaseConfig = {
         else if (total < 12) bar.style.backgroundColor = "#eab308";
         else bar.style.backgroundColor = "#22c55e";
 
+        // Admin Buttons UI
         const pinBtn = document.getElementById('pin-mode-btn');
-        if (data.pinMode !== false) { pinBtn.innerText = "🟢 PIN ACTIVADO"; pinBtn.className = "pin-toggle-btn pin-on"; } else { pinBtn.innerText = "🔴 PIN DESACTIVADO"; pinBtn.className = "pin-toggle-btn pin-off"; }
+        if (data.pinMode !== false) { pinBtn.innerText = "🟢 PIN ACTIVADO"; pinBtn.className = "pin-toggle-btn pin-on"; } 
+        else { pinBtn.innerText = "🔴 PIN DESACTIVADO"; pinBtn.className = "pin-toggle-btn pin-off"; }
+
         const voteAdminBtn = document.getElementById('vote-mode-btn');
-        if (data.voteMode !== false) { voteAdminBtn.innerText = "🟢 VOTACIÓN ACTIVA"; voteAdminBtn.className = "pin-toggle-btn pin-on"; } else { voteAdminBtn.innerText = "🔴 VOTACIÓN DESACTIVADA"; voteAdminBtn.className = "pin-toggle-btn pin-off"; }
+        if (data.voteMode !== false) { voteAdminBtn.innerText = "🟢 VOTACIÓN ACTIVA"; voteAdminBtn.className = "pin-toggle-btn pin-on"; } 
+        else { voteAdminBtn.innerText = "🔴 VOTACIÓN DESACTIVADA"; voteAdminBtn.className = "pin-toggle-btn pin-off"; }
+
         document.getElementById('admin-time-input').value = data.lockTime || "18:00";
 
+        // Admin Lists
         const banList = document.getElementById('ban-list');
         const pinList = document.getElementById('pin-list');
         banList.innerHTML = ""; pinList.innerHTML = "";
+        
         activeRoster.forEach(p => {
              const isBanned = data.bannedIndices?.includes(p.id);
              const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
              const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
              banList.innerHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
-             if(data.pins && data.pins[p.id]) { pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`; }
+             
+             if(data.pins && data.pins[p.id]) {
+                 pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
+             }
         });
         if(pinList.innerHTML === "") pinList.innerHTML = `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
 
         const votes = data.unlockVotes ? data.unlockVotes.length : 0;
         const voteBtn = document.getElementById('vote-btn');
         if (!data.teams && total >= 8 && data.voteMode !== false) {
-            voteBtn.style.display = 'block'; voteBtn.innerText = `🔓 Solicitar Desbloqueo (${votes}/3)`;
-            if(votes >= 3) { voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true; }
+            voteBtn.style.display = 'block';
+            voteBtn.innerText = `🔓 Solicitar Desbloqueo (${votes}/3)`;
+            if(votes >= 3) {
+                 voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true;
+            }
         } else voteBtn.style.display = 'none';
 
         const logDiv = document.getElementById('activity-log');
@@ -507,12 +555,15 @@ const firebaseConfig = {
             document.getElementById('selection-phase').style.display = 'none';
             document.getElementById('results-phase').style.display = 'block';
             document.getElementById('notify-btn').style.display = 'none';
+            
             if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex';
             else document.getElementById('scoreboard').style.display = 'none';
+            
             const sc = data.scores || [0,0,0];
             document.getElementById('sc-blanco').innerText = sc[0];
             document.getElementById('sc-negro').innerText = sc[1];
             document.getElementById('sc-rojo').innerText = sc[2];
+
             renderTeams(teamsData);
         } else {
             document.getElementById('selection-phase').style.display = 'block';
@@ -522,11 +573,13 @@ const firebaseConfig = {
         }
     }
 
+    // --- LOGICA ---
     window.toggleSelection = async (type, id, name) => {
         let newPlayers = [...(currentData.selectedPlayers || [])];
         let newGuests = [...(currentData.selectedGuests || [])];
         let currentPins = {...(currentData.pins || {})};
         let newGuestInviters = {...(currentData.guestInviters || {})};
+        
         const now = new Date();
         const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         
@@ -594,6 +647,7 @@ const firebaseConfig = {
         const myId = localStorage.getItem('futsal_my_id');
         if (!myId || !currentData.selectedPlayers.includes(myId)) return showToast("Solo convocados pueden votar.", "error");
         if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return showToast("Ya has votado.", "info");
+        
         showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => {
             await updateDoc(matchRef, { unlockVotes: arrayUnion(myId) });
             showToast("Voto registrado", "success");
@@ -603,12 +657,16 @@ const firebaseConfig = {
     setInterval(() => {
         if (currentData.matchDate) {
             checkTimeLock(currentData.matchDate, currentData.lockTime);
+            
             const matchDate = new Date(currentData.matchDate);
             const now = new Date();
             const resetTime = new Date(matchDate);
             resetTime.setDate(resetTime.getDate() + 1); 
             resetTime.setHours(10, 0, 0, 0); 
-            if (now >= resetTime) updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null });
+            
+            if (now >= resetTime) {
+                 updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null });
+            }
         }
         
         if(currentData.timerState === 'running') {
@@ -686,7 +744,7 @@ const firebaseConfig = {
         
         const selected = new Date(dateInput);
         const today = new Date(); today.setHours(0,0,0,0);
-        if(selected < today) return showToast("Día pasado no válido", "error");
+        if(selected < today) return showToast("No puedes seleccionar un día pasado", "error");
 
         const adminSnap = await getDoc(configRef);
         if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
@@ -702,9 +760,9 @@ const firebaseConfig = {
                 pinMode: currentData.pinMode !== false,
                 voteMode: currentData.voteMode !== false,
                 selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
                 teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
-                pins: currentData.pins || {}, unlockVotes: [], scores: [0,0,0],
-                timerState: 'stopped', timerLeft: 300, roster: currentData.roster || initialPlayers
+                pins: currentData.pins || {}, unlockVotes: [] 
             }, { merge: true });
             window.shareConvocation(dateInput);
         });
@@ -773,7 +831,7 @@ const firebaseConfig = {
         const date = d ? new Date(d) : new Date(currentData.matchDate);
         const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
         const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     };
     window.shareTeamsOnWhatsapp = () => {
          const t = window.currentTeamsForCopy; if(!t) return;
@@ -793,7 +851,7 @@ const firebaseConfig = {
     window.secretAdminTap = async () => {
         taps++; setTimeout(() => taps = 0, 2000);
         if(taps === 5) {
-            const entered = prompt("🔑 PIN Admin:");
+            // Check Admin PIN from DB
             const snap = await getDoc(configRef);
             const valid = snap.exists() ? snap.data().pin : "9386";
             
