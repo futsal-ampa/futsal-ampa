@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v</title>
+    <title>AMPA Futsal v2.2</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -15,16 +15,21 @@
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        /* HEADER */
         header { background-color: var(--brand-dark); width: 100%; padding: 15px 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; user-select: none; }
         h1 { text-align: center; color: white; font-size: 1.1rem; margin: 0; font-weight: 800; text-transform: uppercase; line-height: 1.2; cursor: pointer; }
         .match-date-display { color: var(--accent); font-size: 0.8rem; margin-top: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        
         .container { width: 90%; max-width: 600px; padding: 15px 0; padding-bottom: 80px; flex: 1; }
         
-        /* UX TOAST & MODAL */
+        /* NOTIFICACIONES Y MODALES (CRÍTICO: ESTO ES LO QUE FALTABA) */
         #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
         .toast { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: auto; border-left: 4px solid var(--accent); }
         .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.error { border-left-color: var(--danger); } .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.success { border-left-color: var(--success); }
+
         #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1500; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: var(--brand-dark); }
@@ -32,23 +37,23 @@
         .modal-input { width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; font-size: 1rem; text-align: center; display: none; }
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
-        .modal-btn.cancel { background: #e2e8f0; color: #475569; } .modal-btn.confirm { background: var(--brand-dark); color: white; }
+        .modal-btn.cancel { background: #e2e8f0; color: #475569; }
+        .modal-btn.confirm { background: var(--brand-dark); color: white; }
 
-        /* UI ELEMENTS */
+        /* Resto de estilos... */
         .match-info-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .res-date { font-weight: 800; font-size: 1rem; color: var(--brand-dark); text-transform: uppercase; margin-bottom: 5px; }
         .res-time { font-weight: 800; color: var(--brand-blue); font-size: 1.1rem; margin-bottom: 5px; display: block; }
         .res-location { font-size: 0.8rem; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        
+
         .status-bar { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .status-label { font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
         .status-count { font-size: 1.4rem; font-weight: 800; color: var(--brand-dark); }
-        .progress-track { width: 100%; height: 10px; background-color: #e2e8f0; border-radius: 5px; overflow: hidden; }
+        .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         .countdown-text { text-align: right; font-size: 0.7rem; color: #ef4444; font-weight: bold; margin-top: 5px; font-family: monospace; }
         
-        /* PLAYERS & LISTS */
         h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
         .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         .player-checkbox { position: relative; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.85rem; font-weight: 600; user-select: none; }
@@ -58,29 +63,45 @@
         .player-checkbox.banned::after { content: '⛔'; position: absolute; right: 10px; }
         .player-checkbox.is-me { border: 2px solid var(--gold); background-color: #fffbeb; }
         .lock-icon { font-size: 0.8em; margin-left: auto; opacity: 0.6; }
-        .order-badge { position: absolute; top: -6px; right: -6px; background: var(--brand-blue); color: white; font-size: 0.7rem; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .order-badge { position: absolute; top: -6px; right: -6px; background: var(--brand-blue); color: white; font-size: 0.6rem; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .player-checkbox.selected .order-badge { transform: scale(1); }
         .player-checkbox.reserve .order-badge { background: var(--reserve); }
-        
         .guest-label { border-style: dashed; flex-direction: column; align-items: flex-start; gap: 2px; }
         .guest-label.selected { background-color: #fffbeb; border-color: var(--accent); color: #b45309; border-style: solid; }
         .invited-by { font-size: 0.6rem; color: #78350f; font-weight: normal; width: 100%; text-align: left; padding-left: 20px; }
-        
-        .log-container { margin-top: 30px; background: #f1f5f9; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; max-height: 200px; overflow-y: auto; }
+
+        .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
+        .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
+        .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
+        .notify-btn.urgent { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; animation: pulseBtn 2s infinite; }
+        .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
+        .log-container { margin-top: 30px; background: #f1f5f9; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
         .log-title { font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
         .log-entry { font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: #475569; display: flex; justify-content: space-between; }
         .log-time { font-size: 0.7rem; color: #94a3b8; }
+        
+        .teams-container { display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; margin-top: 20px; }
+        .team-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
+        .team-header { padding: 15px; text-align: center; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .team-list li { padding: 10px 20px; border-bottom: 1px solid #f1f5f9; font-size: 1rem; color: #334155; display: flex; align-items: center; }
+        .team-list li:last-child { border-bottom: none; }
+        .team-list li::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #cbd5e1; margin-right: 12px; }
+        .team-blanco .team-header { background: #ffffff; color: #1e293b; border-bottom: 2px solid #cbd5e1; }
+        .team-negro .team-header { background: #1e293b; color: white; }
+        .team-rojo .team-header { background: #ef4444; color: white; }
 
         /* ADMIN */
-        #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .admin-title { color: #e11d48; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
+        #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; }
         .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 0.8rem; margin: 5px 0; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px; }
-        .admin-btn-blue { background-color: var(--brand-blue); } .admin-btn-green { background-color: #16a34a; } .admin-btn-yellow { background-color: #eab308; color: #422006; }
+        .admin-btn-blue { background-color: var(--brand-blue); } .admin-btn-dark { background-color: #334155; } .admin-btn-green { background-color: #16a34a; } .admin-btn-yellow { background-color: #eab308; color: #422006; }
         .pin-toggle-btn { width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; font-size: 0.8rem; }
         .pin-on { background-color: #22c55e; color: white; } .pin-off { background-color: #ef4444; color: white; }
         .chip-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 5px; margin-bottom: 15px; padding-top: 5px; border-top: 1px solid #fca5a5; }
         .chip { background: white; border: 1px solid #ccc; color: #555; padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .chip-reset { border-color: #eab308; color: #a16207; } .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
+        .chip-reset { border-color: #eab308; color: #a16207; } .chip-reset:hover { background: #eab308; color: white; }
+        .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
         .new-player-form { background: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: flex; gap: 5px; align-items: center; }
         .new-player-form input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
         .new-player-form select { width: 30%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
@@ -88,8 +109,7 @@
         .time-control { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px; }
         .time-control input { width: auto; margin: 0; padding: 8px; font-size: 1rem; border: 1px solid #ccc; }
         .time-control button { width: auto; margin: 0; padding: 8px 15px; font-size: 0.8rem; }
-
-        /* GAME */
+        
         .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
         .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
         .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
@@ -103,23 +123,14 @@
         .score-val { font-size: 1.5rem; font-weight: bold; color: white; }
         .score-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; font-weight: bold; }
         .sb-blanco { color: #ffffff; } .sb-negro { color: #94a3b8; } .sb-rojo { color: #f87171; }
-
-        /* BUTTONS */
-        .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
-        .action-btn:active { transform: scale(0.98); }
-        .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
-        .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
-        .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
-        .notify-btn.urgent { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; animation: pulseBtn 2s infinite; }
-        .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
-        .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
-        .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
         
-        .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; }
-        .error-message { color: #ef4444; font-size: 1rem; margin-top: 15px; max-width: 80%; text-align: center; }
-
+        .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; font-weight: bold; }
         #setup-panel { background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 20px; }
         input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
+        
+        /* BOTÓN INSTALAR APP */
+        .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
+        .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
 
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -136,7 +147,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.2</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -144,7 +155,7 @@
     <div id="user-greeting"></div>
 
     <div id="admin-zone">
-        <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE v2.2</div>
+        <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE v2.0</div>
         <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">🔄 Reiniciar Partido (Nuevo Día)</button>
         <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🛡️ Seguridad & Votación:</div>
         <div style="display:flex; gap:5px;">
@@ -267,7 +278,6 @@ const firebaseConfig = {
 
     let app, db, matchRef, configRef;
     
-    // ERROR HANDLER
     function showFatalError(err) {
         const loader = document.getElementById('loader');
         const errDiv = document.getElementById('loader-error');
@@ -317,7 +327,8 @@ const firebaseConfig = {
     ];
 
     let currentData = { 
-        matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
+        matchDate: null, lockTime: "18:00", 
+        pinMode: true, voteMode: true,
         selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
         bannedIndices: [], teams: null, logs: [], pins: {}, unlockVotes: [],
         scores: [0,0,0], timerState: 'stopped', timerEnd: 0, timerLeft: 300,
@@ -396,12 +407,8 @@ const firebaseConfig = {
             const lockIcon = (data.pinMode !== false && pins[p.id]) ? '<span class="lock-icon">🔒</span>' : '';
             
             let badgeContent = '';
-            if(isSelected) {
-                div.classList.add('selected');
-                badgeContent = data.selectedPlayers.indexOf(p.id) + 1;
-            }
+            if(isSelected) { div.classList.add('selected'); badgeContent = data.selectedPlayers.indexOf(p.id) + 1; }
             if(isBanned) div.classList.add('banned');
-
             div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
             if(!isBanned) div.onclick = () => window.toggleSelection('player', p.id, p.name);
             container.appendChild(div);
@@ -631,8 +638,11 @@ const firebaseConfig = {
     function checkTimeLock(dateStr, lockTimeStr) {
         const btn = document.getElementById('btn-create');
         const msg = document.getElementById('time-lock-msg');
+        const notifyBtn = document.getElementById('notify-btn');
+        const countdownDiv = document.getElementById('countdown-display');
+        
         const now = new Date();
-        const target = new Date(dateStr);
+        const targetTime = new Date(dateStr);
         const [h, m] = (lockTimeStr || "18:00").split(':');
         target.setHours(h, m, 0, 0);
         
@@ -688,14 +698,15 @@ const firebaseConfig = {
         });
     };
 
-    window.resetCurrentMatch = async (force = false) => {
-        if(force || confirm("¿Empezar semana nueva? (Borra selecciones, mantiene jugadores)")) {
-            await updateDoc(matchRef, { 
-                matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                teams: null, logs: [], scores: [0,0,0], timerState: 'stopped', unlockVotes: [] 
-            });
-            if(!force) window.hideAdmin();
+    window.resetCurrentMatch = async () => {
+        if(currentData.matchDate && currentData.teams) {
+             const histRef = collection(db, "history");
+             await addDoc(histRef, { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
         }
+        showConfirm("¿Reiniciar?", "Se guardará historial y limpiará lista.", async () => {
+             await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
+             window.hideAdmin();
+        });
     };
 
     window.changeLockTime = async () => {
