@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal - fg</title>
+    <title>AMPA Futsal</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -12,15 +12,8 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS GENERALES (ORIGINALES) --- */
-        :root {
-            --brand-dark: #1e293b; --brand-blue: #2563eb; 
-            --bg-color: #f1f5f9; --card-bg: #ffffff;
-            --text-main: #334155; --accent: #f59e0b;
-            --whatsapp: #25d366; --danger: #ef4444;
-            --disabled: #94a3b8; --gold: #fbbf24;
-            --reserve: #f97316; --success: #22c55e;
-        }
+        /* ESTILOS GENERALES */
+        :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
@@ -30,11 +23,11 @@
         
         .container { width: 90%; max-width: 600px; padding: 15px 0; padding-bottom: 80px; flex: 1; }
         
-        /* --- NUEVOS ESTILOS UX (AÑADIDOS) --- */
+        /* UX PREMIUM: TOAST & MODAL */
         #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
         .toast { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: auto; border-left: 4px solid var(--accent); }
         .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.error { border-left-color: var(--danger); } 
+        .toast.error { border-left-color: var(--danger); }
         .toast.success { border-left-color: var(--success); }
 
         #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1500; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
@@ -50,63 +43,7 @@
 
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* --- RESTO DE ESTILOS ORIGINALES --- */
-        #user-greeting { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; font-size: 0.85rem; display: none; animation: fadeIn 0.5s; }
-
-        /* Admin Zone */
-        #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .admin-title { color: #e11d48; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
-        .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 0.8rem; margin: 5px 0; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px; }
-        .admin-btn-blue { background-color: var(--brand-blue); }
-        .admin-btn-dark { background-color: #334155; }
-        .admin-btn-green { background-color: #16a34a; }
-        .admin-btn-yellow { background-color: #eab308; color: #422006; }
-        
-        .pin-toggle-btn { width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; font-size: 0.8rem; }
-        .pin-on { background-color: #22c55e; color: white; }
-        .pin-off { background-color: #ef4444; color: white; }
-
-        .chip-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 5px; margin-bottom: 15px; padding-top: 5px; border-top: 1px solid #fca5a5; }
-        .chip { background: white; border: 1px solid #ccc; color: #555; padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .chip-reset { border-color: #eab308; color: #a16207; } .chip-reset:hover { background: #eab308; color: white; }
-        .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
-
-        .new-player-form { background: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: flex; gap: 5px; align-items: center; }
-        .new-player-form input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
-        .new-player-form select { width: 30%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
-        .new-player-btn { background: #16a34a; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        .time-control { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px; }
-        .time-control input { width: auto; margin: 0; padding: 8px; font-size: 1rem; border: 1px solid #ccc; }
-        .time-control button { width: auto; margin: 0; padding: 8px 15px; font-size: 0.8rem; }
-
-        /* Panels */
-        .status-bar { background: white; padding: 15px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .status-label { font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
-        .status-count { font-size: 1.4rem; font-weight: 800; color: var(--brand-dark); }
-        .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
-        .countdown-text { text-align: right; font-size: 0.7rem; color: #ef4444; font-weight: bold; margin-top: 5px; font-family: monospace; }
-
-        /* Game Controls */
-        .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
-        .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
-        .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
-        .timer-display.finished { color: #ef4444; border-color: #ef4444; font-size: 1.8rem; line-height: 1; animation: blink 0.5s infinite; }
-        .timer-status-text { font-size: 0.7rem; color: #94a3b8; margin-bottom: 10px; height: 15px; font-weight: bold; text-transform: uppercase; }
-        .timer-btn-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
-        .t-btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; width: 100px; }
-        .t-start { background: #22c55e; color: white; } .t-stop { background: #ef4444; color: white; } .t-reset { background: #64748b; color: white; }
-
-        .scoreboard { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 8px; margin-top: 10px; }
-        .score-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .score-val { font-size: 1.5rem; font-weight: bold; color: white; }
-        .score-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; font-weight: bold; }
-        .sb-blanco { color: #ffffff; } .sb-negro { color: #94a3b8; } .sb-rojo { color: #f87171; }
-
-        /* Lists */
-        h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
+        /* LISTAS JUGADORES & BOLITAS */
         .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         .player-checkbox { position: relative; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.85rem; font-weight: 600; user-select: none; }
         .player-checkbox.selected { background-color: #eff6ff; border-color: var(--brand-blue); color: var(--brand-blue); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1); }
@@ -116,31 +53,92 @@
         .player-checkbox.is-me { border: 2px solid var(--gold); background-color: #fffbeb; }
         .lock-icon { font-size: 0.8em; margin-left: auto; opacity: 0.6; }
         
-        /* Bolitas Azules */
-        .order-badge { position: absolute; top: -6px; right: -6px; background: var(--brand-blue); color: white; font-size: 0.6rem; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        /* BOLITA ORDEN */
+        .order-badge { 
+            position: absolute; top: -6px; right: -6px; 
+            background: var(--brand-blue); color: white; 
+            font-size: 0.6rem; width: 22px; height: 22px; 
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+            transform: scale(0); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
         .player-checkbox.selected .order-badge { transform: scale(1); }
         .player-checkbox.reserve .order-badge { background: var(--reserve); }
-
+        
         .guest-label { border-style: dashed; flex-direction: column; align-items: flex-start; gap: 2px; }
         .guest-label.selected { background-color: #fffbeb; border-color: var(--accent); color: #b45309; border-style: solid; }
         .invited-by { font-size: 0.6rem; color: #78350f; font-weight: normal; width: 100%; text-align: left; padding-left: 20px; }
 
+        /* ESTADO Y BARRAS */
+        .status-bar { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .status-label { font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
+        .status-count { font-size: 1.4rem; font-weight: 800; color: var(--brand-dark); }
+        .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
+        .countdown-text { text-align: right; font-size: 0.7rem; color: #ef4444; font-weight: bold; margin-top: 5px; font-family: monospace; }
+
+        /* BOTONES */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
         .action-btn:active { transform: scale(0.98); }
         .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
-        .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         
+        .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
         .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
         .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
+        
+        /* ADMIN ZONE */
+        #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .admin-title { color: #e11d48; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
+        .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 0.8rem; margin: 5px 0; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px; }
+        .admin-btn-blue { background-color: var(--brand-blue); } .admin-btn-dark { background-color: #334155; } .admin-btn-green { background-color: #16a34a; } .admin-btn-yellow { background-color: #eab308; color: #422006; }
+        
+        .pin-toggle-btn { width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; font-size: 0.8rem; }
+        .pin-on { background-color: #22c55e; color: white; } .pin-off { background-color: #ef4444; color: white; }
+        
+        .chip-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 5px; margin-bottom: 15px; padding-top: 5px; border-top: 1px solid #fca5a5; }
+        .chip { background: white; border: 1px solid #ccc; color: #555; padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .chip-reset { border-color: #eab308; color: #a16207; } .chip-reset:hover { background: #eab308; color: white; }
+        .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
+        
+        .new-player-form { background: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: flex; gap: 5px; align-items: center; }
+        .new-player-form input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
+        .new-player-form select { width: 30%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
+        .new-player-btn { background: #16a34a; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        
+        .time-control { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px; }
+        .time-control input { width: auto; margin: 0; padding: 8px; font-size: 1rem; border: 1px solid #ccc; }
+        .time-control button { width: auto; margin: 0; padding: 8px 15px; font-size: 0.8rem; }
+
+        /* JUEGO */
+        .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
+        .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
+        .timer-display.finished { color: #ef4444; border-color: #ef4444; font-size: 1.8rem; line-height: 1; animation: blink 0.5s infinite; }
+        .timer-status-text { font-size: 0.7rem; color: #94a3b8; margin-bottom: 10px; height: 15px; font-weight: bold; text-transform: uppercase; }
+        .timer-btn-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
+        .t-btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; width: 100px; }
+        .t-start { background: #22c55e; color: white; } .t-stop { background: #ef4444; color: white; } .t-reset { background: #64748b; color: white; }
+        .scoreboard { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 8px; margin-top: 10px; }
+        .score-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .score-val { font-size: 1.5rem; font-weight: bold; color: white; }
+        .score-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        .sb-blanco { color: #ffffff; } .sb-negro { color: #94a3b8; } .sb-rojo { color: #f87171; }
+
+        /* MATCH INFO */
+        .match-info-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .res-date { font-weight: 800; font-size: 1rem; color: var(--brand-dark); text-transform: uppercase; margin-bottom: 5px; }
+        .res-time { font-weight: 800; color: var(--brand-blue); font-size: 1.1rem; margin-bottom: 5px; display: block; }
+        .res-location { font-size: 0.8rem; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 5px; }
         
         .log-container { margin-top: 30px; background: #f1f5f9; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
         .log-title { font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
         .log-entry { font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: #475569; display: flex; justify-content: space-between; }
         .log-entry:last-child { border-bottom: none; }
         .log-time { font-size: 0.7rem; color: #94a3b8; }
-        
+
         .teams-container { display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; margin-top: 20px; }
         .team-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
         .team-header { padding: 15px; text-align: center; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
@@ -155,17 +153,12 @@
         .team-rojo { border: 2px solid #ef4444; }
 
         .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; font-weight: bold; }
-        .match-info-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .res-date { font-weight: 800; font-size: 1rem; color: var(--brand-dark); text-transform: uppercase; margin-bottom: 5px; }
-        .res-time { font-weight: 800; color: var(--brand-blue); font-size: 1.1rem; margin-bottom: 5px; display: block; }
-        .res-location { font-size: 0.8rem; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        
         #setup-panel { background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 20px; }
         input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
-        #time-lock-msg { text-align: center; color: #94a3b8; font-size: 0.75rem; margin-bottom: 20px; display: block; height: 20px; }
 
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes pulseTimer { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
@@ -174,18 +167,8 @@
 
 <div id="loader" class="loading-overlay">Conectando...</div>
 
-<div id="toast-container"></div>
-<div id="modal-overlay">
-    <div class="modal-box">
-        <div id="modal-title" class="modal-title"></div>
-        <div id="modal-text" class="modal-text"></div>
-        <input type="text" id="modal-input" class="modal-input">
-        <div id="modal-actions" class="modal-actions"></div>
-    </div>
-</div>
-
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal 25/26</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.2</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -218,6 +201,7 @@
         <button class="admin-btn admin-btn-yellow" onclick="window.voteToUnlock()">🙋 Votar Desbloqueo (Yo)</button>
         <button class="admin-btn admin-btn-blue" onclick="window.forceGeneration()">⚡ Forzar Creación Ya</button>
         <button class="admin-btn" onclick="window.undoTeams()">🔙 Deshacer Equipos</button>
+        <button class="admin-btn" onclick="window.showStats()">📊 Ver Ranking (Beta)</button>
         <button class="admin-btn" style="margin-top:15px; background:#000;" onclick="window.forceReset()">🔥 RESET TOTAL (Peligro)</button>
         <div style="margin-top:10px; font-size:0.7rem; cursor:pointer; text-decoration:underline" onclick="window.hideAdmin()">Cerrar</div>
     </div>
@@ -284,6 +268,17 @@
     </div>
 </div>
 
+<div id="modal-overlay">
+    <div class="modal-box">
+        <div id="modal-title" class="modal-title"></div>
+        <div id="modal-text" class="modal-text"></div>
+        <input type="text" id="modal-input" class="modal-input">
+        <div id="modal-actions" class="modal-actions"></div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -335,6 +330,9 @@ const firebaseConfig = {
         { id: "alfredo", name: "Alfredo", level: 1 }
     ];
 
+    // ORDEN ALFABÉTICO
+    initialPlayers.sort((a, b) => a.name.localeCompare(b.name));
+
     const guestsDB = [
         { id: "guest_1", name: "Invitado 1" }, 
         { id: "guest_2", name: "Invitado 2" }, 
@@ -344,7 +342,8 @@ const firebaseConfig = {
     ];
 
     let currentData = { 
-        matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
+        matchDate: null, lockTime: "18:00", 
+        pinMode: true, voteMode: true,
         selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
         bannedIndices: [], teams: null, logs: [], pins: {}, unlockVotes: [],
         scores: [0,0,0], timerState: 'stopped', timerEnd: 0, timerLeft: 300,
@@ -380,11 +379,13 @@ const firebaseConfig = {
     }
 
     document.getElementById('date-input').valueAsDate = new Date();
-
+    
+    // --- FIREBASE SYNC ---
     onSnapshot(matchRef, (docSnap) => {
         document.getElementById('loader').style.display = 'none';
         if (docSnap.exists()) {
             currentData = docSnap.data();
+            // AUTO FIX ROSTER
             if (!currentData.roster || currentData.roster.length === 0 || !currentData.roster[0].id) {
                 updateDoc(matchRef, { roster: initialPlayers });
             }
@@ -401,6 +402,9 @@ const firebaseConfig = {
 
     function updateUI(data) {
         const activeRoster = data.roster || initialPlayers;
+        // Ordenar alfabéticamente para visualización
+        activeRoster.sort((a, b) => a.name.localeCompare(b.name));
+
         const container = document.getElementById('player-container');
         const guestContainer = document.getElementById('guest-container');
         container.innerHTML = ''; guestContainer.innerHTML = '';
@@ -462,7 +466,6 @@ const firebaseConfig = {
         else if (total < 12) bar.style.backgroundColor = "#eab308";
         else bar.style.backgroundColor = "#22c55e";
 
-        // Admin Buttons UI
         const pinBtn = document.getElementById('pin-mode-btn');
         if (data.pinMode !== false) { pinBtn.innerText = "🟢 PIN ACTIVADO"; pinBtn.className = "pin-toggle-btn pin-on"; } else { pinBtn.innerText = "🔴 PIN DESACTIVADO"; pinBtn.className = "pin-toggle-btn pin-off"; }
         const voteAdminBtn = document.getElementById('vote-mode-btn');
@@ -519,38 +522,7 @@ const firebaseConfig = {
         }
     }
 
-    // --- LOGICA GLOBAL ---
-    window.startNewMatch = async () => {
-        const dateInput = document.getElementById('date-input').value;
-        if (!dateInput) return window.showToast("Selecciona fecha", "error");
-        
-        const selected = new Date(dateInput);
-        const today = new Date(); today.setHours(0,0,0,0);
-        if(selected < today) return window.showToast("Día pasado no válido", "error");
-
-        const adminSnap = await getDoc(configRef);
-        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
-
-        showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
-             const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-             const myId = localStorage.getItem('futsal_my_id');
-             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
-
-             window.shareConvocation(dateInput);
-
-             await setDoc(matchRef, { 
-                matchDate: dateInput, 
-                lockTime: currentData.lockTime || "18:00",
-                pinMode: currentData.pinMode !== false,
-                voteMode: currentData.voteMode !== false,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
-                pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
-            }, { merge: true });
-        });
-    };
-
+    // --- LOGICA ---
     window.toggleSelection = async (type, id, name) => {
         let newPlayers = [...(currentData.selectedPlayers || [])];
         let newGuests = [...(currentData.selectedGuests || [])];
@@ -584,8 +556,11 @@ const firebaseConfig = {
                 return;
             }
         } else {
-             const action = (type === 'player' && newPlayers.includes(id)) ? "borrarte" : "apuntarte";
-             showConfirm("Confirmar", `¿Seguro que quieres ${action}?`, () => {
+             // MENSAJE PERSONALIZADO
+             const isJoining = (type === 'player' && !newPlayers.includes(id)) || (type === 'guest' && !newGuests.includes(id));
+             const msg = isJoining ? `¿Seguro que quieres apuntarte, ${name}?` : `¿Seguro que quieres borrarte, ${name}?`;
+             
+             showConfirm("Confirmar", msg, () => {
                  processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
              });
              return;
@@ -629,7 +604,6 @@ const firebaseConfig = {
         });
     };
 
-    // --- TIMERS ---
     setInterval(() => {
         if (currentData.matchDate) {
             checkTimeLock(currentData.matchDate, currentData.lockTime);
@@ -710,6 +684,38 @@ const firebaseConfig = {
     }
 
     // --- ADMIN ---
+    window.startNewMatch = async () => {
+        const dateInput = document.getElementById('date-input').value;
+        if (!dateInput) return window.showToast("Selecciona fecha", "error");
+        
+        const selected = new Date(dateInput);
+        const today = new Date(); today.setHours(0,0,0,0);
+        if(selected < today) return window.showToast("Día pasado no válido", "error");
+
+        const adminSnap = await getDoc(configRef);
+        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" }); // Default fallback
+
+        showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
+             const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+             const myId = localStorage.getItem('futsal_my_id');
+             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
+
+             window.shareConvocation(dateInput);
+
+             await setDoc(matchRef, { 
+                matchDate: dateInput, 
+                // KEEP PREVIOUS CONFIG
+                lockTime: currentData.lockTime || "18:00",
+                pinMode: currentData.pinMode !== false,
+                voteMode: currentData.voteMode !== false,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
+                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
+                pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
+            }, { merge: true });
+        });
+    };
+
     window.resetCurrentMatch = async () => {
         if(currentData.matchDate && currentData.teams) {
              const histRef = collection(db, "history");
@@ -725,6 +731,7 @@ const firebaseConfig = {
         const t = document.getElementById('admin-time-input').value;
         await updateDoc(matchRef, { lockTime: t });
     };
+
     window.togglePinMode = async () => {
         const s = currentData.pinMode === false ? true : false;
         await updateDoc(matchRef, { pinMode: s });
@@ -733,15 +740,18 @@ const firebaseConfig = {
         const s = currentData.voteMode === false ? true : false;
         await updateDoc(matchRef, { voteMode: s });
     };
+
     window.addNewPlayer = async () => {
         const name = document.getElementById('new-player-name').value;
         const level = parseInt(document.getElementById('new-player-level').value);
         if(!name) return window.showToast("Falta nombre", "error");
+        
         const id = name.toLowerCase().replace(/\s/g, '_');
         const newPlayer = { id: id, name: name, level: level };
         await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
         window.showToast("Jugador añadido", "success");
     };
+    
     window.toggleBan = async (id, name) => {
         let list = [...(currentData.bannedIndices || [])];
         if(list.includes(id)) {
@@ -765,6 +775,20 @@ const firebaseConfig = {
         });
     };
     window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
+    window.showStats = async () => {
+        const hRef = collection(db, "history");
+        const snap = await getDocs(hRef);
+        window.showToast(`Partidos en histórico: ${snap.size}`, "info");
+    };
+    
+    window.forceGeneration = () => {
+        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
+        if(total < 8) return window.showToast("Mínimo 8", "error");
+        showConfirm("Forzar Creación", "¿Crear equipos ignorando la hora?", () => {
+             window.triggerGeneration(total <= 12 ? 2 : 3);
+             window.hideAdmin();
+        });
+    };
     window.forceReset = async () => {
         showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => {
              await setDoc(matchRef, { 
@@ -776,102 +800,13 @@ const firebaseConfig = {
             window.hideAdmin();
         });
     };
-    window.forceGeneration = () => {
-        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-        if(total < 8) return window.showToast("Mínimo 8", "error");
-        showConfirm("Forzar Creación", "¿Crear equipos ignorando la hora?", () => {
-             window.triggerGeneration(total <= 12 ? 2 : 3);
-             window.hideAdmin();
-        });
-    };
 
-    // --- UTILS ---
-    window.shareConvocation = (d) => {
-        const date = d ? new Date(d) : new Date(currentData.matchDate);
-        const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
-        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    // Install PWA
+    let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
+    window.installApp = async () => {
+        if(defPrompt) { defPrompt.prompt(); defPrompt = null; }
+        else window.showToast("Usa menú navegador -> Instalar", "info");
     };
-    window.shareTeamsOnWhatsapp = () => {
-         const t = window.currentTeamsForCopy; if(!t) return;
-         const d = new Date(currentData.matchDate);
-         const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
-         let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`;
-         const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴'];
-         t.forEach((team, i) => {
-             txt += `${em[i]} *${names[i]}* (${team.length})\n`;
-             team.forEach(p => txt += `- ${p.name}\n`);
-             txt += `\n`;
-         });
-         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
-    };
-    window.attemptGeneration = () => {
-        const targetTime = new Date(currentData.matchDate);
-        targetTime.setHours(18, 0, 0, 0); // Default fallback
-        if(currentData.lockTime) {
-             const [h,m] = currentData.lockTime.split(':');
-             targetTime.setHours(h,m,0,0);
-        }
-        
-        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
-        const canUnlock = (currentData.voteMode !== false && votes >= 3);
-        
-        if (new Date() < targetTime && !canUnlock) return window.showToast(`Espera a las ${currentData.lockTime} o votad.`, "error");
-        
-        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-        if (total < 8) return window.showToast("Mínimo 8 jugadores", "error");
-        
-        window.triggerGeneration(total <= 12 ? 2 : 3);
-    };
-
-    window.triggerGeneration = async (numTeams) => {
-        document.getElementById('loader').style.display = 'flex';
-        const roster = currentData.roster || initialPlayers;
-        const sPlayers = (currentData.selectedPlayers || []).map(id => roster.find(p => p.id === id)).filter(Boolean);
-        const sGuests = (currentData.selectedGuests || []).map(id => {
-            const g = guestsDB.find(g => g.id === id);
-            return g ? {...g, level: 0, isGuest: true} : null;
-        }).filter(Boolean);
-
-        let l3 = shuffle([...sPlayers.filter(p => p.level === 3)]);
-        let l2 = shuffle([...sPlayers.filter(p => p.level === 2)]);
-        let l1 = shuffle([...sPlayers.filter(p => p.level === 1)]);
-        let lg = shuffle([...sGuests]);
-        
-        let pool = [...l3, ...l2, ...l1, ...lg];
-        let teams = Array.from({ length: numTeams }, () => []);
-        pool.forEach((p, i) => teams[i % numTeams].push(p));
-        teams.forEach(t => shuffle(t));
-        
-        const myId = localStorage.getItem('futsal_my_id');
-        const author = roster.find(p => p.id === myId)?.name || "Sistema";
-        const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-
-        await updateDoc(matchRef, { 
-            teams: JSON.stringify(teams),
-            logs: arrayUnion(`⚽ Equipos generados por ${author}|${now}`)
-        });
-        document.getElementById('loader').style.display = 'none';
-        window.showToast("Equipos Generados", "success");
-    };
-
-    let taps = 0;
-    window.secretAdminTap = async () => {
-        taps++; setTimeout(() => taps = 0, 2000);
-        if(taps === 5) {
-            const entered = prompt("🔑 PIN Admin:");
-            // Check DB PIN
-            const snap = await getDoc(configRef);
-            const valid = snap.exists() ? snap.data().pin : "9386"; // Fallback PIN
-            
-            showConfirm("Acceso Admin", "Introduce PIN Maestro", (val) => {
-                if(val === valid) document.getElementById('admin-zone').style.display = 'block';
-                else window.showToast("Acceso denegado", "error");
-            }, true);
-            taps = 0;
-        }
-    };
-    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
 
     // Helpers
     function shuffle(array) {
@@ -898,12 +833,39 @@ const firebaseConfig = {
         });
         window.currentTeamsForCopy = teams;
     }
+    
+    let taps = 0;
+    window.secretAdminTap = async () => {
+        taps++; setTimeout(() => taps = 0, 2000);
+        if(taps === 5) {
+            document.getElementById('modal-input').value = '';
+            showConfirm("Acceso Admin", "Introduce PIN:", (val) => {
+                if(val === "1234") document.getElementById('admin-zone').style.display = 'block';
+                else window.showToast("PIN Incorrecto", "error");
+            }, true); // true = mostrar input
+            taps = 0;
+        }
+    };
+    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
 
-    // Install PWA
-    let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
-    window.installApp = async () => {
-        if(defPrompt) { defPrompt.prompt(); defPrompt = null; }
-        else window.showToast("Usa menú navegador -> Instalar", "info");
+    window.shareConvocation = (d) => {
+        const date = d ? new Date(d) : new Date(currentData.matchDate);
+        const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: 19:45h\n\n👇 *APÚNTATE:* ${window.location.href}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    };
+    window.shareTeamsOnWhatsapp = () => {
+         const t = window.currentTeamsForCopy; if(!t) return;
+         const d = new Date(currentData.matchDate);
+         const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+         let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`;
+         const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴'];
+         t.forEach((team, i) => {
+             txt += `${em[i]} *${names[i]}* (${team.length})\n`;
+             team.forEach(p => txt += `- ${p.name}\n`);
+             txt += `\n`;
+         });
+         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
     };
 
 </script>
