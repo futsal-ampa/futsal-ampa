@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v2.1</title>
+    <title>AMPA Futsal v2.2</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -24,6 +24,7 @@
         .toast { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: auto; border-left: 4px solid var(--accent); }
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast.error { border-left-color: var(--danger); } .toast.success { border-left-color: var(--success); }
+        
         #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1500; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: var(--brand-dark); }
@@ -32,6 +33,7 @@
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
         .modal-btn.cancel { background: #e2e8f0; color: #475569; } .modal-btn.confirm { background: var(--brand-dark); color: white; }
+        
         .match-info-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .res-date { font-weight: 800; font-size: 1rem; color: var(--brand-dark); text-transform: uppercase; margin-bottom: 5px; }
         .res-time { font-weight: 800; color: var(--brand-blue); font-size: 1.1rem; margin-bottom: 5px; display: block; }
@@ -43,6 +45,7 @@
         .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         .countdown-text { text-align: right; font-size: 0.7rem; color: #ef4444; font-weight: bold; margin-top: 5px; font-family: monospace; }
+        
         .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
         .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
         .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
@@ -120,9 +123,12 @@
         .time-control input { width: auto; margin: 0; padding: 8px; font-size: 1rem; border: 1px solid #ccc; }
         .time-control button { width: auto; margin: 0; padding: 8px 15px; font-size: 0.8rem; }
 
-        .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; font-weight: bold; }
+        .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; }
+        .error-message { color: #ef4444; font-size: 1rem; margin-top: 15px; max-width: 80%; text-align: center; }
+
         #setup-panel { background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 20px; }
         input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
+
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -132,10 +138,13 @@
 </head>
 <body>
 
-<div id="loader" class="loading-overlay">Conectando...</div>
+<div id="loader" class="loading-overlay">
+    <div>Conectando...</div>
+    <div id="loader-error" class="error-message"></div>
+</div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.1</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.2</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -183,6 +192,7 @@
 
     <div id="active-match-panel" style="display:none;">
         <button id="notify-btn" class="notify-btn" onclick="window.shareConvocation()">📢 Reenviar aviso al Grupo</button>
+
         <div class="status-bar">
             <div class="status-header">
                 <div><span class="status-label">CONVOCADOS</span> <span class="status-sub" id="status-text">Máx 18</span></div>
@@ -191,6 +201,7 @@
             <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
             <div id="countdown-display" class="countdown-text"></div>
         </div>
+        
         <div id="selection-phase">
             <div class="install-center"><button class="install-app-btn" onclick="window.installApp()">📲 Instalar App</button></div>
             <h3>PLANTILLA</h3>
@@ -263,12 +274,22 @@ const firebaseConfig = {
     // -------------------------------------------------------------
 
     let app, db, matchRef, configRef;
+    
+    // ERROR HANDLER
+    function showFatalError(err) {
+        const loader = document.getElementById('loader');
+        const errDiv = document.getElementById('loader-error');
+        loader.style.display = 'flex';
+        errDiv.innerText = `Error: ${err.message}.`;
+        console.error("FATAL:", err);
+    }
+
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         matchRef = doc(db, "partidos", "semana_actual");
         configRef = doc(db, "config", "admin_settings"); 
-    } catch (e) { console.error(e); }
+    } catch (e) { showFatalError(e); }
 
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3 },
@@ -304,7 +325,8 @@ const firebaseConfig = {
     ];
 
     let currentData = { 
-        matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
+        matchDate: null, lockTime: "18:00", 
+        pinMode: true, voteMode: true,
         selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
         bannedIndices: [], teams: null, logs: [], pins: {}, unlockVotes: [],
         scores: [0,0,0], timerState: 'stopped', timerEnd: 0, timerLeft: 300,
@@ -314,7 +336,7 @@ const firebaseConfig = {
     let timerInterval = null;
     let hasBeeped = false;
 
-    // --- UTILS ---
+    // GLOBALIZE FUNCTIONS
     window.showToast = (msg, type = 'info') => {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -344,14 +366,17 @@ const firebaseConfig = {
     // --- FIREBASE SYNC ---
     onSnapshot(matchRef, (docSnap) => {
         document.getElementById('loader').style.display = 'none';
+        console.log("🔥 Firebase conectado");
         if (docSnap.exists()) {
             currentData = docSnap.data();
             // AUTO FIX ROSTER
             if (!currentData.roster || currentData.roster.length === 0 || !currentData.roster[0].id) {
+                console.log("🛠️ Reparando base de datos antigua...");
                 updateDoc(matchRef, { roster: initialPlayers });
             }
             updateUI(currentData);
         } else {
+            // First run init
             setDoc(matchRef, { 
                 matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
                 selectedPlayers: [], selectedGuests: [], guestInviters: {}, bannedIndices: [],
@@ -359,6 +384,8 @@ const firebaseConfig = {
                 timerState: 'stopped', timerLeft: 300, roster: initialPlayers 
             });
         }
+    }, (error) => {
+        showFatalError(error);
     });
 
     function updateUI(data) {
@@ -388,9 +415,10 @@ const firebaseConfig = {
                 div.classList.add('selected');
                 badgeContent = data.selectedPlayers.indexOf(p.id) + 1;
             }
+            
+            if(isBanned) div.classList.add('banned');
 
             div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
-            if(isBanned) div.classList.add('banned');
             if(!isBanned) div.onclick = () => window.toggleSelection('player', p.id, p.name);
             container.appendChild(div);
         });
@@ -400,8 +428,10 @@ const firebaseConfig = {
             div.className = 'player-checkbox guest-label';
             const isSelected = data.selectedGuests?.includes(g.id);
             const inviter = (data.guestInviters && data.guestInviters[g.id]) ? data.guestInviters[g.id] : null;
+            
             if(isSelected) div.classList.add('selected');
             let badgeContent = isSelected ? 'G' : '';
+            
             let html = `<div class="guest-name"><span class="order-badge">${badgeContent}</span> ${g.name}</div>`;
             if (isSelected && inviter) { html += `<div class="invited-by">↳ por ${inviter}</div>`; }
             div.innerHTML = html;
@@ -412,8 +442,11 @@ const firebaseConfig = {
         const setupPanel = document.getElementById('setup-panel');
         const activePanel = document.getElementById('active-match-panel');
         const headerDate = document.getElementById('header-date');
-        if (!data.matchDate) { setupPanel.style.display = 'block'; activePanel.style.display = 'none'; headerDate.innerText = "PRÓXIMO PARTIDO"; } 
-        else {
+
+        if (!data.matchDate) {
+            setupPanel.style.display = 'block'; activePanel.style.display = 'none';
+            headerDate.innerText = "PRÓXIMO PARTIDO";
+        } else {
             setupPanel.style.display = 'none'; activePanel.style.display = 'block';
             const d = new Date(data.matchDate);
             headerDate.innerText = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -428,21 +461,31 @@ const firebaseConfig = {
         else if (total < 12) bar.style.backgroundColor = "#eab308";
         else bar.style.backgroundColor = "#22c55e";
 
+        // Admin Buttons UI
         const pinBtn = document.getElementById('pin-mode-btn');
-        if (data.pinMode !== false) { pinBtn.innerText = "🟢 PIN ACTIVADO"; pinBtn.className = "pin-toggle-btn pin-on"; } else { pinBtn.innerText = "🔴 PIN DESACTIVADO"; pinBtn.className = "pin-toggle-btn pin-off"; }
+        if (data.pinMode !== false) { pinBtn.innerText = "🟢 PIN ACTIVADO"; pinBtn.className = "pin-toggle-btn pin-on"; } 
+        else { pinBtn.innerText = "🔴 PIN DESACTIVADO"; pinBtn.className = "pin-toggle-btn pin-off"; }
+
         const voteAdminBtn = document.getElementById('vote-mode-btn');
-        if (data.voteMode !== false) { voteAdminBtn.innerText = "🟢 VOTOS ACTIVOS"; voteAdminBtn.className = "pin-toggle-btn pin-on"; } else { voteAdminBtn.innerText = "🔴 VOTOS OFF"; voteAdminBtn.className = "pin-toggle-btn pin-off"; }
+        if (data.voteMode !== false) { voteAdminBtn.innerText = "🟢 VOTOS ACTIVOS"; voteAdminBtn.className = "pin-toggle-btn pin-on"; } 
+        else { voteAdminBtn.innerText = "🔴 VOTOS OFF"; voteAdminBtn.className = "pin-toggle-btn pin-off"; }
+
         document.getElementById('admin-time-input').value = data.lockTime || "18:00";
 
+        // Admin Lists
         const banList = document.getElementById('ban-list');
         const pinList = document.getElementById('pin-list');
         banList.innerHTML = ""; pinList.innerHTML = "";
+        
         activeRoster.forEach(p => {
              const isBanned = data.bannedIndices?.includes(p.id);
              const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
              const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
              banList.innerHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
-             if(data.pins && data.pins[p.id]) { pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`; }
+             
+             if(data.pins && data.pins[p.id]) {
+                 pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
+             }
         });
         if(pinList.innerHTML === "") pinList.innerHTML = `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
 
@@ -469,12 +512,15 @@ const firebaseConfig = {
             document.getElementById('selection-phase').style.display = 'none';
             document.getElementById('results-phase').style.display = 'block';
             document.getElementById('notify-btn').style.display = 'none';
+            
             if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex';
             else document.getElementById('scoreboard').style.display = 'none';
+            
             const sc = data.scores || [0,0,0];
             document.getElementById('sc-blanco').innerText = sc[0];
             document.getElementById('sc-negro').innerText = sc[1];
             document.getElementById('sc-rojo').innerText = sc[2];
+
             renderTeams(teamsData);
         } else {
             document.getElementById('selection-phase').style.display = 'block';
@@ -484,6 +530,7 @@ const firebaseConfig = {
         }
     }
 
+    // --- LOGICA ---
     window.toggleSelection = async (type, id, name) => {
         let newPlayers = [...(currentData.selectedPlayers || [])];
         let newGuests = [...(currentData.selectedGuests || [])];
@@ -556,6 +603,7 @@ const firebaseConfig = {
         const myId = localStorage.getItem('futsal_my_id');
         if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo convocados pueden votar.", "error");
         if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info");
+        
         showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => {
             await updateDoc(matchRef, { unlockVotes: arrayUnion(myId) });
             window.showToast("Voto registrado", "success");
@@ -641,57 +689,117 @@ const firebaseConfig = {
         } else cd.innerText = "Cierre alcanzado";
     }
 
-    window.shareConvocation = (d) => {
-        const date = d ? new Date(d) : new Date(currentData.matchDate);
-        const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
-        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    // --- ADMIN ---
+    window.startNewMatch = async () => {
+        const dateInput = document.getElementById('date-input').value;
+        if (!dateInput) return window.showToast("Selecciona fecha", "error");
+        
+        const selected = new Date(dateInput);
+        const today = new Date(); today.setHours(0,0,0,0);
+        if(selected < today) return window.showToast("Día pasado no válido", "error");
+
+        const adminSnap = await getDoc(configRef);
+        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
+
+        showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
+             const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+             const myId = localStorage.getItem('futsal_my_id');
+             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
+
+             // Share BEFORE saving to avoid popup block
+             window.shareConvocation(dateInput);
+
+             await setDoc(matchRef, { 
+                matchDate: dateInput, 
+                // KEEP PREVIOUS CONFIG
+                lockTime: currentData.lockTime || "18:00",
+                pinMode: currentData.pinMode !== false,
+                voteMode: currentData.voteMode !== false,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
+                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
+                pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
+            }, { merge: true });
+        });
     };
-    window.shareTeamsOnWhatsapp = () => {
-         const t = window.currentTeamsForCopy; if(!t) return;
-         const d = new Date(currentData.matchDate);
-         const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
-         let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`;
-         const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴'];
-         t.forEach((team, i) => {
-             txt += `${em[i]} *${names[i]}* (${team.length})\n`;
-             team.forEach(p => txt += `- ${p.name}\n`);
-             txt += `\n`;
-         });
-         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+
+    window.resetCurrentMatch = async () => {
+        if(currentData.matchDate && currentData.teams) {
+             const histRef = collection(db, "history");
+             await addDoc(histRef, { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
+        }
+        showConfirm("¿Reiniciar?", "Se guardará historial y limpiará lista.", async () => {
+             await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
+             window.hideAdmin();
+        });
+    };
+
+    window.changeLockTime = async () => {
+        const t = document.getElementById('admin-time-input').value;
+        await updateDoc(matchRef, { lockTime: t });
+    };
+
+    window.togglePinMode = async () => {
+        const s = currentData.pinMode === false ? true : false;
+        await updateDoc(matchRef, { pinMode: s });
+    };
+    window.toggleVoteMode = async () => {
+        const s = currentData.voteMode === false ? true : false;
+        await updateDoc(matchRef, { voteMode: s });
+    };
+
+    window.addNewPlayer = async () => {
+        const name = document.getElementById('new-player-name').value;
+        const level = parseInt(document.getElementById('new-player-level').value);
+        if(!name) return window.showToast("Falta nombre", "error");
+        
+        const id = name.toLowerCase().replace(/\s/g, '_');
+        const newPlayer = { id: id, name: name, level: level };
+        await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
+        window.showToast("Jugador añadido", "success");
     };
     
-    let taps = 0;
-    window.secretAdminTap = async () => {
-        taps++; setTimeout(() => taps = 0, 2000);
-        if(taps === 5) {
-            const entered = prompt("🔑 PIN Admin:");
-            const snap = await getDoc(configRef);
-            const valid = snap.exists() ? snap.data().pin : "9386";
-            
-            showConfirm("Acceso Admin", "Introduce PIN Maestro", (val) => {
-                if(val === valid) document.getElementById('admin-zone').style.display = 'block';
-                else window.showToast("Acceso denegado", "error");
-            }, true);
-            taps = 0;
+    window.toggleBan = async (id, name) => {
+        let list = [...(currentData.bannedIndices || [])];
+        if(list.includes(id)) {
+            list = list.filter(i => i !== id);
+            window.showToast(`${name} desbloqueado`, "success");
+        } else {
+            list.push(id);
+            if(currentData.selectedPlayers.includes(id)) {
+                let s = currentData.selectedPlayers.filter(i => i !== id);
+                await updateDoc(matchRef, { selectedPlayers: s });
+            }
+            window.showToast(`${name} bloqueado`, "error");
         }
+        await updateDoc(matchRef, { bannedIndices: list });
     };
-    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
+    window.resetPin = async (id, name) => {
+        showConfirm("Reset PIN", `¿Borrar PIN de ${name}?`, async () => {
+            let p = {...currentData.pins}; delete p[id];
+            await updateDoc(matchRef, { pins: p });
+            window.showToast("PIN reseteado", "success");
+        });
+    };
+    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
     window.showStats = async () => {
         const hRef = collection(db, "history");
         const snap = await getDocs(hRef);
         window.showToast(`Partidos en histórico: ${snap.size}`, "info");
     };
-    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
+    
     window.forceGeneration = () => {
+        // SOLUCIÓN BUG: Sumar longitudes de arrays correctamente
         const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
         if(total < 8) return window.showToast("Mínimo 8", "error");
         
         showConfirm("Forzar Creación", "¿Crear equipos ignorando la hora?", () => {
-             triggerGeneration(total <= 12 ? 2 : 3);
+             // Llamar a trigger con parámetros
+             window.triggerGeneration(total <= 12 ? 2 : 3);
              window.hideAdmin();
         });
     };
+    
     window.forceReset = async () => {
         showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => {
              await setDoc(matchRef, { 
