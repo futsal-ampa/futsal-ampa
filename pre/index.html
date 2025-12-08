@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v2.2</title>
+    <title>AMPA Futsal - LIVE (BETA UX)</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -12,174 +12,125 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* --- ESTILOS GENERALES --- */
+        :root {
+            --brand-dark: #1e293b; --brand-blue: #2563eb; 
+            --bg-color: #f1f5f9; --card-bg: #ffffff;
+            --text-main: #334155; --accent: #f59e0b;
+            --whatsapp: #25d366; --danger: #ef4444;
+            --disabled: #94a3b8; --gold: #fbbf24;
+            --reserve: #f97316; --success: #22c55e;
+        }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        header { background-color: var(--brand-dark); width: 100%; padding: 15px 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; user-select: none; }
+        
+        header { background-color: var(--brand-dark); width: 100%; padding: 20px 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; user-select: none; }
         h1 { text-align: center; color: white; font-size: 1.1rem; margin: 0; font-weight: 800; text-transform: uppercase; line-height: 1.2; cursor: pointer; }
         .match-date-display { color: var(--accent); font-size: 0.8rem; margin-top: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .container { width: 90%; max-width: 600px; padding: 15px 0; padding-bottom: 80px; flex: 1; }
         
+        .container { width: 90%; max-width: 600px; padding: 20px 0; padding-bottom: 60px; flex: 1; }
+
+        /* --- NUEVO: ESTILOS UX (Toast y Modal) --- */
         #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
         .toast { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: auto; border-left: 4px solid var(--accent); }
         .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.error { border-left-color: var(--danger); } .toast.success { border-left-color: var(--success); }
-        
+        .toast.error { border-left-color: var(--danger); }
+        .toast.success { border-left-color: var(--success); }
+
         #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1500; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: var(--brand-dark); }
         .modal-text { font-size: 0.9rem; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
-        .modal-input { width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; font-size: 1rem; text-align: center; display: none; }
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
-        .modal-btn.cancel { background: #e2e8f0; color: #475569; } .modal-btn.confirm { background: var(--brand-dark); color: white; }
+        .modal-btn.cancel { background: #e2e8f0; color: #475569; }
+        .modal-btn.confirm { background: var(--brand-dark); color: white; }
         
-        .match-info-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .res-date { font-weight: 800; font-size: 1rem; color: var(--brand-dark); text-transform: uppercase; margin-bottom: 5px; }
-        .res-time { font-weight: 800; color: var(--brand-blue); font-size: 1.1rem; margin-bottom: 5px; display: block; }
-        .res-location { font-size: 0.8rem; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .status-bar { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .status-label { font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
-        .status-count { font-size: 1.4rem; font-weight: 800; color: var(--brand-dark); }
-        .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
-        .countdown-text { text-align: right; font-size: 0.7rem; color: #ef4444; font-weight: bold; margin-top: 5px; font-family: monospace; }
+        /* ... resto de estilos originales ... */
+        #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .admin-title { color: #e11d48; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
+        .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 0.85rem; margin: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px;}
+        .admin-btn-blue { background-color: var(--brand-blue); }
+        .admin-btn-green { background-color: #16a34a; } /* Boton verde */
+
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Setup Panel */
+        #setup-panel { background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 20px; }
+        input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
         
-        .game-controls { background: #1e293b; color: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
-        .timer-display { font-family: 'Courier New', monospace; font-size: 3rem; font-weight: bold; color: #4ade80; background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155; margin-bottom: 5px; letter-spacing: 2px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
-        .timer-display.last-minute { color: #fbbf24; border-color: #fbbf24; animation: pulseTimer 1s infinite; }
-        .timer-display.finished { color: #ef4444; border-color: #ef4444; font-size: 1.8rem; line-height: 1; animation: blink 0.5s infinite; }
-        .timer-status-text { font-size: 0.7rem; color: #94a3b8; margin-bottom: 10px; height: 15px; font-weight: bold; text-transform: uppercase; }
-        .timer-btn-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
-        .t-btn { padding: 8px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; width: 100px; }
-        .t-start { background: #22c55e; color: white; } .t-stop { background: #ef4444; color: white; } .t-reset { background: #64748b; color: white; }
-        .scoreboard { display: flex; justify-content: space-around; background: #334155; padding: 10px; border-radius: 8px; margin-top: 10px; }
-        .score-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .score-val { font-size: 1.5rem; font-weight: bold; color: white; }
-        .score-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; font-weight: bold; }
-        .sb-blanco { color: #ffffff; } .sb-negro { color: #94a3b8; } .sb-rojo { color: #f87171; }
-        .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
-        .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
-        #user-greeting { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; font-size: 0.85rem; display: none; animation: fadeIn 0.5s; }
-        h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
-        .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-        .player-checkbox { position: relative; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.85rem; font-weight: 600; user-select: none; }
+        /* Status Bar */
+        .status-bar { background: white; padding: 15px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-left: 5px solid var(--brand-blue); }
+        .status-label { font-size: 0.85rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
+        .status-count { font-size: 1.5rem; font-weight: 800; color: var(--brand-dark); }
+        
+        h3 { font-size: 0.95rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
+        .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .player-checkbox { background: var(--card-bg); padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; font-weight: 600; user-select: none; position: relative; }
         .player-checkbox.selected { background-color: #eff6ff; border-color: var(--brand-blue); color: var(--brand-blue); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1); }
-        .player-checkbox.reserve { background-color: #fff7ed; border-color: var(--reserve); color: var(--reserve); }
-        .player-checkbox.banned { opacity: 0.5; background-color: #f1f5f9; cursor: not-allowed; border-color: #cbd5e1; }
-        .player-checkbox.banned::after { content: '⛔'; position: absolute; right: 10px; }
-        .player-checkbox.is-me { border: 2px solid var(--gold); background-color: #fffbeb; }
-        .lock-icon { font-size: 0.8em; margin-left: auto; opacity: 0.6; }
-        .order-badge { position: absolute; top: -6px; right: -6px; background: var(--brand-blue); color: white; font-size: 0.6rem; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .player-checkbox.selected .order-badge { transform: scale(1); }
-        .player-checkbox.reserve .order-badge { background: var(--reserve); }
-        .guest-label { border-style: dashed; flex-direction: column; align-items: flex-start; gap: 2px; }
+        .player-checkbox input { margin-right: 12px; accent-color: var(--brand-blue); transform: scale(1.1); pointer-events: none; }
+        .guest-label { border-style: dashed; }
         .guest-label.selected { background-color: #fffbeb; border-color: var(--accent); color: #b45309; border-style: solid; }
-        .invited-by { font-size: 0.6rem; color: #78350f; font-weight: normal; width: 100%; text-align: left; padding-left: 20px; }
-        .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
+        
+        /* BOTÓN PRINCIPAL */
+        .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-top: 40px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
         .action-btn:active { transform: scale(0.98); }
         .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
-        .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
-        .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
-        .notify-btn.urgent { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; animation: pulseBtn 2s infinite; }
+
+        .time-lock-msg { text-align: center; color: #94a3b8; font-size: 0.75rem; margin-bottom: 20px; display: block; height: 20px; }
+        
+        .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; }
+        .notify-btn:hover { background-color: #bbf7d0; }
+
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
-        .log-container { margin-top: 30px; background: #f1f5f9; border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
-        .log-title { font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
-        .log-entry { font-size: 0.75rem; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: #475569; display: flex; justify-content: space-between; }
-        .log-entry:last-child { border-bottom: none; }
-        .log-time { font-size: 0.7rem; color: #94a3b8; }
+        
+        /* Resultados */
         .teams-container { display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; margin-top: 20px; }
         .team-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
         .team-header { padding: 15px; text-align: center; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .team-list { list-style: none; padding: 5px 0; margin: 0; }
         .team-list li { padding: 10px 20px; border-bottom: 1px solid #f1f5f9; font-size: 1rem; color: #334155; display: flex; align-items: center; }
         .team-list li:last-child { border-bottom: none; }
         .team-list li::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #cbd5e1; margin-right: 12px; }
+        .guest-result { color: #64748b; font-style: italic; }
         .team-blanco .team-header { background: #ffffff; color: #1e293b; border-bottom: 2px solid #cbd5e1; }
         .team-blanco { border: 2px solid #cbd5e1; }
         .team-negro .team-header { background: #1e293b; color: white; }
         .team-negro { border: 2px solid #1e293b; }
         .team-rojo .team-header { background: #ef4444; color: white; }
         .team-rojo { border: 2px solid #ef4444; }
-        #admin-zone { display: none; background-color: #ffe4e6; border: 2px dashed #e11d48; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; animation: slideDown 0.3s ease-out; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .admin-title { color: #e11d48; font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; }
-        .admin-btn { background-color: #e11d48; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 0.8rem; margin: 5px 0; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 5px; }
-        .admin-btn-blue { background-color: var(--brand-blue); }
-        .admin-btn-dark { background-color: #334155; }
-        .admin-btn-green { background-color: #16a34a; }
-        .admin-btn-yellow { background-color: #eab308; color: #422006; }
-        .pin-toggle-btn { width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; font-size: 0.8rem; }
-        .pin-on { background-color: #22c55e; color: white; }
-        .pin-off { background-color: #ef4444; color: white; }
-        .chip-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 5px; margin-bottom: 15px; padding-top: 5px; border-top: 1px solid #fca5a5; }
-        .chip { background: white; border: 1px solid #ccc; color: #555; padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .chip-reset { border-color: #eab308; color: #a16207; } .chip-reset:hover { background: #eab308; color: white; }
-        .chip-ban { border-color: #ef4444; color: #ef4444; } .chip-ban.is-banned { background: #ef4444; color: white; text-decoration: line-through; }
-        .new-player-form { background: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: flex; gap: 5px; align-items: center; }
-        .new-player-form input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
-        .new-player-form select { width: 30%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; }
-        .new-player-btn { background: #16a34a; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .time-control { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; background: white; padding: 10px; border-radius: 8px; }
-        .time-control input { width: auto; margin: 0; padding: 8px; font-size: 1rem; border: 1px solid #ccc; }
-        .time-control button { width: auto; margin: 0; padding: 8px 15px; font-size: 0.8rem; }
-
-        .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; }
-        .error-message { color: #ef4444; font-size: 1rem; margin-top: 15px; max-width: 80%; text-align: center; }
-
-        #setup-panel { background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 20px; }
-        input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
-
-        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes pulseTimer { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="loader" class="loading-overlay">
-    <div>Conectando...</div>
-    <div id="loader-error" class="error-message"></div>
+<div id="loader" class="loading-overlay">Conectando...</div>
+
+<div id="toast-container"></div>
+<div id="modal-overlay">
+    <div class="modal-box">
+        <div id="modal-title" class="modal-title"></div>
+        <div id="modal-text" class="modal-text"></div>
+        <div id="modal-actions" class="modal-actions"></div>
+    </div>
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.2</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal 25/26</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
 <div class="container">
-    <div id="user-greeting"></div>
-
+    
     <div id="admin-zone">
-        <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE v2.0</div>
-        <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">🔄 Reiniciar Partido (Nuevo Día)</button>
-        <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🛡️ Seguridad & Votación:</div>
-        <div style="display:flex; gap:5px;">
-            <button id="pin-mode-btn" class="pin-toggle-btn" onclick="window.togglePinMode()">PIN...</button>
-            <button id="vote-mode-btn" class="pin-toggle-btn" onclick="window.toggleVoteMode()">VOTO...</button>
-        </div>
-        <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; text-align:left;">🕒 Hora Creación Equipos:</div>
-        <div class="time-control">
-            <input type="time" id="admin-time-input" value="18:00">
-            <button class="admin-btn admin-btn-blue" style="margin:0" onclick="window.changeLockTime()">Actualizar</button>
-        </div>
-        <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; text-align:left;">➕ Alta Jugador:</div>
-        <div class="new-player-form">
-            <input type="text" id="new-player-name" placeholder="Nombre">
-            <select id="new-player-level"><option value="1">Nivel 1</option><option value="2" selected>Nivel 2</option><option value="3">Nivel 3</option></select>
-            <button class="new-player-btn" onclick="window.addNewPlayer()">+</button>
-        </div>
-        <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🚫 BLOQUEAR JUGADORES</div>
-        <div id="ban-list" class="chip-list"><div style="font-size:0.7rem; color:#999;">Cargando...</div></div>
-        <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🔐 RESET PINS</div>
-        <div id="pin-list" class="chip-list"><div style="font-size:0.7rem; color:#999;">Cargando...</div></div>
-        <button class="admin-btn admin-btn-yellow" onclick="window.voteToUnlock()">🙋 Votar Desbloqueo (Yo)</button>
+        <div class="admin-title">🛠️ Menú Oculto Admin 🛠️</div>
+        <p style="font-size:0.8rem; margin-bottom:10px;">Zona de Emergencia:</p>
         <button class="admin-btn admin-btn-blue" onclick="window.forceGeneration()">⚡ Forzar Creación Ya</button>
+        <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">🔄 Reiniciar Partido (Nuevo Día)</button>
         <button class="admin-btn" onclick="window.undoTeams()">🔙 Deshacer Equipos</button>
-        <button class="admin-btn" onclick="window.showStats()">📊 Ver Ranking (Beta)</button>
-        <button class="admin-btn" style="margin-top:15px; background:#000;" onclick="window.forceReset()">🔥 RESET TOTAL (Peligro)</button>
-        <div style="margin-top:10px; font-size:0.7rem; cursor:pointer; text-decoration:underline" onclick="window.hideAdmin()">Cerrar</div>
+        <button class="admin-btn" onclick="window.showStats()">📊 Ver Estadísticas</button>
+        
+        <div style="margin-top:10px; font-size:0.7rem; cursor:pointer; text-decoration:underline" onclick="window.hideAdmin()">Cerrar Menú</div>
     </div>
 
     <div id="setup-panel" style="display:none;">
@@ -187,77 +138,45 @@
         <p style="color:#64748b; margin-bottom:20px;">Elige la fecha para abrir la convocatoria:</p>
         <input type="date" id="date-input">
         <button class="action-btn" onclick="window.startNewMatch()">ABRIR CONVOCATORIA</button>
-        <div class="install-center"><button class="install-app-btn" onclick="window.installApp()">📲 Instalar App</button></div>
     </div>
 
     <div id="active-match-panel" style="display:none;">
-        <button id="notify-btn" class="notify-btn" onclick="window.shareConvocation()">📢 Reenviar aviso al Grupo</button>
+        <button id="notify-btn" class="notify-btn" onclick="window.shareConvocation()">
+            📢 Enviar aviso al Grupo de WhatsApp
+        </button>
 
         <div class="status-bar">
-            <div class="status-header">
-                <div><span class="status-label">CONVOCADOS</span> <span class="status-sub" id="status-text">Máx 18</span></div>
-                <span class="status-count" id="player-count">0 / 18</span>
+            <div>
+                <span class="status-label">JUGADORES DISPONIBLES</span>
+                <span style="font-size:0.7rem; color:#94a3b8">(Máx 18)</span>
             </div>
-            <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
-            <div id="countdown-display" class="countdown-text"></div>
+            <span class="status-count" id="player-count">0</span>
         </div>
         
         <div id="selection-phase">
-            <div class="install-center"><button class="install-app-btn" onclick="window.installApp()">📲 Instalar App</button></div>
             <h3>PLANTILLA</h3>
             <div class="player-group" id="player-container"></div>
+
             <h3>Invitados</h3>
             <div class="player-group" id="guest-container"></div>
-            <div class="log-container">
-                <div class="log-title">🕓 Historial de Actividad</div>
-                <div id="activity-log"></div>
-            </div>
-            <button id="vote-btn" class="vote-btn" style="display:none;" onclick="window.voteToUnlock()">🔓 Solicitar Desbloqueo (0/3)</button>
+
             <button id="btn-create" class="action-btn" onclick="window.attemptGeneration()">CREAR EQUIPOS</button>
-            <span id="time-lock-msg" style="text-align: center; display:block; color:#94a3b8; font-size:0.75rem; margin-bottom:20px;"></span>
+            <span id="time-lock-msg" class="time-lock-msg"></span>
         </div>
 
         <div id="results-phase" style="display:none;">
-            <div class="game-controls">
-                <div style="font-size:0.8rem; font-weight:bold; margin-bottom:5px; color:#94a3b8;">TIEMPO DE JUEGO</div>
-                <div class="timer-status-text" id="timer-status-text"></div>
-                <div id="timer-display" class="timer-display">05:00</div>
-                <div class="timer-btn-row">
-                    <button class="t-btn t-start" onclick="window.toggleTimer()" id="timer-start-btn">▶ INICIO</button>
-                    <button class="t-btn t-reset" onclick="window.resetTimer()">↺ RESET</button>
-                </div>
-                <div id="scoreboard" class="scoreboard" style="display:none;">
-                    <div class="score-box"><span class="score-team sb-blanco">BLANCO</span><span id="sc-blanco" class="score-val">0</span><div><button class="score-btn" onclick="window.updateScore(0, 1)">+</button><button class="score-btn" onclick="window.updateScore(0, -1)">-</button></div></div>
-                    <div class="score-box"><span class="score-team sb-negro">NEGRO</span><span id="sc-negro" class="score-val">0</span><div><button class="score-btn" onclick="window.updateScore(1, 1)">+</button><button class="score-btn" onclick="window.updateScore(1, -1)">-</button></div></div>
-                    <div class="score-box"><span class="score-team sb-rojo">ROJO</span><span id="sc-rojo" class="score-val">0</span><div><button class="score-btn" onclick="window.updateScore(2, 1)">+</button><button class="score-btn" onclick="window.updateScore(2, -1)">-</button></div></div>
-                </div>
-            </div>
             <h3 style="text-align: center; color: #2563eb;">¡EQUIPOS CONFIRMADOS!</h3>
-            <div class="match-info-card">
-                <div id="res-date" class="res-date"></div>
-                <div class="res-time">⏰ 20:30h</div>
-                <div class="res-location">📍 Pabellón Colegio Virgen de la Vega</div>
-            </div>
             <div class="teams-container" id="teams-result"></div>
-            <button class="whatsapp-btn" style="display:flex; justify-content:center;" onclick="window.shareTeamsOnWhatsapp()">📲 Enviar Equipos al Grupo</button>
+            <button class="whatsapp-btn" style="display:flex" onclick="window.shareTeamsOnWhatsapp()">
+                📲 Enviar Equipos al Grupo
+            </button>
         </div>
     </div>
 </div>
 
-<div id="modal-overlay">
-    <div class="modal-box">
-        <div id="modal-title" class="modal-title"></div>
-        <div id="modal-text" class="modal-text"></div>
-        <input type="text" id="modal-input" class="modal-input">
-        <div id="modal-actions" class="modal-actions"></div>
-    </div>
-</div>
-
-<div id="toast-container"></div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // -------------------------------------------------------------
     // ⚠️ PEGA AQUÍ TUS CLAVES DE FIREBASE (BETA) ⚠️
@@ -273,71 +192,36 @@ const firebaseConfig = {
 };
     // -------------------------------------------------------------
 
-    let app, db, matchRef, configRef;
-    
-    // ERROR HANDLER
-    function showFatalError(err) {
-        const loader = document.getElementById('loader');
-        const errDiv = document.getElementById('loader-error');
-        loader.style.display = 'flex';
-        errDiv.innerText = `Error: ${err.message}.`;
-        console.error("FATAL:", err);
-    }
+    const ADMIN_PIN = "9386"; // Mantenemos tu PIN
 
+    let app, db, matchRef;
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
-        matchRef = doc(db, "partidos", "semana_actual");
-        configRef = doc(db, "config", "admin_settings"); 
-    } catch (e) { showFatalError(e); }
+        matchRef = doc(db, "partidos", "semana_actual"); 
+    } catch (e) { console.error(e); }
 
-    const initialPlayers = [
-        { id: "willi", name: "Willi", level: 3 },
-        { id: "jhon", name: "Jhon", level: 3 },
-        { id: "santi", name: "Santi", level: 3 },
-        { id: "ivan", name: "Ivan", level: 3 },
-        { id: "gus", name: "Gus", level: 3 },
-        { id: "fabian", name: "Fabián", level: 3 },
-        { id: "arturo", name: "Arturo", level: 3 },
-        { id: "abraham", name: "Abraham", level: 2 },
-        { id: "ivan_n", name: "Iván N", level: 2 },
-        { id: "adrian", name: "Adrián", level: 2 },
-        { id: "yusto", name: "Yusto", level: 2 },
-        { id: "jose", name: "José", level: 2 },
-        { id: "tono", name: "Toño", level: 2 },
-        { id: "rafa", name: "Rafa", level: 2 },
-        { id: "edu", name: "Edu", level: 2 },
-        { id: "jesus_s", name: "Jesús S", level: 1 },
-        { id: "norvey", name: "Norvey", level: 1 },
-        { id: "richard", name: "Richard", level: 1 },
-        { id: "ruben", name: "Rubén", level: 1 },
-        { id: "eloy", name: "Eloy", level: 1 },
-        { id: "luis", name: "Luis", level: 1 },
-        { id: "alfredo", name: "Alfredo", level: 1 }
+    const playersDB = [
+        { name: "Willi", level: 3 }, { name: "Jhon", level: 3 }, { name: "Santi", level: 3 },
+        { name: "Ivan", level: 3 }, { name: "Gus", level: 3 }, { name: "Fabián", level: 3 },
+        { name: "Arturo", level: 3 }, { name: "Abraham", level: 2 }, { name: "Iván N", level: 2 },
+        { name: "Adrián", level: 2 }, { name: "Yusto", level: 2 }, { name: "José", level: 2 },
+        { name: "Toño", level: 2 }, { name: "Rafa", level: 2 }, { name: "Edu", level: 2 },
+        { name: "Jesús S", level: 1 }, { name: "Norvey", level: 1 }, { name: "Richard", level: 1 },
+        { name: "Rubén", level: 1 }, { name: "Eloy", level: 1 }, { name: "Luis", level: 1 },
+        { name: "Alfredo", level: 1 }
     ];
+    playersDB.sort((a, b) => a.name.localeCompare(b.name));
 
     const guestsDB = [
-        { id: "guest_1", name: "Invitado 1" }, 
-        { id: "guest_2", name: "Invitado 2" }, 
-        { id: "guest_3", name: "Invitado 3" }, 
-        { id: "guest_4", name: "Invitado 4" }, 
-        { id: "guest_5", name: "Invitado 5" }
+        { name: "Invitado 1" }, { name: "Invitado 2" }, { name: "Invitado 3" }, 
+        { name: "Invitado 4" }, { name: "Invitado 5" }
     ];
 
-    let currentData = { 
-        matchDate: null, lockTime: "18:00", 
-        pinMode: true, voteMode: true,
-        selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-        bannedIndices: [], teams: null, logs: [], pins: {}, unlockVotes: [],
-        scores: [0,0,0], timerState: 'stopped', timerEnd: 0, timerLeft: 300,
-        roster: []
-    };
-    
-    let timerInterval = null;
-    let hasBeeped = false;
+    let currentData = { matchDate: null, selectedPlayers: [], selectedGuests: [], teams: null };
 
-    // GLOBALIZE FUNCTIONS
-    window.showToast = (msg, type = 'info') => {
+    // --- UX HELPERS ---
+    function showToast(msg, type = 'info') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
@@ -347,98 +231,63 @@ const firebaseConfig = {
         setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
     }
 
-    function showConfirm(title, text, onConfirm, showInput = false) {
+    function showConfirm(title, text, onConfirm) {
         const modal = document.getElementById('modal-overlay');
         document.getElementById('modal-title').innerText = title;
         document.getElementById('modal-text').innerText = text;
-        const input = document.getElementById('modal-input');
-        if(showInput) { input.style.display = 'block'; input.value = ''; input.focus(); } else input.style.display = 'none';
         const actions = document.getElementById('modal-actions');
         actions.innerHTML = '';
-        const btnCancel = document.createElement('button'); btnCancel.className = 'modal-btn cancel'; btnCancel.innerText = 'Cancelar'; btnCancel.onclick = () => { modal.style.display = 'none'; };
-        const btnConfirm = document.createElement('button'); btnConfirm.className = 'modal-btn confirm'; btnConfirm.innerText = 'Confirmar'; btnConfirm.onclick = () => { const val = input.value; modal.style.display = 'none'; onConfirm(val); };
-        actions.appendChild(btnCancel); actions.appendChild(btnConfirm);
+        
+        const btnCancel = document.createElement('button');
+        btnCancel.className = 'modal-btn cancel';
+        btnCancel.innerText = 'Cancelar';
+        btnCancel.onclick = () => { modal.style.display = 'none'; };
+        
+        const btnConfirm = document.createElement('button');
+        btnConfirm.className = 'modal-btn confirm';
+        btnConfirm.innerText = 'Confirmar';
+        btnConfirm.onclick = () => { modal.style.display = 'none'; onConfirm(); };
+        
+        actions.appendChild(btnCancel);
+        actions.appendChild(btnConfirm);
         modal.style.display = 'flex';
     }
 
+    // --- RENDERIZADO INICIAL ---
+    const container = document.getElementById('player-container');
+    const guestContainer = document.getElementById('guest-container');
     document.getElementById('date-input').valueAsDate = new Date();
-    
-    // --- FIREBASE SYNC ---
+
+    playersDB.forEach((p, idx) => {
+        const div = document.createElement('div');
+        div.className = 'player-checkbox';
+        div.id = `p-${idx}`;
+        div.innerHTML = `<input type="checkbox" id="chk-p-${idx}"> ${p.name}`;
+        div.onclick = () => window.toggleSelection('player', idx);
+        container.appendChild(div);
+    });
+
+    guestsDB.forEach((g, idx) => {
+        const div = document.createElement('div');
+        div.className = 'player-checkbox guest-label';
+        div.id = `g-${idx}`;
+        div.innerHTML = `<input type="checkbox" id="chk-g-${idx}"> ${g.name}`;
+        div.onclick = () => window.toggleSelection('guest', idx);
+        guestContainer.appendChild(div);
+    });
+
+    // --- FIREBASE LOGIC ---
     onSnapshot(matchRef, (docSnap) => {
         document.getElementById('loader').style.display = 'none';
-        console.log("🔥 Firebase conectado");
         if (docSnap.exists()) {
-            currentData = docSnap.data();
-            // AUTO FIX ROSTER
-            if (!currentData.roster || currentData.roster.length === 0 || !currentData.roster[0].id) {
-                console.log("🛠️ Reparando base de datos antigua...");
-                updateDoc(matchRef, { roster: initialPlayers });
-            }
+            currentData = docSnap.data(); 
             updateUI(currentData);
         } else {
-            // First run init
-            setDoc(matchRef, { 
-                matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, bannedIndices: [],
-                teams: null, logs: [], pins: {}, unlockVotes: [], scores:[0,0,0], 
-                timerState: 'stopped', timerLeft: 300, roster: initialPlayers 
-            });
+            setDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], teams: null });
         }
-    }, (error) => {
-        showFatalError(error);
     });
 
     function updateUI(data) {
-        const activeRoster = data.roster || initialPlayers;
-        const container = document.getElementById('player-container');
-        const guestContainer = document.getElementById('guest-container');
-        container.innerHTML = ''; guestContainer.innerHTML = '';
-
-        const myId = localStorage.getItem('futsal_my_id');
-        if (myId) {
-            const me = activeRoster.find(p => p.id === myId);
-            if(me) { document.getElementById('user-greeting').innerText = `👋 ¡Hola, ${me.name}!`; document.getElementById('user-greeting').style.display = 'block'; }
-        }
-
-        activeRoster.forEach((p) => {
-            const div = document.createElement('div');
-            div.className = 'player-checkbox';
-            if (p.id === myId) div.classList.add('is-me');
-            
-            const isSelected = data.selectedPlayers?.includes(p.id);
-            const isBanned = data.bannedIndices?.includes(p.id);
-            const pins = data.pins || {};
-            const lockIcon = (data.pinMode !== false && pins[p.id]) ? '<span class="lock-icon">🔒</span>' : '';
-            
-            let badgeContent = '';
-            if(isSelected) {
-                div.classList.add('selected');
-                badgeContent = data.selectedPlayers.indexOf(p.id) + 1;
-            }
-            
-            if(isBanned) div.classList.add('banned');
-
-            div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
-            if(!isBanned) div.onclick = () => window.toggleSelection('player', p.id, p.name);
-            container.appendChild(div);
-        });
-
-        guestsDB.forEach((g) => {
-            const div = document.createElement('div');
-            div.className = 'player-checkbox guest-label';
-            const isSelected = data.selectedGuests?.includes(g.id);
-            const inviter = (data.guestInviters && data.guestInviters[g.id]) ? data.guestInviters[g.id] : null;
-            
-            if(isSelected) div.classList.add('selected');
-            let badgeContent = isSelected ? 'G' : '';
-            
-            let html = `<div class="guest-name"><span class="order-badge">${badgeContent}</span> ${g.name}</div>`;
-            if (isSelected && inviter) { html += `<div class="invited-by">↳ por ${inviter}</div>`; }
-            div.innerHTML = html;
-            div.onclick = () => window.toggleSelection('guest', g.id, g.name);
-            guestContainer.appendChild(div);
-        });
-
         const setupPanel = document.getElementById('setup-panel');
         const activePanel = document.getElementById('active-match-panel');
         const headerDate = document.getElementById('header-date');
@@ -446,64 +295,31 @@ const firebaseConfig = {
         if (!data.matchDate) {
             setupPanel.style.display = 'block'; activePanel.style.display = 'none';
             headerDate.innerText = "PRÓXIMO PARTIDO";
-        } else {
-            setupPanel.style.display = 'none'; activePanel.style.display = 'block';
-            const d = new Date(data.matchDate);
-            headerDate.innerText = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-            document.getElementById('res-date').innerText = headerDate.innerText;
+            return;
         }
+
+        setupPanel.style.display = 'none'; activePanel.style.display = 'block';
+        const dateObj = new Date(data.matchDate);
+        headerDate.innerText = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
         const total = (data.selectedPlayers?.length || 0) + (data.selectedGuests?.length || 0);
-        document.getElementById('player-count').innerText = `${total} / 18`;
-        const bar = document.getElementById('progress-fill');
-        bar.style.width = `${Math.min((total/18)*100, 100)}%`;
-        if(total < 8) bar.style.backgroundColor = "#ef4444";
-        else if (total < 12) bar.style.backgroundColor = "#eab308";
-        else bar.style.backgroundColor = "#22c55e";
+        document.getElementById('player-count').innerText = total;
 
-        // Admin Buttons UI
-        const pinBtn = document.getElementById('pin-mode-btn');
-        if (data.pinMode !== false) { pinBtn.innerText = "🟢 PIN ACTIVADO"; pinBtn.className = "pin-toggle-btn pin-on"; } 
-        else { pinBtn.innerText = "🔴 PIN DESACTIVADO"; pinBtn.className = "pin-toggle-btn pin-off"; }
-
-        const voteAdminBtn = document.getElementById('vote-mode-btn');
-        if (data.voteMode !== false) { voteAdminBtn.innerText = "🟢 VOTOS ACTIVOS"; voteAdminBtn.className = "pin-toggle-btn pin-on"; } 
-        else { voteAdminBtn.innerText = "🔴 VOTOS OFF"; voteAdminBtn.className = "pin-toggle-btn pin-off"; }
-
-        document.getElementById('admin-time-input').value = data.lockTime || "18:00";
-
-        // Admin Lists
-        const banList = document.getElementById('ban-list');
-        const pinList = document.getElementById('pin-list');
-        banList.innerHTML = ""; pinList.innerHTML = "";
-        
-        activeRoster.forEach(p => {
-             const isBanned = data.bannedIndices?.includes(p.id);
-             const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
-             const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
-             banList.innerHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
-             
-             if(data.pins && data.pins[p.id]) {
-                 pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
-             }
+        playersDB.forEach((p, idx) => {
+            const isSelected = data.selectedPlayers?.includes(idx);
+            const el = document.getElementById(`p-${idx}`);
+            const chk = document.getElementById(`chk-p-${idx}`);
+            if(isSelected) { el.classList.add('selected'); chk.checked = true; } 
+            else { el.classList.remove('selected'); chk.checked = false; }
         });
-        if(pinList.innerHTML === "") pinList.innerHTML = `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
 
-        const votes = data.unlockVotes ? data.unlockVotes.length : 0;
-        const voteBtn = document.getElementById('vote-btn');
-        if (!data.teams && total >= 8 && data.voteMode !== false) {
-            voteBtn.style.display = 'block'; voteBtn.innerText = `🔓 Solicitar Desbloqueo (${votes}/3)`;
-            if(votes >= 3) { voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true; }
-        } else voteBtn.style.display = 'none';
-
-        const logDiv = document.getElementById('activity-log');
-        if (data.logs && data.logs.length > 0) {
-            logDiv.innerHTML = "";
-            [...data.logs].reverse().slice(0, 15).forEach(logStr => {
-                const parts = logStr.split('|');
-                if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
-            });
-        }
+        guestsDB.forEach((g, idx) => {
+            const isSelected = data.selectedGuests?.includes(idx);
+            const el = document.getElementById(`g-${idx}`);
+            const chk = document.getElementById(`chk-g-${idx}`);
+            if(isSelected) { el.classList.add('selected'); chk.checked = true; } 
+            else { el.classList.remove('selected'); chk.checked = false; }
+        });
 
         let teamsData = data.teams;
         if (typeof teamsData === 'string') { try { teamsData = JSON.parse(teamsData); } catch(e){} }
@@ -511,314 +327,187 @@ const firebaseConfig = {
         if (teamsData && teamsData.length > 0) {
             document.getElementById('selection-phase').style.display = 'none';
             document.getElementById('results-phase').style.display = 'block';
-            document.getElementById('notify-btn').style.display = 'none';
-            
-            if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex';
-            else document.getElementById('scoreboard').style.display = 'none';
-            
-            const sc = data.scores || [0,0,0];
-            document.getElementById('sc-blanco').innerText = sc[0];
-            document.getElementById('sc-negro').innerText = sc[1];
-            document.getElementById('sc-rojo').innerText = sc[2];
-
             renderTeams(teamsData);
         } else {
             document.getElementById('selection-phase').style.display = 'block';
             document.getElementById('results-phase').style.display = 'none';
-            document.getElementById('notify-btn').style.display = 'flex';
-            checkTimeLock(data.matchDate, data.lockTime);
+            checkTimeLock(data.matchDate);
         }
     }
 
-    // --- LOGICA ---
-    window.toggleSelection = async (type, id, name) => {
-        let newPlayers = [...(currentData.selectedPlayers || [])];
-        let newGuests = [...(currentData.selectedGuests || [])];
-        let currentPins = {...(currentData.pins || {})};
-        let newGuestInviters = {...(currentData.guestInviters || {})};
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        
-        let inviterName = "";
-        if (type === 'guest') {
-            const userIndex = localStorage.getItem('futsal_my_id');
-            if (!userIndex || !newPlayers.includes(userIndex)) return window.showToast("⛔ Solo jugadores confirmados pueden invitar.", "error");
-            const roster = currentData.roster || initialPlayers;
-            const inviterObj = roster.find(p => p.id === userIndex);
-            if(inviterObj) inviterName = inviterObj.name;
-        }
-
-        if (type === 'player' && currentData.pinMode !== false) {
-            if (currentPins[id]) {
-                showConfirm("🔐 Seguridad", `Introduce PIN para ${name}:`, (val) => {
-                    if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error");
-                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
-                }, true);
-                return; 
-            } else {
-                showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name}:`, (val) => {
-                    if (!val || val.length < 3) return window.showToast("PIN inválido", "error");
-                    currentPins[id] = val;
-                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
-                }, true);
-                return;
-            }
-        } else {
-             const action = (type === 'player' && newPlayers.includes(id)) ? "borrarte" : "apuntarte";
-             showConfirm("Confirmar", `¿Seguro que quieres ${action}?`, () => {
-                 processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
-             });
-             return;
-        }
-    };
-
-    async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr) {
-        if (type === 'player') {
-            if (newPlayers.includes(id)) {
-                newPlayers = newPlayers.filter(i => i !== id);
-                await updateDoc(matchRef, { selectedPlayers: newPlayers, logs: arrayUnion(`❌ ${name} sale|${timeStr}`) });
-                window.showToast(`${name} eliminado`, "info");
-            } else {
-                if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
-                newPlayers.push(id);
-                localStorage.setItem('futsal_my_id', id);
-                await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} entra|${timeStr}`) });
-                window.showToast(`¡Bienvenido ${name}!`, "success");
-            }
-        } else {
-             if (newGuests.includes(id)) {
-                newGuests = newGuests.filter(i => i !== id);
-                delete newGuestInviters[id];
-                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} sale|${timeStr}`) });
-            } else {
-                if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
-                newGuests.push(id);
-                newGuestInviters[id] = inviterName;
-                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`✅ ${name} invitado por ${inviterName}|${timeStr}`) });
-            }
-        }
-    }
-
-    window.voteToUnlock = async () => {
-        const myId = localStorage.getItem('futsal_my_id');
-        if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo convocados pueden votar.", "error");
-        if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info");
-        
-        showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => {
-            await updateDoc(matchRef, { unlockVotes: arrayUnion(myId) });
-            window.showToast("Voto registrado", "success");
-        });
-    };
-
-    setInterval(() => {
-        if (currentData.matchDate) {
-            checkTimeLock(currentData.matchDate, currentData.lockTime);
-            const matchDate = new Date(currentData.matchDate);
-            const now = new Date();
-            const resetTime = new Date(matchDate);
-            resetTime.setDate(resetTime.getDate() + 1); 
-            resetTime.setHours(10, 0, 0, 0); 
-            if (now >= resetTime) updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null });
-        }
-        
-        if(currentData.timerState === 'running') {
-            const display = document.getElementById('timer-display');
-            const btn = document.getElementById('timer-start-btn');
-            const txt = document.getElementById('timer-status-text');
-            const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
-            const m = Math.floor(left / 60).toString().padStart(2, '0');
-            const s = (left % 60).toString().padStart(2, '0');
-            display.innerText = `${m}:${s}`;
-            btn.innerText = "⏸ PAUSA"; btn.classList.add('t-stop');
-            if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; }
-            else if(left <= 0) { 
-                display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN";
-                if(!hasBeeped) {
-                     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                     const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000);
-                     hasBeeped = true;
-                }
-            }
-        }
-    }, 1000);
-    
-    window.toggleTimer = async () => {
-        if (currentData.timerState === 'running') {
-            const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000));
-            await updateDoc(matchRef, { timerState: 'paused', timerLeft: left });
-        } else {
-            const target = Date.now() + (currentData.timerLeft * 1000);
-            await updateDoc(matchRef, { timerState: 'running', timerEnd: target });
-        }
-    };
-    window.resetTimer = async () => {
-        await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 });
-        hasBeeped = false;
-        document.getElementById('timer-display').classList.remove('finished', 'last-minute');
-        document.getElementById('timer-display').innerText = "05:00";
-    };
-    window.updateScore = async (idx, delta) => {
-        let s = [...(currentData.scores || [0,0,0])];
-        s[idx] = Math.max(0, s[idx] + delta);
-        await updateDoc(matchRef, { scores: s });
-    };
-
-    function checkTimeLock(dateStr, lockTimeStr) {
-        const btn = document.getElementById('btn-create');
+    function checkTimeLock(matchDateString) {
+        const btnCreate = document.getElementById('btn-create');
         const msg = document.getElementById('time-lock-msg');
         const now = new Date();
-        const target = new Date(dateStr);
-        const [h, m] = (lockTimeStr || "18:00").split(':');
-        target.setHours(h, m, 0, 0);
-        
-        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
-        const canUnlock = (currentData.voteMode !== false && votes >= 3);
-        
-        if (now >= target || canUnlock) {
-            btn.disabled = false; btn.innerText = "CREAR EQUIPOS"; msg.innerText = "";
+        const targetTime = new Date(matchDateString);
+        targetTime.setHours(19, 45, 0, 0);
+
+        if (now >= targetTime) {
+            btnCreate.disabled = false; btnCreate.innerText = "CREAR EQUIPOS"; msg.innerText = "";
         } else {
-            btn.disabled = true; btn.innerText = "🔒 CREAR EQUIPOS"; msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
+            btnCreate.disabled = true; btnCreate.innerText = "🔒 CREAR EQUIPOS"; msg.innerText = "Disponible el día del partido a las 19:45";
         }
-        
-        const cd = document.getElementById('countdown-display');
-        if(now < target) {
-            const diff = target - now;
-            const hh = Math.floor(diff/(1000*60*60));
-            const mm = Math.floor((diff%(1000*60*60))/(1000*60));
-            cd.innerText = `Cierre en: ${hh}h ${mm}m`;
-        } else cd.innerText = "Cierre alcanzado";
     }
 
-    // --- ADMIN ---
+    // --- FUNCIONES GLOBALES (ACCIONES) ---
     window.startNewMatch = async () => {
         const dateInput = document.getElementById('date-input').value;
-        if (!dateInput) return window.showToast("Selecciona fecha", "error");
+        if (!dateInput) return showToast("Selecciona fecha", "error");
         
-        const selected = new Date(dateInput);
-        const today = new Date(); today.setHours(0,0,0,0);
-        if(selected < today) return window.showToast("Día pasado no válido", "error");
-
-        const adminSnap = await getDoc(configRef);
-        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
-
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
-             const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-             const myId = localStorage.getItem('futsal_my_id');
-             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
-
-             // Share BEFORE saving to avoid popup block
-             window.shareConvocation(dateInput);
-
-             await setDoc(matchRef, { 
-                matchDate: dateInput, 
-                // KEEP PREVIOUS CONFIG
-                lockTime: currentData.lockTime || "18:00",
-                pinMode: currentData.pinMode !== false,
-                voteMode: currentData.voteMode !== false,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
-                pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
-            }, { merge: true });
+            await setDoc(matchRef, { matchDate: dateInput, selectedPlayers: [], selectedGuests: [], teams: null });
+            window.shareConvocation(dateInput);
+            showToast("Convocatoria abierta", "success");
         });
     };
 
-    window.resetCurrentMatch = async () => {
-        if(currentData.matchDate && currentData.teams) {
-             const histRef = collection(db, "history");
-             await addDoc(histRef, { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
-        }
-        showConfirm("¿Reiniciar?", "Se guardará historial y limpiará lista.", async () => {
-             await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
-             window.hideAdmin();
-        });
-    };
+    window.toggleSelection = async (type, index) => {
+        let newPlayers = [...(currentData.selectedPlayers || [])];
+        let newGuests = [...(currentData.selectedGuests || [])];
+        const currentTotal = newPlayers.length + newGuests.length;
 
-    window.changeLockTime = async () => {
-        const t = document.getElementById('admin-time-input').value;
-        await updateDoc(matchRef, { lockTime: t });
-    };
-
-    window.togglePinMode = async () => {
-        const s = currentData.pinMode === false ? true : false;
-        await updateDoc(matchRef, { pinMode: s });
-    };
-    window.toggleVoteMode = async () => {
-        const s = currentData.voteMode === false ? true : false;
-        await updateDoc(matchRef, { voteMode: s });
-    };
-
-    window.addNewPlayer = async () => {
-        const name = document.getElementById('new-player-name').value;
-        const level = parseInt(document.getElementById('new-player-level').value);
-        if(!name) return window.showToast("Falta nombre", "error");
-        
-        const id = name.toLowerCase().replace(/\s/g, '_');
-        const newPlayer = { id: id, name: name, level: level };
-        await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
-        window.showToast("Jugador añadido", "success");
-    };
-    
-    window.toggleBan = async (id, name) => {
-        let list = [...(currentData.bannedIndices || [])];
-        if(list.includes(id)) {
-            list = list.filter(i => i !== id);
-            window.showToast(`${name} desbloqueado`, "success");
-        } else {
-            list.push(id);
-            if(currentData.selectedPlayers.includes(id)) {
-                let s = currentData.selectedPlayers.filter(i => i !== id);
-                await updateDoc(matchRef, { selectedPlayers: s });
+        if (type === 'player') {
+            if (newPlayers.includes(index)) {
+                newPlayers = newPlayers.filter(i => i !== index);
+            } else {
+                if (currentTotal >= 18) return showToast("⚠️ Máximo 18 jugadores.", "error");
+                newPlayers.push(index);
             }
-            window.showToast(`${name} bloqueado`, "error");
+        } else {
+            if (newGuests.includes(index)) {
+                newGuests = newGuests.filter(i => i !== index);
+            } else {
+                if (currentTotal >= 18) return showToast("⚠️ Máximo 18 jugadores.", "error");
+                newGuests.push(index);
+            }
         }
-        await updateDoc(matchRef, { bannedIndices: list });
+        await updateDoc(matchRef, { selectedPlayers: newPlayers, selectedGuests: newGuests });
     };
-    window.resetPin = async (id, name) => {
-        showConfirm("Reset PIN", `¿Borrar PIN de ${name}?`, async () => {
-            let p = {...currentData.pins}; delete p[id];
-            await updateDoc(matchRef, { pins: p });
-            window.showToast("PIN reseteado", "success");
-        });
-    };
-    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
-    window.showStats = async () => {
-        const hRef = collection(db, "history");
-        const snap = await getDocs(hRef);
-        window.showToast(`Partidos en histórico: ${snap.size}`, "info");
-    };
-    
-    window.forceGeneration = () => {
-        // SOLUCIÓN BUG: Sumar longitudes de arrays correctamente
-        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-        if(total < 8) return window.showToast("Mínimo 8", "error");
-        
-        showConfirm("Forzar Creación", "¿Crear equipos ignorando la hora?", () => {
-             // Llamar a trigger con parámetros
-             window.triggerGeneration(total <= 12 ? 2 : 3);
-             window.hideAdmin();
-        });
-    };
-    
-    window.forceReset = async () => {
-        showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => {
-             await setDoc(matchRef, { 
-                matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0],
-                timerState: 'stopped', roster: initialPlayers
-            });
+
+    // --- MEJORA 3: HISTORIAL EN RESET ---
+    window.resetCurrentMatch = async () => {
+        // 1. Guardar en historial si hay partido
+        if(currentData.matchDate && currentData.teams) {
+            const histRef = collection(db, "history");
+            await addDoc(histRef, { date: currentData.matchDate, teams: currentData.teams });
+        }
+
+        showConfirm("¿Reiniciar Partido?", "Esto guardará el acta y limpiará la lista para una nueva semana.", async () => {
+            await setDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], teams: null });
+            showToast("Partido reiniciado", "success");
             window.hideAdmin();
         });
     };
 
-    // Install PWA
-    let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
-    window.installApp = async () => {
-        if(defPrompt) { defPrompt.prompt(); defPrompt = null; }
-        else window.showToast("Usa menú navegador -> Instalar", "info");
+    window.showStats = async () => {
+        const hRef = collection(db, "history");
+        const snap = await getDocs(hRef);
+        showToast(`Partidos guardados en histórico: ${snap.size}`, "info");
     };
 
+    // --- GENERACIÓN ---
+    window.attemptGeneration = () => {
+        const targetTime = new Date(currentData.matchDate);
+        targetTime.setHours(19, 45, 0, 0);
+        if (new Date() < targetTime) return showToast("Aún no son las 19:45.", "error");
+
+        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
+        if (total < 8) return showToast("Faltan jugadores. Mínimo 8.", "error");
+
+        triggerGeneration(total <= 12 ? 2 : 3);
+    };
+
+    window.forceGeneration = () => {
+        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
+        if (total < 8) return showToast("Mínimo 8 jugadores", "error");
+        
+        showConfirm("Forzar Creación", "¿Generar equipos ignorando la hora?", () => {
+            triggerGeneration(total <= 12 ? 2 : 3);
+            window.hideAdmin();
+        });
+    };
+
+    const triggerGeneration = async (numTeams) => {
+        document.getElementById('loader').style.display = 'flex';
+        const sPlayers = (currentData.selectedPlayers || []).map(i => playersDB[i]);
+        const sGuests = (currentData.selectedGuests || []).map(i => ({...guestsDB[i], level: 0, isGuest: true}));
+        
+        let l3 = shuffle([...sPlayers.filter(p => p.level === 3)]);
+        let l2 = shuffle([...sPlayers.filter(p => p.level === 2)]);
+        let l1 = shuffle([...sPlayers.filter(p => p.level === 1)]);
+        let lg = shuffle([...sGuests]);
+        
+        let pool = [...l3, ...l2, ...l1, ...lg];
+        let teams = Array.from({ length: numTeams }, () => []);
+        pool.forEach((p, i) => teams[i % numTeams].push(p));
+        teams.forEach(t => shuffle(t));
+        
+        await updateDoc(matchRef, { teams: JSON.stringify(teams) });
+        document.getElementById('loader').style.display = 'none';
+        showToast("Equipos Generados", "success");
+    };
+
+    // --- ADMIN TOOLS ---
+    let taps = 0;
+    window.secretAdminTap = () => {
+        taps++; setTimeout(() => taps = 0, 2000);
+        if(taps === 5) {
+            const p = prompt("🔑 PIN Admin:");
+            if(p === ADMIN_PIN) document.getElementById('admin-zone').style.display = 'block';
+            else showToast("PIN Incorrecto", "error");
+            taps = 0;
+        }
+    };
+    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
+    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
+
+    // --- SHARES ---
+    window.shareConvocation = (d) => {
+        const date = d ? new Date(d) : new Date(currentData.matchDate);
+        const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n👇 *Apúntate:* ${window.location.href}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    };
+
+    window.shareTeamsOnWhatsapp = () => {
+         const t = window.currentTeamsForCopy; if(!t) return;
+         const d = new Date(currentData.matchDate);
+         const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+         let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()}\n\n`;
+         const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴'];
+         t.forEach((team, i) => {
+             txt += `${em[i]} *${names[i]}* (${team.length})\n`;
+             team.forEach(p => txt += `- ${p.name}\n`);
+             txt += `\n`;
+         });
+         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    };
+
+    // HELPERS
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+    
+    function renderTeams(teams) {
+        const resDiv = document.getElementById('teams-result');
+        resDiv.innerHTML = '';
+        const names = ['BLANCO', 'NEGRO', 'ROJO'];
+        const classes = ['team-blanco', 'team-negro', 'team-rojo'];
+        teams.forEach((team, idx) => {
+            let html = `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`;
+            team.forEach(p => {
+                const name = p.isGuest ? `<span class="guest-result">${p.name}</span>` : p.name;
+                html += `<li>${name}</li>`;
+            });
+            html += `</ul></div>`;
+            resDiv.innerHTML += html;
+        });
+        window.currentTeamsForCopy = teams;
+    }
 </script>
 </body>
 </html>
