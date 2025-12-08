@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal</title>
+    <title>AMPA Futsal - LIVE222</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -23,6 +23,22 @@
         
         .container { width: 90%; max-width: 600px; padding: 15px 0; padding-bottom: 80px; flex: 1; }
         
+        /* --- NUEVO ESTILO DE SALUDO (MÁS VISIBLE) --- */
+        #user-greeting { 
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); /* Azul intenso */
+            color: white; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            text-align: center; 
+            font-weight: 800; 
+            font-size: 1.1rem; /* Letra más grande */
+            display: none; 
+            animation: slideDown 0.4s ease-out;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
         /* UX PREMIUM: TOAST & MODAL */
         #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
         .toast { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: auto; border-left: 4px solid var(--accent); }
@@ -155,10 +171,10 @@
         .loading-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; font-weight: bold; }
         #setup-panel { background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-top: 20px; }
         input[type="date"] { padding: 15px; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%; box-sizing: border-box; font-family: 'Montserrat', sans-serif; color: var(--brand-dark); margin-bottom: 20px; }
+        #time-lock-msg { text-align: center; color: #94a3b8; font-size: 0.75rem; margin-bottom: 20px; display: block; height: 20px; }
 
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes pulseTimer { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
@@ -167,12 +183,23 @@
 
 <div id="loader" class="loading-overlay">Conectando...</div>
 
+<div id="toast-container"></div>
+<div id="modal-overlay">
+    <div class="modal-box">
+        <div id="modal-title" class="modal-title"></div>
+        <div id="modal-text" class="modal-text"></div>
+        <input type="text" id="modal-input" class="modal-input">
+        <div id="modal-actions" class="modal-actions"></div>
+    </div>
+</div>
+
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.2</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal 25/26</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
 <div class="container">
+    
     <div id="user-greeting"></div>
 
     <div id="admin-zone">
@@ -268,17 +295,6 @@
     </div>
 </div>
 
-<div id="modal-overlay">
-    <div class="modal-box">
-        <div id="modal-title" class="modal-title"></div>
-        <div id="modal-text" class="modal-text"></div>
-        <input type="text" id="modal-input" class="modal-input">
-        <div id="modal-actions" class="modal-actions"></div>
-    </div>
-</div>
-
-<div id="toast-container"></div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -298,6 +314,7 @@ const firebaseConfig = {
     // -------------------------------------------------------------
 
     let app, db, matchRef, configRef;
+    
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
@@ -330,7 +347,7 @@ const firebaseConfig = {
         { id: "alfredo", name: "Alfredo", level: 1 }
     ];
 
-    // ORDEN ALFABÉTICO
+    // Ordenar alfabéticamente al inicio
     initialPlayers.sort((a, b) => a.name.localeCompare(b.name));
 
     const guestsDB = [
@@ -353,7 +370,7 @@ const firebaseConfig = {
     let timerInterval = null;
     let hasBeeped = false;
 
-    // GLOBALIZE UX HELPERS
+    // GLOBALIZE FUNCTIONS
     window.showToast = (msg, type = 'info') => {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -380,12 +397,10 @@ const firebaseConfig = {
 
     document.getElementById('date-input').valueAsDate = new Date();
     
-    // --- FIREBASE SYNC ---
     onSnapshot(matchRef, (docSnap) => {
         document.getElementById('loader').style.display = 'none';
         if (docSnap.exists()) {
             currentData = docSnap.data();
-            // AUTO FIX ROSTER
             if (!currentData.roster || currentData.roster.length === 0 || !currentData.roster[0].id) {
                 updateDoc(matchRef, { roster: initialPlayers });
             }
@@ -402,7 +417,7 @@ const firebaseConfig = {
 
     function updateUI(data) {
         const activeRoster = data.roster || initialPlayers;
-        // Ordenar alfabéticamente para visualización
+        // Orden alfabético
         activeRoster.sort((a, b) => a.name.localeCompare(b.name));
 
         const container = document.getElementById('player-container');
@@ -522,7 +537,6 @@ const firebaseConfig = {
         }
     }
 
-    // --- LOGICA ---
     window.toggleSelection = async (type, id, name) => {
         let newPlayers = [...(currentData.selectedPlayers || [])];
         let newGuests = [...(currentData.selectedGuests || [])];
@@ -556,7 +570,7 @@ const firebaseConfig = {
                 return;
             }
         } else {
-             // MENSAJE PERSONALIZADO
+             // CONFIRMACIÓN PERSONALIZADA
              const isJoining = (type === 'player' && !newPlayers.includes(id)) || (type === 'guest' && !newGuests.includes(id));
              const msg = isJoining ? `¿Seguro que quieres apuntarte, ${name}?` : `¿Seguro que quieres borrarte, ${name}?`;
              
@@ -598,8 +612,17 @@ const firebaseConfig = {
         const myId = localStorage.getItem('futsal_my_id');
         if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo convocados pueden votar.", "error");
         if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info");
+        
+        // Log de voto con nombre
+        const roster = currentData.roster || initialPlayers;
+        const voterName = roster.find(p => p.id === myId)?.name || "Alguien";
+        const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
         showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => {
-            await updateDoc(matchRef, { unlockVotes: arrayUnion(myId) });
+            await updateDoc(matchRef, { 
+                unlockVotes: arrayUnion(myId),
+                logs: arrayUnion(`🗳️ Voto de desbloqueo: ${voterName}|${now}`)
+            });
             window.showToast("Voto registrado", "success");
         });
     };
@@ -693,14 +716,12 @@ const firebaseConfig = {
         if(selected < today) return window.showToast("Día pasado no válido", "error");
 
         const adminSnap = await getDoc(configRef);
-        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" }); // Default fallback
+        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
 
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
              const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
              const myId = localStorage.getItem('futsal_my_id');
              const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
-
-             window.shareConvocation(dateInput);
 
              await setDoc(matchRef, { 
                 matchDate: dateInput, 
@@ -713,6 +734,7 @@ const firebaseConfig = {
                 teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
                 pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
             }, { merge: true });
+            window.shareConvocation(dateInput);
         });
     };
 
@@ -780,7 +802,6 @@ const firebaseConfig = {
         const snap = await getDocs(hRef);
         window.showToast(`Partidos en histórico: ${snap.size}`, "info");
     };
-    
     window.forceGeneration = () => {
         const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
         if(total < 8) return window.showToast("Mínimo 8", "error");
@@ -835,14 +856,18 @@ const firebaseConfig = {
     }
     
     let taps = 0;
+    let tapTimer = null;
     window.secretAdminTap = async () => {
-        taps++; setTimeout(() => taps = 0, 2000);
+        taps++; 
+        clearTimeout(tapTimer);
+        tapTimer = setTimeout(() => taps = 0, 2000);
         if(taps === 5) {
             document.getElementById('modal-input').value = '';
             showConfirm("Acceso Admin", "Introduce PIN:", (val) => {
+                // PIN CODE DIRECTO AQUI: 1234
                 if(val === "1234") document.getElementById('admin-zone').style.display = 'block';
                 else window.showToast("PIN Incorrecto", "error");
-            }, true); // true = mostrar input
+            }, true);
             taps = 0;
         }
     };
@@ -851,7 +876,7 @@ const firebaseConfig = {
     window.shareConvocation = (d) => {
         const date = d ? new Date(d) : new Date(currentData.matchDate);
         const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
-        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: 19:45h\n\n👇 *APÚNTATE:* ${window.location.href}`;
+        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
     };
     window.shareTeamsOnWhatsapp = () => {
