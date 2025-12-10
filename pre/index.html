@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v2.3</title>
+    <title>AMPA Futsal v2.5</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -31,14 +31,28 @@
         .toast.error { border-left-color: var(--danger); } .toast.success { border-left-color: var(--success); }
         
         #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1500; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-box { background: white; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-box { background: white; padding: 25px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
         .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: var(--brand-dark); }
         .modal-text { font-size: 0.9rem; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
         .modal-input { width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; font-size: 1rem; text-align: center; display: none; }
-        .modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: auto; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
         .modal-btn.cancel { background: #e2e8f0; color: #475569; } .modal-btn.confirm { background: var(--brand-dark); color: white; }
         
+        /* STATS MODAL */
+        #stats-content { overflow-y: auto; text-align: left; width: 100%; margin-bottom: 15px; }
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
+        .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
+        .ranking-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .ranking-row:first-child { font-weight: 800; color: var(--brand-dark); border-bottom: 2px solid #cbd5e1; }
+        .rank-pos { width: 30px; font-weight: bold; color: var(--accent); }
+        .rank-name { flex: 1; }
+        .rank-val { font-weight: 800; color: var(--brand-dark); }
+        .history-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+        .h-date { font-weight: 800; font-size: 0.8rem; color: #64748b; margin-bottom: 5px; }
+        .h-score { font-family: monospace; font-weight: bold; color: var(--brand-dark); }
+
         /* PLAYERS LIST */
         .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         .player-checkbox { position: relative; background: var(--card-bg); padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.85rem; font-weight: 600; user-select: none; }
@@ -64,6 +78,7 @@
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         
         /* BOTONES */
+        .stats-btn-main { width: 100%; background: white; border: 1px solid #cbd5e1; color: var(--brand-dark); padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
         .action-btn:active { transform: scale(0.98); }
         .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
@@ -134,36 +149,17 @@
         #user-greeting { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; font-size: 0.85rem; display: none; animation: fadeIn 0.5s; }
         h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
 
-        /* --- STICKY USER BAR (NUEVO) --- */
+        /* --- STICKY USER BAR --- */
         #user-action-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid #e2e8f0;
-            padding: 15px 20px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
-            display: none; /* Se activa con JS */
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1100;
-            animation: slideUp 0.3s ease-out;
+            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid #e2e8f0; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: none;
+            justify-content: space-between; align-items: center; z-index: 1100; animation: slideUp 0.3s ease-out;
             padding-bottom: max(15px, env(safe-area-inset-bottom));
         }
         .action-bar-text { font-size: 0.9rem; color: var(--brand-dark); font-weight: 700; }
         .action-bar-btn {
-            padding: 12px 25px;
-            border-radius: 30px;
-            border: none;
-            font-weight: 800;
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            transition: transform 0.1s;
+            padding: 12px 25px; border-radius: 30px; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.1s;
         }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
@@ -183,26 +179,42 @@
 <div id="loader" class="loading-overlay">Conectando...</div>
 
 <div id="toast-container"></div>
+
 <div id="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box" id="generic-modal-box">
         <div id="modal-title" class="modal-title"></div>
         <div id="modal-text" class="modal-text"></div>
         <input type="text" id="modal-input" class="modal-input">
+        
+        <div id="stats-content" style="display:none;">
+            <div class="tabs">
+                <div class="tab active" onclick="window.switchTab('ranking')">🏆 Ranking</div>
+                <div class="tab" onclick="window.switchTab('history')">📅 Partidos</div>
+            </div>
+            <div id="tab-ranking" style="display:block;">
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando datos...</div>
+            </div>
+            <div id="tab-history" style="display:none;">
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando datos...</div>
+            </div>
+        </div>
+
         <div id="modal-actions" class="modal-actions"></div>
     </div>
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.3</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.5</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
 <div class="container">
     <div id="user-greeting"></div>
-
+    
     <div id="admin-zone">
         <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE</div>
         <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">🔄 Reiniciar Partido (Nuevo Día)</button>
+        <button class="admin-btn" style="background-color:#475569;" onclick="window.openStats()">📊 Ver Ranking y Historial</button>
         <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🛡️ Seguridad & Votación:</div>
         <div style="display:flex; gap:5px;">
             <button id="pin-mode-btn" class="pin-toggle-btn" onclick="window.togglePinMode()">PIN...</button>
@@ -298,7 +310,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // -------------------------------------------------------------
     // ⚠️ CONFIGURACIÓN FIREBASE ⚠️
@@ -384,6 +396,11 @@
         document.getElementById('modal-title').innerText = title;
         document.getElementById('modal-text').innerText = text;
         const input = document.getElementById('modal-input');
+        
+        // Reset estados
+        document.getElementById('stats-content').style.display = 'none';
+        document.getElementById('modal-text').style.display = 'block';
+        
         if(showInput) { input.style.display = 'block'; input.value = ''; input.focus(); } else input.style.display = 'none';
         const actions = document.getElementById('modal-actions');
         actions.innerHTML = '';
@@ -392,6 +409,115 @@
         actions.appendChild(btnCancel); actions.appendChild(btnConfirm);
         modal.style.display = 'flex';
     }
+
+    // --- LOGICA DE ESTADISTICAS ---
+    window.openStats = async () => {
+        const modal = document.getElementById('modal-overlay');
+        document.getElementById('modal-title').innerText = "Estadísticas y Ranking";
+        document.getElementById('modal-text').style.display = 'none';
+        document.getElementById('modal-input').style.display = 'none';
+        document.getElementById('stats-content').style.display = 'block';
+        
+        // Botón cerrar
+        const actions = document.getElementById('modal-actions');
+        actions.innerHTML = '';
+        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; };
+        actions.appendChild(btnClose);
+        
+        modal.style.display = 'flex';
+        
+        // Cargar datos
+        try {
+            const histRef = collection(db, "history");
+            // Nota: Ordenar en cliente es más barato para pocos datos que crear índice compuesto
+            const snap = await getDocs(histRef);
+            
+            const matches = [];
+            const playerCounts = {};
+            
+            snap.forEach(doc => {
+                const d = doc.data();
+                matches.push(d);
+                
+                // Contar jugadores
+                if(d.teams) {
+                    let teamsArr = [];
+                    try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){}
+                    
+                    teamsArr.forEach(team => {
+                        team.forEach(player => {
+                            if(!player.isGuest) {
+                                playerCounts[player.name] = (playerCounts[player.name] || 0) + 1;
+                            }
+                        });
+                    });
+                }
+            });
+            
+            // Render Ranking
+            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]);
+            const rankDiv = document.getElementById('tab-ranking');
+            rankDiv.innerHTML = '';
+            
+            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>';
+            
+            sortedPlayers.forEach(([name, count], index) => {
+                let medal = '';
+                if(index === 0) medal = '🥇';
+                else if(index === 1) medal = '🥈';
+                else if(index === 2) medal = '🥉';
+                
+                rankDiv.innerHTML += `
+                    <div class="ranking-row">
+                        <div class="rank-pos">${medal || (index + 1)}</div>
+                        <div class="rank-name">${name}</div>
+                        <div class="rank-val">${count}</div>
+                    </div>
+                `;
+            });
+            
+            // Render Partidos (ordenar por fecha descendente aprox)
+            // Si las fechas son strings 'YYYY-MM-DD', sort funciona.
+            matches.sort((a,b) => (a.date < b.date ? 1 : -1));
+            
+            const histDiv = document.getElementById('tab-history');
+            histDiv.innerHTML = '';
+            
+            if(matches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos registrados</div>';
+
+            matches.forEach(m => {
+                const d = new Date(m.date);
+                const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
+                const s = m.scores || [0,0,0];
+                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`;
+                if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`;
+                
+                histDiv.innerHTML += `
+                    <div class="history-card">
+                        <div class="h-date">${dateStr}</div>
+                        <div class="h-score">${scoreStr}</div>
+                    </div>
+                `;
+            });
+            
+        } catch(e) {
+            console.error(e);
+            window.showToast("Error cargando historial", "error");
+        }
+    };
+    
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('[id^="tab-"]').forEach(d => d.style.display = 'none');
+        
+        if(tab === 'ranking') {
+            document.querySelector('.tab:nth-child(1)').classList.add('active');
+            document.getElementById('tab-ranking').style.display = 'block';
+        } else {
+            document.querySelector('.tab:nth-child(2)').classList.add('active');
+            document.getElementById('tab-history').style.display = 'block';
+        }
+    };
 
     // --- INICIALIZACIÓN ---
     document.getElementById('date-input').valueAsDate = new Date();
