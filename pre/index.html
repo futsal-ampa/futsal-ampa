@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.5</title>
+    <title>AMPA Futsal v3.6 (Estable)</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -69,11 +69,7 @@
         /* BOTONES & ESTILOS NUEVOS DE BOTON CREAR */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .action-btn:active { transform: scale(0.98); }
-        
-        /* Boton Bloqueado */
         .btn-locked { background-color: #94a3b8 !important; opacity: 0.7; cursor: not-allowed; box-shadow: none; filter: grayscale(0.8); }
-        
-        /* Boton Desbloqueado */
         .btn-unlocked { background-color: var(--brand-blue) !important; opacity: 1; cursor: pointer; animation: pulseBtn 2s infinite; box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
 
         .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
@@ -221,7 +217,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.5</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.6</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -406,6 +402,15 @@
     
     let timerInterval = null;
     let hasBeeped = false;
+
+    // --- HELPER: SHUFFLE (Ahora disponible globalmente para evitar errores) ---
+    window.shuffle = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    };
 
     // --- AUTHENTICATION STATE ---
     onAuthStateChanged(auth, (user) => {
@@ -657,57 +662,65 @@
 
     // --- ALGORITMO GREEDY BALANCE (Equipos equilibrados invisibles) ---
     window.triggerGeneration = async (numTeams) => {
-        document.getElementById('loader').style.display = 'flex';
-        const roster = currentData.roster || initialPlayers;
-        
-        // 1. Obtener jugadores seleccionados y asignarles su nivel decimal
-        const pool = [];
-        (currentData.selectedPlayers || []).forEach(id => {
-            const p = roster.find(x => x.id === id);
-            if(p) pool.push({ ...p, isGuest: false });
-        });
-        (currentData.selectedGuests || []).forEach(id => {
-            const g = guestsDB.find(x => x.id === id);
-            // Invitados: Usar nivel definido o default 1.5
-            pool.push({ ...g, level: g.level || 1.5, isGuest: true });
-        });
-
-        // 2. Ordenar por nivel (Mejor a Peor)
-        pool.sort((a, b) => b.level - a.level);
-
-        // 3. Crear equipos vacios
-        let teams = Array.from({ length: numTeams }, () => ({ players: [], totalScore: 0 }));
-
-        // 4. Reparto Greedy: Asignar al siguiente mejor jugador al equipo más débil
-        pool.forEach(player => {
-            // Ordenar equipos por puntuación ascendente (el más débil primero)
-            // PERO: Si un equipo ya tiene demasiados jugadores, pasarlo al final
-            teams.sort((a, b) => {
-                if (a.players.length !== b.players.length) return a.players.length - b.players.length; // Priorizar llenar huecos
-                return a.totalScore - b.totalScore; // Luego priorizar score
-            });
+        try {
+            document.getElementById('loader').style.display = 'flex';
+            const roster = currentData.roster || initialPlayers;
             
-            teams[0].players.push(player);
-            teams[0].totalScore += player.level;
-        });
+            // 1. Obtener jugadores seleccionados y asignarles su nivel decimal
+            const pool = [];
+            (currentData.selectedPlayers || []).forEach(id => {
+                const p = roster.find(x => x.id === id);
+                if(p) pool.push({ ...p, isGuest: false });
+            });
+            (currentData.selectedGuests || []).forEach(id => {
+                const g = guestsDB.find(x => x.id === id);
+                if(g) { // Check safety added
+                    // Invitados: Usar nivel definido o default 1.5
+                    pool.push({ ...g, level: g.level || 1.5, isGuest: true });
+                }
+            });
 
-        // 5. Extraer solo los arrays de jugadores
-        const finalTeams = teams.map(t => t.players);
-        
-        // MEJORA: Barajar el orden DENTRO de cada equipo para ocultar el ranking
-        finalTeams.forEach(team => shuffle(team));
+            // 2. Ordenar por nivel (Mejor a Peor)
+            pool.sort((a, b) => b.level - a.level);
 
-        // Guardar
-        const teamsString = JSON.stringify(finalTeams);
-        const myId = localStorage.getItem('futsal_my_id');
-        const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
-        const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            // 3. Crear equipos vacios
+            let teams = Array.from({ length: numTeams }, () => ({ players: [], totalScore: 0 }));
 
-        await updateDoc(matchRef, { 
-            teams: teamsString,
-            logs: arrayUnion(`⚽ Equipos equilibrados creados por ${author}|${now}`)
-        });
-        document.getElementById('loader').style.display = 'none';
+            // 4. Reparto Greedy: Asignar al siguiente mejor jugador al equipo más débil
+            pool.forEach(player => {
+                // Ordenar equipos por puntuación ascendente (el más débil primero)
+                // PERO: Si un equipo ya tiene demasiados jugadores, pasarlo al final
+                teams.sort((a, b) => {
+                    if (a.players.length !== b.players.length) return a.players.length - b.players.length; // Priorizar llenar huecos
+                    return a.totalScore - b.totalScore; // Luego priorizar score
+                });
+                
+                teams[0].players.push(player);
+                teams[0].totalScore += player.level;
+            });
+
+            // 5. Extraer solo los arrays de jugadores
+            const finalTeams = teams.map(t => t.players);
+            
+            // MEJORA: Barajar el orden DENTRO de cada equipo para ocultar el ranking
+            finalTeams.forEach(team => window.shuffle(team));
+
+            // Guardar
+            const teamsString = JSON.stringify(finalTeams);
+            const myId = localStorage.getItem('futsal_my_id');
+            const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
+            const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+            await updateDoc(matchRef, { 
+                teams: teamsString,
+                logs: arrayUnion(`⚽ Equipos equilibrados creados por ${author}|${now}`)
+            });
+            document.getElementById('loader').style.display = 'none';
+        } catch (e) {
+            console.error(e);
+            document.getElementById('loader').style.display = 'none';
+            window.showToast("Error generando equipos: " + e.message, "error");
+        }
     };
 
     // --- AUTH LOGIN TRIGGER (CORREGIDO) ---
