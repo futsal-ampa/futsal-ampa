@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.14</title>
+    <title>AMPA Futsal v3.15</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -199,6 +199,23 @@
         .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
         .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
+        /* NUEVO ESTILO PARA EL BOTON "NO ERES TU" */
+        .reset-id-btn {
+            background: #fff;
+            border: 1px solid #d97706;
+            color: #d97706;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            cursor: pointer;
+            margin-left: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            text-transform: uppercase;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -243,7 +260,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.14</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.15</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -552,8 +569,7 @@
         const guestContainer = document.getElementById('guest-container');
         container.innerHTML = ''; guestContainer.innerHTML = '';
 
-        // --- ADMIN UI UPDATE FIX (CARGANDO INFINITO) ---
-        // Renderizamos las listas de admin aquí arriba para asegurar que se limpian
+        // Render Admin Lists first to clear loading
         const banList = document.getElementById('ban-list');
         const pinList = document.getElementById('pin-list');
         if(banList && pinList) {
@@ -580,8 +596,8 @@
             const me = activeRoster.find(p => p.id === myId);
             if (me) {
                 const greet = document.getElementById('user-greeting');
-                // LINK DE RESET AÑADIDO
-                greet.innerHTML = `👋 Hola, ${me.name} <span style="font-size:0.7em; text-decoration:underline; cursor:pointer; margin-left:5px;" onclick="window.resetIdentity()">(¿No eres tú?)</span>`;
+                // LINK DE RESET AÑADIDO (BOTON TIPO CHIP)
+                greet.innerHTML = `👋 Hola, ${me.name} <span class="reset-id-btn" onclick="window.resetIdentity()">¿NO ERES TÚ?</span>`;
                 greet.style.display = 'block';
 
                 if (data.matchDate && !data.teams) {
@@ -873,7 +889,6 @@
              });
         }
     };
-    
     async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName) {
         let actionSuffix = "";
         if (actorName && actorName !== "Alguien" && actorName !== name) {
@@ -888,6 +903,7 @@
             } else {
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
                 newPlayers.push(id);
+                // Si me apunto a mí mismo, guardo mi ID. Si apunto a otro, NO cambio mi identidad.
                 if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
                 
                 await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} entra${actionSuffix}|${timeStr}`) });
@@ -897,6 +913,7 @@
              if (newGuests.includes(id)) {
                 newGuests = newGuests.filter(i => i !== id);
                 delete newGuestInviters[id];
+                // LOG DE QUIEN ELIMINA AL INVITADO
                 await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} eliminado por ${actorName}|${timeStr}`) });
             } else {
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
@@ -906,7 +923,6 @@
             }
         }
     }
-    
     window.voteToUnlock = async () => { /* ... existing code ... */ 
         const myId = localStorage.getItem('futsal_my_id');
         if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo convocados pueden votar.", "error");
@@ -937,12 +953,6 @@
              await updateDoc(matchRef, { lockTime: "00:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
              window.showToast("Botón desbloqueado para todos", "success");
              window.hideAdmin();
-        });
-    };
-    window.resetRosterOnly = async () => {
-        showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código? El historial NO se borrará.", async () => {
-            await updateDoc(matchRef, { roster: initialPlayers });
-            window.showToast("Plantilla actualizada", "success");
         });
     };
     
@@ -1104,6 +1114,41 @@
     window.updateScore = async (idx, delta) => { let s = [...(currentData.scores || [0,0,0])]; s[idx] = Math.max(0, s[idx] + delta); await updateDoc(matchRef, { scores: s }); };
     let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
     window.installApp = async () => { if(defPrompt) { defPrompt.prompt(); defPrompt = null; } else window.showToast("Usa menú navegador -> Instalar", "info"); };
+
+    function checkTimeLock(dateStr, lockTimeStr) {
+        const btn = document.getElementById('btn-create');
+        const msg = document.getElementById('time-lock-msg');
+        const now = new Date();
+        const target = new Date(dateStr);
+        const [h, m] = (lockTimeStr || "18:00").split(':');
+        target.setHours(h, m, 0, 0);
+        
+        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
+        const canUnlock = (currentData.voteMode !== false && votes >= 3);
+        
+        // Remove standard disabled attribute to allow click interaction
+        btn.removeAttribute('disabled');
+
+        if (now >= target || canUnlock) {
+            // Unlocked state
+            btn.className = "action-btn btn-unlocked";
+            btn.innerHTML = "⚽ CREAR EQUIPOS";
+            msg.innerText = "";
+        } else {
+            // Locked state
+            btn.className = "action-btn btn-locked";
+            btn.innerHTML = "🔒 CREAR EQUIPOS";
+            msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
+        }
+        
+        const cd = document.getElementById('countdown-display');
+        if(now < target) {
+            const diff = target - now;
+            const hh = Math.floor(diff/(1000*60*60));
+            const mm = Math.floor((diff%(1000*60*60))/(1000*60));
+            cd.innerText = `Cierre en: ${hh}h ${mm}m`;
+        } else cd.innerText = "Cierre alcanzado";
+    }
 
 </script>
 </body>
