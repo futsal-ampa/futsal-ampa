@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.3</title>
+    <title>AMPA Futsal v3.4</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -66,10 +66,16 @@
         .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         
-        /* BOTONES */
-        .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
+        /* BOTONES & ESTILOS NUEVOS DE BOTON CREAR */
+        .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .action-btn:active { transform: scale(0.98); }
-        .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
+        
+        /* Boton Bloqueado */
+        .btn-locked { background-color: #94a3b8 !important; opacity: 0.7; cursor: not-allowed; box-shadow: none; filter: grayscale(0.8); }
+        
+        /* Boton Desbloqueado */
+        .btn-unlocked { background-color: var(--brand-blue) !important; opacity: 1; cursor: pointer; animation: pulseBtn 2s infinite; box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
+
         .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
@@ -175,7 +181,7 @@
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes pulseTimer { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -215,7 +221,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.3</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.4</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -289,7 +295,7 @@
                 <div id="activity-log"></div>
             </div>
             <button id="vote-btn" class="vote-btn" style="display:none;" onclick="window.voteToUnlock()">🔓 Solicitar Desbloqueo (0/3)</button>
-            <button id="btn-create" class="action-btn" onclick="window.attemptGeneration()">CREAR EQUIPOS</button>
+            <button id="btn-create" class="action-btn" onclick="window.attemptGeneration()">🔒 CREAR EQUIPOS</button>
             <span id="time-lock-msg" style="text-align: center; display:block; color:#94a3b8; font-size:0.75rem; margin-bottom:20px;"></span>
         </div>
 
@@ -500,7 +506,9 @@
     });
 
     function updateUI(data) {
-        const activeRoster = data.roster || initialPlayers;
+        // SORT ALPHABETICALLY FOR DISPLAY ONLY
+        const activeRoster = [...(data.roster || initialPlayers)].sort((a, b) => a.name.localeCompare(b.name));
+        
         const container = document.getElementById('player-container');
         const guestContainer = document.getElementById('guest-container');
         container.innerHTML = ''; guestContainer.innerHTML = '';
@@ -816,13 +824,18 @@
             window.showToast("Voto registrado", "success");
         });
     };
-    window.attemptGeneration = () => { /* ... existing code ... */
+    window.attemptGeneration = () => {
         const targetTime = new Date(currentData.matchDate);
         const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
         targetTime.setHours(hours, minutes, 0, 0);
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
-        if (new Date() < targetTime && !canUnlockByVote) return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
+        
+        // CHECK ONLY IF BUTTON IS CLICKED
+        if (new Date() < targetTime && !canUnlockByVote) {
+            return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
+        }
+        
         const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
         if (total < 8) return window.showToast("Mínimo 8.", "error");
         if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
@@ -1012,6 +1025,41 @@
     window.updateScore = async (idx, delta) => { let s = [...(currentData.scores || [0,0,0])]; s[idx] = Math.max(0, s[idx] + delta); await updateDoc(matchRef, { scores: s }); };
     let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
     window.installApp = async () => { if(defPrompt) { defPrompt.prompt(); defPrompt = null; } else window.showToast("Usa menú navegador -> Instalar", "info"); };
+
+    function checkTimeLock(dateStr, lockTimeStr) {
+        const btn = document.getElementById('btn-create');
+        const msg = document.getElementById('time-lock-msg');
+        const now = new Date();
+        const target = new Date(dateStr);
+        const [h, m] = (lockTimeStr || "18:00").split(':');
+        target.setHours(h, m, 0, 0);
+        
+        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
+        const canUnlock = (currentData.voteMode !== false && votes >= 3);
+        
+        // Remove standard disabled attribute to allow click interaction
+        btn.removeAttribute('disabled');
+
+        if (now >= target || canUnlock) {
+            // Unlocked state
+            btn.className = "action-btn btn-unlocked";
+            btn.innerHTML = "⚽ CREAR EQUIPOS";
+            msg.innerText = "";
+        } else {
+            // Locked state
+            btn.className = "action-btn btn-locked";
+            btn.innerHTML = "🔒 CREAR EQUIPOS";
+            msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
+        }
+        
+        const cd = document.getElementById('countdown-display');
+        if(now < target) {
+            const diff = target - now;
+            const hh = Math.floor(diff/(1000*60*60));
+            const mm = Math.floor((diff%(1000*60*60))/(1000*60));
+            cd.innerText = `Cierre en: ${hh}h ${mm}m`;
+        } else cd.innerText = "Cierre alcanzado";
+    }
 
 </script>
 </body>
