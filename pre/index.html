@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v2.6</title>
+    <title>AMPA Futsal v3.0 PRO</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -21,7 +21,6 @@
         h1 { text-align: center; color: white; font-size: 1.1rem; margin: 0; font-weight: 800; text-transform: uppercase; line-height: 1.2; cursor: pointer; }
         .match-date-display { color: var(--accent); font-size: 0.8rem; margin-top: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         
-        /* Ajuste de padding inferior para que la barra fija no tape contenido */
         .container { width: 90%; max-width: 600px; padding: 15px 0; padding-bottom: 120px; flex: 1; }
         
         /* UX: TOAST & MODAL */
@@ -39,25 +38,11 @@
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
         .modal-btn.cancel { background: #e2e8f0; color: #475569; } .modal-btn.confirm { background: var(--brand-dark); color: white; }
         
-        /* STATS MODAL */
-        #stats-content { overflow-y: auto; text-align: left; width: 100%; margin-bottom: 15px; }
-        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px; }
-        .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
-        .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
-        .ranking-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-        .ranking-row:first-child { font-weight: 800; color: var(--brand-dark); border-bottom: 2px solid #cbd5e1; }
-        .rank-pos { width: 30px; font-weight: bold; color: var(--accent); }
-        .rank-name { flex: 1; }
-        .rank-val { font-weight: 800; color: var(--brand-dark); }
-        .history-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 10px; display:flex; justify-content: space-between; align-items: center; }
-        .h-info { text-align: left; }
-        .h-date { font-weight: 800; font-size: 0.85rem; color: #334155; }
-        .h-score { font-family: monospace; font-weight: bold; color: #64748b; font-size: 0.8rem; margin-top:2px; }
-        .h-players { background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; }
-        .stats-footer { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ef4444; text-align: center; }
-        .reset-stats-btn { background: #fff1f2; color: #e11d48; border: 1px solid #fda4af; padding: 8px 15px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; width: 100%; }
+        /* LOGIN FORM */
+        #login-form { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        #login-form input { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
 
-        /* PLAYERS LIST */
+        /* PLAYERS */
         .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         .player-checkbox { position: relative; background: var(--card-bg); padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.85rem; font-weight: 600; user-select: none; }
         .player-checkbox.selected { background-color: #eff6ff; border-color: var(--brand-blue); color: var(--brand-blue); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1); }
@@ -82,7 +67,6 @@
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         
         /* BOTONES */
-        .stats-btn-main { width: 100%; background: white; border: 1px solid #cbd5e1; color: var(--brand-dark); padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.2s; }
         .action-btn:active { transform: scale(0.98); }
         .action-btn:disabled { background-color: var(--disabled); cursor: not-allowed; box-shadow: none; transform: none; }
@@ -170,6 +154,23 @@
         .btn-leave { background: var(--danger); color: white; }
         .btn-full { background: var(--disabled); color: white; cursor: not-allowed; }
         
+        /* Stats Styles */
+        .ranking-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .ranking-row:first-child { font-weight: 800; color: var(--brand-dark); border-bottom: 2px solid #cbd5e1; }
+        .rank-pos { width: 30px; font-weight: bold; color: var(--accent); }
+        .rank-name { flex: 1; }
+        .rank-val { font-weight: 800; color: var(--brand-dark); }
+        .history-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 10px; display:flex; justify-content: space-between; align-items: center; }
+        .h-info { text-align: left; }
+        .h-date { font-weight: 800; font-size: 0.85rem; color: #334155; }
+        .h-score { font-family: monospace; font-weight: bold; color: #64748b; font-size: 0.8rem; margin-top:2px; }
+        .h-players { background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; }
+        .stats-footer { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ef4444; text-align: center; }
+        .reset-stats-btn { background: #fff1f2; color: #e11d48; border: 1px solid #fda4af; padding: 8px 15px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; width: 100%; }
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
+        .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
+
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -188,6 +189,12 @@
     <div class="modal-box" id="generic-modal-box">
         <div id="modal-title" class="modal-title"></div>
         <div id="modal-text" class="modal-text"></div>
+        
+        <div id="login-form">
+            <input type="email" id="login-email" placeholder="Email admin">
+            <input type="password" id="login-pass" placeholder="Contraseña">
+        </div>
+
         <input type="text" id="modal-input" class="modal-input">
         
         <div id="stats-content" style="display:none;">
@@ -208,7 +215,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.6</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.0</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -216,7 +223,11 @@
     <div id="user-greeting"></div>
     
     <div id="admin-zone">
-        <div style="color:#e11d48; font-weight:800; margin-bottom:10px;">ADMIN ZONE</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="color:#e11d48; font-weight:800;">ADMIN PRO</div>
+            <button onclick="window.logoutAdmin()" style="background:none; border:none; font-size:0.8rem; text-decoration:underline; color:#64748b; cursor:pointer;">Salir</button>
+        </div>
+        
         <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">🔄 Reiniciar Partido (Nuevo Día)</button>
         <button class="admin-btn" style="background-color:#475569;" onclick="window.openStats()">📊 Ver Ranking y Historial</button>
         <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🛡️ Seguridad & Votación:</div>
@@ -314,7 +325,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs, query, orderBy, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     // -------------------------------------------------------------
     // ⚠️ CONFIGURACIÓN FIREBASE ⚠️
@@ -330,46 +342,49 @@
     };
     // -------------------------------------------------------------
 
-    let app, db, matchRef, configRef;
+    let app, db, matchRef, configRef, auth;
     
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
+        auth = getAuth(app);
         matchRef = doc(db, "partidos", "semana_actual");
         configRef = doc(db, "config", "admin_settings"); 
     } catch (e) { console.error("Error init firebase", e); }
 
+    // --- LISTA PRO CON SUB-NIVELES (Ocultos al usuario) ---
+    // Edita aquí los decimales para afinar el equilibrio
     const initialPlayers = [
-        { id: "willi", name: "Willi", level: 3 },
-        { id: "jhon", name: "Jhon", level: 3 },
-        { id: "santi", name: "Santi", level: 3 },
-        { id: "ivan", name: "Ivan", level: 3 },
-        { id: "gus", name: "Gus", level: 3 },
-        { id: "fabian", name: "Fabián", level: 3 },
-        { id: "arturo", name: "Arturo", level: 3 },
-        { id: "abraham", name: "Abraham", level: 2 },
-        { id: "ivan_n", name: "Iván N", level: 2 },
-        { id: "adrian", name: "Adrián", level: 2 },
-        { id: "yusto", name: "Yusto", level: 2 },
-        { id: "jose", name: "José", level: 2 },
-        { id: "tono", name: "Toño", level: 2 },
-        { id: "rafa", name: "Rafa", level: 2 },
-        { id: "edu", name: "Edu", level: 2 },
-        { id: "jesus_s", name: "Jesús S", level: 1 },
-        { id: "norvey", name: "Norvey", level: 1 },
-        { id: "richard", name: "Richard", level: 1 },
-        { id: "ruben", name: "Rubén", level: 1 },
-        { id: "eloy", name: "Eloy", level: 1 },
-        { id: "luis", name: "Luis", level: 1 },
-        { id: "alfredo", name: "Alfredo", level: 1 }
+        { id: "willi", name: "Willi", level: 3.2 },
+        { id: "jhon", name: "Jhon", level: 3.0 },
+        { id: "santi", name: "Santi", level: 3.1 },
+        { id: "ivan", name: "Ivan", level: 3.0 },
+        { id: "gus", name: "Gus", level: 3.0 },
+        { id: "fabian", name: "Fabián", level: 2.9 },
+        { id: "arturo", name: "Arturo", level: 2.8 },
+        { id: "abraham", name: "Abraham", level: 2.5 },
+        { id: "ivan_n", name: "Iván N", level: 2.4 },
+        { id: "adrian", name: "Adrián", level: 2.3 },
+        { id: "yusto", name: "Yusto", level: 2.2 },
+        { id: "jose", name: "José", level: 2.1 },
+        { id: "tono", name: "Toño", level: 2.0 },
+        { id: "rafa", name: "Rafa", level: 2.0 },
+        { id: "edu", name: "Edu", level: 2.0 },
+        { id: "jesus_s", name: "Jesús S", level: 1.8 },
+        { id: "norvey", name: "Norvey", level: 1.5 },
+        { id: "richard", name: "Richard", level: 1.5 },
+        { id: "ruben", name: "Rubén", level: 1.2 },
+        { id: "eloy", name: "Eloy", level: 1.0 },
+        { id: "luis", name: "Luis", level: 1.0 },
+        { id: "alfredo", name: "Alfredo", level: 1.0 }
     ];
 
     const guestsDB = [
-        { id: "guest_1", name: "Invitado 1" }, 
-        { id: "guest_2", name: "Invitado 2" }, 
-        { id: "guest_3", name: "Invitado 3" }, 
-        { id: "guest_4", name: "Invitado 4" }, 
-        { id: "guest_5", name: "Invitado 5" }
+        { id: "guest_1", name: "Invitado 1", level: 1.5 }, 
+        { id: "guest_2", name: "Invitado 2", level: 1.5 }, 
+        { id: "guest_3", name: "Invitado 3", level: 1.5 }, 
+        { id: "guest_4", name: "Invitado 4", level: 1.5 }, 
+        { id: "guest_5", name: "Invitado 5", level: 1.5 }
     ];
 
     let currentData = { 
@@ -383,6 +398,16 @@
     
     let timerInterval = null;
     let hasBeeped = false;
+
+    // --- AUTHENTICATION STATE ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('admin-zone').style.display = 'block';
+            window.showToast("Modo Admin Activo", "success");
+        } else {
+            document.getElementById('admin-zone').style.display = 'none';
+        }
+    });
 
     // --- UTILS UX ---
     window.showToast = (msg, type = 'info') => {
@@ -401,8 +426,9 @@
         document.getElementById('modal-text').innerText = text;
         const input = document.getElementById('modal-input');
         
-        // Reset estados
+        // Reset visuales
         document.getElementById('stats-content').style.display = 'none';
+        document.getElementById('login-form').style.display = 'none';
         document.getElementById('modal-text').style.display = 'block';
         
         if(showInput) { input.style.display = 'block'; input.value = ''; input.focus(); } else input.style.display = 'none';
@@ -414,137 +440,36 @@
         modal.style.display = 'flex';
     }
 
-    // --- LOGICA DE ESTADISTICAS ---
-    window.openStats = async () => {
+    // --- LOGIN MODAL ---
+    window.showLoginModal = () => {
         const modal = document.getElementById('modal-overlay');
-        document.getElementById('modal-title').innerText = "Estadísticas y Ranking";
+        document.getElementById('modal-title').innerText = "Acceso Admin Seguro";
         document.getElementById('modal-text').style.display = 'none';
         document.getElementById('modal-input').style.display = 'none';
-        document.getElementById('stats-content').style.display = 'block';
+        document.getElementById('stats-content').style.display = 'none';
         
-        // Botón cerrar
+        const form = document.getElementById('login-form');
+        form.style.display = 'flex';
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-pass').value = '';
+
         const actions = document.getElementById('modal-actions');
         actions.innerHTML = '';
-        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; };
-        actions.appendChild(btnClose);
-        
+        const btnCancel = document.createElement('button'); btnCancel.className = 'modal-btn cancel'; btnCancel.innerText = 'Cancelar'; btnCancel.onclick = () => { modal.style.display = 'none'; };
+        const btnLogin = document.createElement('button'); btnLogin.className = 'modal-btn confirm'; btnLogin.innerText = 'Entrar'; 
+        btnLogin.onclick = () => { 
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            signInWithEmailAndPassword(auth, email, pass)
+                .then(() => { modal.style.display = 'none'; })
+                .catch((e) => { window.showToast("Error de acceso: " + e.message, "error"); });
+        };
+        actions.appendChild(btnCancel); actions.appendChild(btnLogin);
         modal.style.display = 'flex';
-        
-        // Cargar datos
-        try {
-            const histRef = collection(db, "history");
-            const snap = await getDocs(histRef);
-            
-            const matches = [];
-            const playerCounts = {};
-            
-            snap.forEach(doc => {
-                const d = doc.data();
-                matches.push(d);
-                
-                if(d.teams) {
-                    let teamsArr = [];
-                    try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){}
-                    
-                    teamsArr.forEach(team => {
-                        team.forEach(player => {
-                            if(!player.isGuest) {
-                                playerCounts[player.name] = (playerCounts[player.name] || 0) + 1;
-                            }
-                        });
-                    });
-                }
-            });
-            
-            // Render Ranking
-            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]);
-            const rankDiv = document.getElementById('tab-ranking');
-            rankDiv.innerHTML = '';
-            
-            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>';
-            
-            sortedPlayers.forEach(([name, count], index) => {
-                let medal = '';
-                if(index === 0) medal = '🥇';
-                else if(index === 1) medal = '🥈';
-                else if(index === 2) medal = '🥉';
-                
-                rankDiv.innerHTML += `
-                    <div class="ranking-row">
-                        <div class="rank-pos">${medal || (index + 1)}</div>
-                        <div class="rank-name">${name}</div>
-                        <div class="rank-val">${count}</div>
-                    </div>
-                `;
-            });
-            
-            // Boton Reset en Ranking
-            if(sortedPlayers.length > 0) {
-                rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial y Resetear Ranking</button></div>`;
-            }
-            
-            // Render Partidos
-            matches.sort((a,b) => (a.date < b.date ? 1 : -1));
-            const histDiv = document.getElementById('tab-history');
-            histDiv.innerHTML = '';
-            
-            if(matches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos registrados</div>';
+    }
 
-            matches.forEach(m => {
-                const d = new Date(m.date);
-                const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
-                const s = m.scores || [0,0,0];
-                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`;
-                if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`;
-                
-                // Conteo Jugadores
-                let pCount = 0;
-                if(m.teams) {
-                    let teamsArr = [];
-                    try { teamsArr = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; } catch(e){}
-                    teamsArr.forEach(t => pCount += t.length);
-                }
-                
-                histDiv.innerHTML += `
-                    <div class="history-card">
-                        <div class="h-info">
-                            <div class="h-date">${dateStr}</div>
-                            <div class="h-score">${scoreStr}</div>
-                        </div>
-                        <div class="h-players">👥 ${pCount} jug.</div>
-                    </div>
-                `;
-            });
-            
-        } catch(e) {
-            console.error(e);
-            window.showToast("Error cargando historial", "error");
-        }
-    };
-    
-    window.resetHistory = async () => {
-        showConfirm("⚠️ BORRAR HISTORIAL", "Esto eliminará todos los partidos pasados y pondrá el ranking a 0. ¿Estás seguro?", async () => {
-            const histRef = collection(db, "history");
-            const snap = await getDocs(histRef);
-            snap.forEach(async (d) => {
-                await deleteDoc(doc(db, "history", d.id));
-            });
-            window.showToast("Historial eliminado", "success");
-            setTimeout(() => window.openStats(), 500); 
-        });
-    };
-    
-    window.switchTab = (tab) => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('[id^="tab-"]').forEach(d => d.style.display = 'none');
-        
-        if(tab === 'ranking') {
-            document.querySelector('.tab:nth-child(1)').classList.add('active');
-            document.getElementById('tab-ranking').style.display = 'block';
-        } else {
-            document.querySelector('.tab:nth-child(2)').classList.add('active');
-            document.getElementById('tab-history').style.display = 'block';
-        }
+    window.logoutAdmin = () => {
+        signOut(auth).then(() => window.showToast("Sesión cerrada", "info"));
     };
 
     // --- INICIALIZACIÓN ---
@@ -554,13 +479,12 @@
         document.getElementById('loader').style.display = 'none';
         if (docSnap.exists()) {
             currentData = docSnap.data();
-            // AUTO FIX ROSTER (VITAL)
+            // AUTO FIX ROSTER
             if (!currentData.roster || currentData.roster.length === 0 || !currentData.roster[0].id) {
                 updateDoc(matchRef, { roster: initialPlayers });
             }
             updateUI(currentData);
         } else {
-            // INIT
             setDoc(matchRef, { 
                 matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
                 selectedPlayers: [], selectedGuests: [], guestInviters: {}, bannedIndices: [],
@@ -576,49 +500,31 @@
         const guestContainer = document.getElementById('guest-container');
         container.innerHTML = ''; guestContainer.innerHTML = '';
 
-        // --- GESTIÓN DE USUARIO (STICKY BAR & SALUDO) ---
         const myId = localStorage.getItem('futsal_my_id');
         const actionBar = document.getElementById('user-action-bar');
-        
-        // Ocultar por defecto
         actionBar.style.display = 'none';
         document.getElementById('user-greeting').style.display = 'none';
 
         if (myId) {
             const me = activeRoster.find(p => p.id === myId);
             if (me) {
-                // 1. Mostrar Saludo Superior
                 const greet = document.getElementById('user-greeting');
                 greet.innerText = `👋 Hola, ${me.name}`;
                 greet.style.display = 'block';
 
-                // 2. Lógica Sticky Bar
                 if (data.matchDate && !data.teams) {
                     actionBar.style.display = 'flex';
                     const txt = document.getElementById('action-bar-text');
                     const btn = document.getElementById('action-bar-btn');
-                    
                     const isSelected = data.selectedPlayers?.includes(myId);
                     const total = (data.selectedPlayers?.length || 0) + (data.selectedGuests?.length || 0);
-
                     txt.innerHTML = `<span>Tu estado:</span> ${isSelected ? '<span style="color:#22c55e">DENTRO</span>' : '<span style="color:#64748b">FUERA</span>'}`;
-
                     if (isSelected) {
-                        btn.innerText = "❌ BORRARME";
-                        btn.className = "action-bar-btn btn-leave";
-                        btn.disabled = false;
+                        btn.innerText = "❌ BORRARME"; btn.className = "action-bar-btn btn-leave"; btn.disabled = false;
                         btn.onclick = () => window.toggleSelection('player', myId, me.name);
                     } else {
-                        if (total >= 18) {
-                            btn.innerText = "⛔ COMPLETO";
-                            btn.className = "action-bar-btn btn-full";
-                            btn.disabled = true;
-                        } else {
-                            btn.innerText = "✅ APUNTARME";
-                            btn.className = "action-bar-btn btn-join";
-                            btn.disabled = false;
-                            btn.onclick = () => window.toggleSelection('player', myId, me.name);
-                        }
+                        if (total >= 18) { btn.innerText = "⛔ COMPLETO"; btn.className = "action-bar-btn btn-full"; btn.disabled = true; } 
+                        else { btn.innerText = "✅ APUNTARME"; btn.className = "action-bar-btn btn-join"; btn.disabled = false; btn.onclick = () => window.toggleSelection('player', myId, me.name); }
                     }
                 }
             }
@@ -628,19 +534,13 @@
             const div = document.createElement('div');
             div.className = 'player-checkbox';
             if (p.id === myId) div.classList.add('is-me');
-            
             const isSelected = data.selectedPlayers?.includes(p.id);
             const isBanned = data.bannedIndices?.includes(p.id);
             const pins = data.pins || {};
             const lockIcon = (data.pinMode !== false && pins[p.id]) ? '<span class="lock-icon">🔒</span>' : '';
-            
             let badgeContent = '';
-            if(isSelected) {
-                div.classList.add('selected');
-                badgeContent = data.selectedPlayers.indexOf(p.id) + 1;
-            }
+            if(isSelected) { div.classList.add('selected'); badgeContent = data.selectedPlayers.indexOf(p.id) + 1; }
             if(isBanned) div.classList.add('banned');
-
             div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
             if(!isBanned) div.onclick = () => window.toggleSelection('player', p.id, p.name);
             container.appendChild(div);
@@ -651,11 +551,8 @@
             div.className = 'player-checkbox guest-label';
             const isSelected = data.selectedGuests?.includes(g.id);
             const inviter = (data.guestInviters && data.guestInviters[g.id]) ? data.guestInviters[g.id] : null;
-            
             if(isSelected) div.classList.add('selected');
-            let badgeContent = isSelected ? 'G' : '';
-            
-            let html = `<div class="guest-name"><span class="order-badge">${badgeContent}</span> ${g.name}</div>`;
+            let html = `<div class="guest-name"><span class="order-badge">${isSelected ? 'G' : ''}</span> ${g.name}</div>`;
             if (isSelected && inviter) { html += `<div class="invited-by">↳ por ${inviter}</div>`; }
             div.innerHTML = html;
             div.onclick = () => window.toggleSelection('guest', g.id, g.name);
@@ -680,34 +577,14 @@
         document.getElementById('player-count').innerText = `${total} / 18`;
         const bar = document.getElementById('progress-fill');
         bar.style.width = `${Math.min((total/18)*100, 100)}%`;
-        if(total < 8) bar.style.backgroundColor = "#ef4444";
-        else if (total < 12) bar.style.backgroundColor = "#eab308";
-        else bar.style.backgroundColor = "#22c55e";
+        if(total < 8) bar.style.backgroundColor = "#ef4444"; else if (total < 12) bar.style.backgroundColor = "#eab308"; else bar.style.backgroundColor = "#22c55e";
 
-        // Admin Toggles
+        // Admin Stuff Update
         const pinBtn = document.getElementById('pin-mode-btn');
         if (data.pinMode !== false) { pinBtn.innerText = "🟢 PIN ACTIVADO"; pinBtn.className = "pin-toggle-btn pin-on"; } else { pinBtn.innerText = "🔴 PIN DESACTIVADO"; pinBtn.className = "pin-toggle-btn pin-off"; }
         const voteAdminBtn = document.getElementById('vote-mode-btn');
         if (data.voteMode !== false) { voteAdminBtn.innerText = "🟢 VOTOS ACTIVOS"; voteAdminBtn.className = "pin-toggle-btn pin-on"; } else { voteAdminBtn.innerText = "🔴 VOTOS OFF"; voteAdminBtn.className = "pin-toggle-btn pin-off"; }
-        document.getElementById('admin-time-input').value = data.lockTime || "18:00";
-
-        // Admin Lists
-        const banList = document.getElementById('ban-list');
-        const pinList = document.getElementById('pin-list');
-        banList.innerHTML = ""; pinList.innerHTML = "";
         
-        activeRoster.forEach(p => {
-             const isBanned = data.bannedIndices?.includes(p.id);
-             const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
-             const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
-             banList.innerHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
-             
-             if(data.pins && data.pins[p.id]) {
-                 pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
-             }
-        });
-        if(pinList.innerHTML === "") pinList.innerHTML = `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
-
         const votes = data.unlockVotes ? data.unlockVotes.length : 0;
         const voteBtn = document.getElementById('vote-btn');
         if (!data.teams && total >= 8 && data.voteMode !== false) {
@@ -715,6 +592,7 @@
             if(votes >= 3) { voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true; }
         } else voteBtn.style.display = 'none';
 
+        // Render Teams / Logs etc.
         const logDiv = document.getElementById('activity-log');
         if (data.logs && data.logs.length > 0) {
             logDiv.innerHTML = "";
@@ -731,15 +609,11 @@
             document.getElementById('selection-phase').style.display = 'none';
             document.getElementById('results-phase').style.display = 'block';
             document.getElementById('notify-btn').style.display = 'none';
-            
-            if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex';
-            else document.getElementById('scoreboard').style.display = 'none';
-            
+            if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex'; else document.getElementById('scoreboard').style.display = 'none';
             const sc = data.scores || [0,0,0];
             document.getElementById('sc-blanco').innerText = sc[0];
             document.getElementById('sc-negro').innerText = sc[1];
             document.getElementById('sc-rojo').innerText = sc[2];
-
             renderTeams(teamsData);
         } else {
             document.getElementById('selection-phase').style.display = 'block';
@@ -749,47 +623,97 @@
         }
     }
 
-    // --- GLOBAL FUNCTIONS ---
-    window.startNewMatch = async () => {
+    // --- ALGORITMO GREEDY BALANCE (Equipos equilibrados invisibles) ---
+    window.triggerGeneration = async (numTeams) => {
+        document.getElementById('loader').style.display = 'flex';
+        const roster = currentData.roster || initialPlayers;
+        
+        // 1. Obtener jugadores seleccionados y asignarles su nivel decimal
+        const pool = [];
+        (currentData.selectedPlayers || []).forEach(id => {
+            const p = roster.find(x => x.id === id);
+            if(p) pool.push({ ...p, isGuest: false });
+        });
+        (currentData.selectedGuests || []).forEach(id => {
+            const g = guestsDB.find(x => x.id === id);
+            // Invitados: Usar nivel definido o default 1.5
+            pool.push({ ...g, level: g.level || 1.5, isGuest: true });
+        });
+
+        // 2. Ordenar por nivel (Mejor a Peor)
+        pool.sort((a, b) => b.level - a.level);
+
+        // 3. Crear equipos vacios
+        let teams = Array.from({ length: numTeams }, () => ({ players: [], totalScore: 0 }));
+
+        // 4. Reparto Greedy: Asignar al siguiente mejor jugador al equipo más débil
+        pool.forEach(player => {
+            // Ordenar equipos por puntuación ascendente (el más débil primero)
+            // PERO: Si un equipo ya tiene demasiados jugadores, pasarlo al final
+            teams.sort((a, b) => {
+                if (a.players.length !== b.players.length) return a.players.length - b.players.length; // Priorizar llenar huecos
+                return a.totalScore - b.totalScore; // Luego priorizar score
+            });
+            
+            teams[0].players.push(player);
+            teams[0].totalScore += player.level;
+        });
+
+        // 5. Extraer solo los arrays de jugadores
+        const finalTeams = teams.map(t => t.players);
+        
+        // Guardar
+        const teamsString = JSON.stringify(finalTeams);
+        const myId = localStorage.getItem('futsal_my_id');
+        const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
+        const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+        await updateDoc(matchRef, { 
+            teams: teamsString,
+            logs: arrayUnion(`⚽ Equipos equilibrados creados por ${author}|${now}`)
+        });
+        document.getElementById('loader').style.display = 'none';
+    };
+
+    // --- AUTH LOGIN TRIGGER ---
+    let taps = 0;
+    let tapTimer = null;
+    window.secretAdminTap = () => {
+        taps++; clearTimeout(tapTimer);
+        tapTimer = setTimeout(() => taps = 0, 2000);
+        if(taps === 5) {
+            window.showLoginModal(); // Abre el modal de Firebase Auth
+            taps = 0;
+        }
+    };
+    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
+
+    // --- REST OF FUNCTIONS (Keep existing ones) ---
+    window.startNewMatch = async () => { /* ... existing code ... */ 
         const dateInput = document.getElementById('date-input').value;
         if (!dateInput) return window.showToast("Selecciona fecha", "error");
-        
         const selected = new Date(dateInput);
         const today = new Date(); today.setHours(0,0,0,0);
         if(selected < today) return window.showToast("Día pasado no válido", "error");
-
-        const adminSnap = await getDoc(configRef);
-        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
-
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
              const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
              const myId = localStorage.getItem('futsal_my_id');
              const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
-
              window.shareConvocation(dateInput);
-
              await setDoc(matchRef, { 
-                matchDate: dateInput, 
-                // KEEP PREVIOUS CONFIG
-                lockTime: currentData.lockTime || "18:00",
-                pinMode: currentData.pinMode !== false,
-                voteMode: currentData.voteMode !== false,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
-                pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
+                matchDate: dateInput, lockTime: currentData.lockTime || "18:00", pinMode: currentData.pinMode !== false, voteMode: currentData.voteMode !== false,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
+                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
             }, { merge: true });
         });
     };
-
-    window.toggleSelection = async (type, id, name) => {
+    window.toggleSelection = async (type, id, name) => { /* ... existing code ... */
         let newPlayers = [...(currentData.selectedPlayers || [])];
         let newGuests = [...(currentData.selectedGuests || [])];
         let currentPins = {...(currentData.pins || {})};
         let newGuestInviters = {...(currentData.guestInviters || {})};
         const now = new Date();
         const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        
         let inviterName = "";
         if (type === 'guest') {
             const userIndex = localStorage.getItem('futsal_my_id');
@@ -798,34 +722,28 @@
             const inviterObj = roster.find(p => p.id === userIndex);
             if(inviterObj) inviterName = inviterObj.name;
         }
-
         if (type === 'player' && currentData.pinMode !== false) {
             if (currentPins[id]) {
                 showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => {
                     if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error");
                     processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
-                }, true);
-                return; 
+                }, true); return; 
             } else {
                 showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name.toUpperCase()}:`, (val) => {
                     if (!val || val.length < 3) return window.showToast("PIN inválido", "error");
                     currentPins[id] = val;
                     processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
-                }, true);
-                return;
+                }, true); return;
             }
         } else {
              const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
              const action = isSelected ? "BORRAR" : "AÑADIR";
-             
              showConfirm("Confirmar Acción", `¿Seguro que quieres ${action} a ${name.toUpperCase()}?`, () => {
                  processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
              });
-             return;
         }
     };
-
-    async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr) {
+    async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr) { /* ... existing code ... */
         if (type === 'player') {
             if (newPlayers.includes(id)) {
                 newPlayers = newPlayers.filter(i => i !== id);
@@ -851,107 +769,129 @@
             }
         }
     }
-
-    window.voteToUnlock = async () => {
+    window.voteToUnlock = async () => { /* ... existing code ... */ 
         const myId = localStorage.getItem('futsal_my_id');
         if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo convocados pueden votar.", "error");
         if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info");
-        
-        // Buscamos nombre para el log
         const roster = currentData.roster || initialPlayers;
         const me = roster.find(p => p.id === myId);
         const myName = me ? me.name : "Alguien";
         const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
         showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => {
-            await updateDoc(matchRef, { 
-                unlockVotes: arrayUnion(myId),
-                logs: arrayUnion(`🗳️ Voto de ${myName}|${now}`) 
-            });
+            await updateDoc(matchRef, { unlockVotes: arrayUnion(myId), logs: arrayUnion(`🗳️ Voto de ${myName}|${now}`) });
             window.showToast("Voto registrado", "success");
         });
     };
-
-    setInterval(() => {
-        if (currentData.matchDate) {
-            checkTimeLock(currentData.matchDate, currentData.lockTime);
-            const matchDate = new Date(currentData.matchDate);
-            const now = new Date();
-            const resetTime = new Date(matchDate);
-            resetTime.setDate(resetTime.getDate() + 1); 
-            resetTime.setHours(10, 0, 0, 0); 
-            if (now >= resetTime) updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null });
-        }
-        
-        if(currentData.timerState === 'running') {
-            const display = document.getElementById('timer-display');
-            const btn = document.getElementById('timer-start-btn');
-            const txt = document.getElementById('timer-status-text');
-            const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
-            const m = Math.floor(left / 60).toString().padStart(2, '0');
-            const s = (left % 60).toString().padStart(2, '0');
-            display.innerText = `${m}:${s}`;
-            btn.innerText = "⏸ PAUSA"; btn.classList.add('t-stop');
-            if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; }
-            else if(left <= 0) { 
-                display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN";
-                if(!hasBeeped) {
-                     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                     const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000);
-                     hasBeeped = true;
-                }
-            }
-        }
-    }, 1000);
-    
-    window.toggleTimer = async () => {
-        if (currentData.timerState === 'running') {
-            const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000));
-            await updateDoc(matchRef, { timerState: 'paused', timerLeft: left });
-        } else {
-            const target = Date.now() + (currentData.timerLeft * 1000);
-            await updateDoc(matchRef, { timerState: 'running', timerEnd: target });
-        }
-    };
-    window.resetTimer = async () => {
-        await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 });
-        hasBeeped = false;
-        document.getElementById('timer-display').classList.remove('finished', 'last-minute');
-        document.getElementById('timer-display').innerText = "05:00";
-    };
-    window.updateScore = async (idx, delta) => {
-        let s = [...(currentData.scores || [0,0,0])];
-        s[idx] = Math.max(0, s[idx] + delta);
-        await updateDoc(matchRef, { scores: s });
-    };
-
-    function checkTimeLock(dateStr, lockTimeStr) {
-        const btn = document.getElementById('btn-create');
-        const msg = document.getElementById('time-lock-msg');
-        const now = new Date();
-        const target = new Date(dateStr);
-        const [h, m] = (lockTimeStr || "18:00").split(':');
-        target.setHours(h, m, 0, 0);
-        
+    window.attemptGeneration = () => { /* ... existing code ... */
+        const targetTime = new Date(currentData.matchDate);
+        const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
+        targetTime.setHours(hours, minutes, 0, 0);
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
-        const canUnlock = (currentData.voteMode !== false && votes >= 3);
-        
-        if (now >= target || canUnlock) {
-            btn.disabled = false; btn.innerText = "CREAR EQUIPOS"; msg.innerText = "";
-        } else {
-            btn.disabled = true; btn.innerText = "🔒 CREAR EQUIPOS"; msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
-        }
-        
-        const cd = document.getElementById('countdown-display');
-        if(now < target) {
-            const diff = target - now;
-            const hh = Math.floor(diff/(1000*60*60));
-            const mm = Math.floor((diff%(1000*60*60))/(1000*60));
-            cd.innerText = `Cierre en: ${hh}h ${mm}m`;
-        } else cd.innerText = "Cierre alcanzado";
+        const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
+        if (new Date() < targetTime && !canUnlockByVote) return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
+        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
+        if (total < 8) return window.showToast("Mínimo 8.", "error");
+        if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
+    };
+    window.forceGeneration = () => { /* ... existing code ... */
+        showConfirm("🔓 Desbloquear Creación", "¿Quieres habilitar el botón 'Crear Equipos' para todos?", async () => {
+             const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+             await updateDoc(matchRef, { lockTime: "00:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
+             window.showToast("Botón desbloqueado para todos", "success");
+             window.hideAdmin();
+        });
+    };
+    
+    // ... (Keep renderTeams, shareFunctions, timers, stats logic unchanged from v2.6) ...
+    // Just ensuring the logic for stats is included here for completeness
+    window.openStats = async () => {
+        const modal = document.getElementById('modal-overlay');
+        document.getElementById('modal-title').innerText = "Estadísticas y Ranking";
+        document.getElementById('modal-text').style.display = 'none';
+        document.getElementById('modal-input').style.display = 'none';
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('stats-content').style.display = 'block';
+        const actions = document.getElementById('modal-actions');
+        actions.innerHTML = '';
+        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; };
+        actions.appendChild(btnClose);
+        modal.style.display = 'flex';
+        try {
+            const histRef = collection(db, "history");
+            const snap = await getDocs(histRef);
+            const matches = [];
+            const playerCounts = {};
+            snap.forEach(doc => {
+                const d = doc.data();
+                matches.push(d);
+                if(d.teams) {
+                    let teamsArr = [];
+                    try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){}
+                    teamsArr.forEach(team => {
+                        team.forEach(player => {
+                            if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; }
+                        });
+                    });
+                }
+            });
+            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]);
+            const rankDiv = document.getElementById('tab-ranking');
+            rankDiv.innerHTML = '';
+            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>';
+            sortedPlayers.forEach(([name, count], index) => {
+                let medal = '';
+                if(index === 0) medal = '🥇'; else if(index === 1) medal = '🥈'; else if(index === 2) medal = '🥉';
+                rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal || (index + 1)}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`;
+            });
+            if(sortedPlayers.length > 0) { rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial y Resetear Ranking</button></div>`; }
+            matches.sort((a,b) => (a.date < b.date ? 1 : -1));
+            const histDiv = document.getElementById('tab-history');
+            histDiv.innerHTML = '';
+            if(matches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos registrados</div>';
+            matches.forEach(m => {
+                const d = new Date(m.date);
+                const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
+                const s = m.scores || [0,0,0];
+                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`;
+                if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`;
+                let pCount = 0;
+                if(m.teams) {
+                    let teamsArr = [];
+                    try { teamsArr = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; } catch(e){}
+                    teamsArr.forEach(t => pCount += t.length);
+                }
+                histDiv.innerHTML += `<div class="history-card"><div class="h-info"><div class="h-date">${dateStr}</div><div class="h-score">${scoreStr}</div></div><div class="h-players">👥 ${pCount} jug.</div></div>`;
+            });
+        } catch(e) { window.showToast("Error cargando historial", "error"); }
+    };
+    window.resetHistory = async () => {
+        showConfirm("⚠️ BORRAR HISTORIAL", "Esto eliminará todos los partidos pasados. ¿Estás seguro?", async () => {
+            const histRef = collection(db, "history");
+            const snap = await getDocs(histRef);
+            snap.forEach(async (d) => { await deleteDoc(doc(db, "history", d.id)); });
+            window.showToast("Historial eliminado", "success");
+            setTimeout(() => window.openStats(), 500); 
+        });
+    };
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('[id^="tab-"]').forEach(d => d.style.display = 'none');
+        if(tab === 'ranking') { document.querySelector('.tab:nth-child(1)').classList.add('active'); document.getElementById('tab-ranking').style.display = 'block'; } 
+        else { document.querySelector('.tab:nth-child(2)').classList.add('active'); document.getElementById('tab-history').style.display = 'block'; }
+    };
+    window.renderTeams = (teams) => {
+        const resDiv = document.getElementById('teams-result');
+        resDiv.innerHTML = '';
+        const names = ['BLANCO', 'NEGRO', 'ROJO'];
+        const classes = ['team-blanco', 'team-negro', 'team-rojo'];
+        teams.forEach((team, idx) => {
+            let html = `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`;
+            team.forEach(p => { const name = p.isGuest ? `<span class="guest-result">${p.name}</span>` : p.name; html += `<li>${name}</li>`; });
+            html += `</ul></div>`;
+            resDiv.innerHTML += html;
+        });
+        window.currentTeamsForCopy = teams;
     }
-
-    // --- ADMIN ---
     window.resetCurrentMatch = async () => {
         if(currentData.matchDate && currentData.teams) {
              const histRef = collection(db, "history");
@@ -962,84 +902,34 @@
              window.hideAdmin();
         });
     };
-
-    window.changeLockTime = async () => {
-        const t = document.getElementById('admin-time-input').value;
-        await updateDoc(matchRef, { lockTime: t });
-    };
-
-    window.togglePinMode = async () => {
-        const s = currentData.pinMode === false ? true : false;
-        await updateDoc(matchRef, { pinMode: s });
-    };
-    window.toggleVoteMode = async () => {
-        const s = currentData.voteMode === false ? true : false;
-        await updateDoc(matchRef, { voteMode: s });
-    };
-
+    window.changeLockTime = async () => { const t = document.getElementById('admin-time-input').value; await updateDoc(matchRef, { lockTime: t }); };
+    window.togglePinMode = async () => { const s = currentData.pinMode === false ? true : false; await updateDoc(matchRef, { pinMode: s }); };
+    window.toggleVoteMode = async () => { const s = currentData.voteMode === false ? true : false; await updateDoc(matchRef, { voteMode: s }); };
     window.addNewPlayer = async () => {
         const name = document.getElementById('new-player-name').value;
-        const level = parseInt(document.getElementById('new-player-level').value);
+        const level = parseFloat(document.getElementById('new-player-level').value); // Parse Float now
         if(!name) return window.showToast("Falta nombre", "error");
-        
         const id = name.toLowerCase().replace(/\s/g, '_');
         const newPlayer = { id: id, name: name, level: level };
         await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
         window.showToast("Jugador añadido", "success");
     };
-    
     window.toggleBan = async (id, name) => {
         let list = [...(currentData.bannedIndices || [])];
-        if(list.includes(id)) {
-            list = list.filter(i => i !== id);
-            window.showToast(`${name} desbloqueado`, "success");
-        } else {
-            list.push(id);
-            if(currentData.selectedPlayers.includes(id)) {
-                let s = currentData.selectedPlayers.filter(i => i !== id);
-                await updateDoc(matchRef, { selectedPlayers: s });
-            }
-            window.showToast(`${name} bloqueado`, "error");
-        }
+        if(list.includes(id)) { list = list.filter(i => i !== id); window.showToast(`${name} desbloqueado`, "success"); } 
+        else { list.push(id); if(currentData.selectedPlayers.includes(id)) { let s = currentData.selectedPlayers.filter(i => i !== id); await updateDoc(matchRef, { selectedPlayers: s }); } window.showToast(`${name} bloqueado`, "error"); }
         await updateDoc(matchRef, { bannedIndices: list });
     };
     window.resetPin = async (id, name) => {
-        showConfirm("Reset PIN", `¿Borrar PIN de ${name}?`, async () => {
-            let p = {...currentData.pins}; delete p[id];
-            await updateDoc(matchRef, { pins: p });
-            window.showToast("PIN reseteado", "success");
-        });
+        showConfirm("Reset PIN", `¿Borrar PIN de ${name}?`, async () => { let p = {...currentData.pins}; delete p[id]; await updateDoc(matchRef, { pins: p }); window.showToast("PIN reseteado", "success"); });
     };
     window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
-    
-    window.forceGeneration = () => {
-        showConfirm("🔓 Desbloquear Creación", "¿Quieres habilitar el botón 'Crear Equipos' para todos?", async () => {
-             const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-             
-             // Actualizamos la hora de bloqueo a las 00:00 para que se abra ya
-             // y añadimos un log para que se vea en el historial
-             await updateDoc(matchRef, { 
-                 lockTime: "00:00",
-                 logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`)
-             });
-             
-             window.showToast("Botón desbloqueado para todos", "success");
-             window.hideAdmin();
-        });
-    };
-    
     window.forceReset = async () => {
         showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => {
-             await setDoc(matchRef, { 
-                matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0],
-                timerState: 'stopped', roster: initialPlayers
-            });
+             await setDoc(matchRef, { matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0], timerState: 'stopped', roster: initialPlayers });
             window.hideAdmin();
         });
     };
-
     window.shareConvocation = (d) => {
         const date = d ? new Date(d) : new Date(currentData.matchDate);
         const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
@@ -1052,115 +942,24 @@
          const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
          let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`;
          const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴'];
-         t.forEach((team, i) => {
-             txt += `${em[i]} *${names[i]}* (${team.length})\n`;
-             team.forEach(p => txt += `- ${p.name}\n`);
-             txt += `\n`;
-         });
+         t.forEach((team, i) => { txt += `${em[i]} *${names[i]}* (${team.length})\n`; team.forEach(p => txt += `- ${p.name}\n`); txt += `\n`; });
          window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
     };
-
-    // --- ADMIN TOOLS ---
-    let taps = 0;
-    let tapTimer = null;
-    window.secretAdminTap = () => {
-        taps++; clearTimeout(tapTimer);
-        tapTimer = setTimeout(() => taps = 0, 2000);
-        if(taps === 5) {
-            document.getElementById('modal-input').value = '';
-            showConfirm("Acceso Admin", "Introduce PIN:", (val) => {
-                if(val === "1234") document.getElementById('admin-zone').style.display = 'block';
-                else window.showToast("PIN Incorrecto", "error");
-            }, true);
-            taps = 0;
+    // Timers & Scores (Keep existing logic)
+    setInterval(() => {
+        if (currentData.matchDate) { checkTimeLock(currentData.matchDate, currentData.lockTime); const matchDate = new Date(currentData.matchDate); const now = new Date(); const resetTime = new Date(matchDate); resetTime.setDate(resetTime.getDate() + 1); resetTime.setHours(10, 0, 0, 0); if (now >= resetTime) updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); }
+        if(currentData.timerState === 'running') {
+            const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
+            const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
+            const m = Math.floor(left / 60).toString().padStart(2, '0'); const s = (left % 60).toString().padStart(2, '0'); display.innerText = `${m}:${s}`; btn.innerText = "⏸ PAUSA"; btn.classList.add('t-stop');
+            if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; } else if(left <= 0) { display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN"; if(!hasBeeped) { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000); hasBeeped = true; } }
         }
-    };
-    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
-
-    // --- CORE: GENERACIÓN DE EQUIPOS (Ahora globales) ---
-    window.attemptGeneration = () => {
-        const targetTime = new Date(currentData.matchDate);
-        const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
-        targetTime.setHours(hours, minutes, 0, 0);
-        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
-
-        const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
-
-        if (new Date() < targetTime && !canUnlockByVote) return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
-        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-        if (total < 8) return window.showToast("Mínimo 8.", "error");
-        
-        // Usamos la versión global
-        if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
-    };
-
-    window.triggerGeneration = async (numTeams) => {
-        document.getElementById('loader').style.display = 'flex';
-        const roster = currentData.roster || initialPlayers;
-        const sPlayers = (currentData.selectedPlayers || []).map(id => roster.find(p => p.id === id));
-        const sGuests = (currentData.selectedGuests || []).map(id => {
-            const g = guestsDB.find(guest => guest.id === id);
-            return {...g, level: 0, isGuest: true};
-        });
-        
-        let l3 = shuffle([...sPlayers.filter(p => p.level === 3)]);
-        let l2 = shuffle([...sPlayers.filter(p => p.level === 2)]);
-        let l1 = shuffle([...sPlayers.filter(p => p.level === 1)]);
-        let lg = shuffle([...sGuests]);
-        
-        let pool = [...l3, ...l2, ...l1, ...lg];
-        let teams = Array.from({ length: numTeams }, () => []);
-        
-        pool.forEach((player, i) => {
-            teams[i % numTeams].push(player);
-        });
-        
-        teams.forEach(t => shuffle(t));
-        const teamsString = JSON.stringify(teams);
-        
-        const myId = localStorage.getItem('futsal_my_id');
-        const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
-        const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
-        await updateDoc(matchRef, { 
-            teams: teamsString,
-            logs: arrayUnion(`⚽ Equipos generados por ${author}|${now}`)
-        });
-        document.getElementById('loader').style.display = 'none';
-    };
-
-    // Helpers locales
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-    
-    function renderTeams(teams) {
-        const resDiv = document.getElementById('teams-result');
-        resDiv.innerHTML = '';
-        const names = ['BLANCO', 'NEGRO', 'ROJO'];
-        const classes = ['team-blanco', 'team-negro', 'team-rojo'];
-        teams.forEach((team, idx) => {
-            let html = `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`;
-            team.forEach(p => {
-                const name = p.isGuest ? `<span class="guest-result">${p.name}</span>` : p.name;
-                html += `<li>${name}</li>`;
-            });
-            html += `</ul></div>`;
-            resDiv.innerHTML += html;
-        });
-        window.currentTeamsForCopy = teams;
-    }
-
-    // Install PWA
+    }, 1000);
+    window.toggleTimer = async () => { if (currentData.timerState === 'running') { const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000)); await updateDoc(matchRef, { timerState: 'paused', timerLeft: left }); } else { const target = Date.now() + (currentData.timerLeft * 1000); await updateDoc(matchRef, { timerState: 'running', timerEnd: target }); } };
+    window.resetTimer = async () => { await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 }); hasBeeped = false; document.getElementById('timer-display').classList.remove('finished', 'last-minute'); document.getElementById('timer-display').innerText = "05:00"; };
+    window.updateScore = async (idx, delta) => { let s = [...(currentData.scores || [0,0,0])]; s[idx] = Math.max(0, s[idx] + delta); await updateDoc(matchRef, { scores: s }); };
     let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
-    window.installApp = async () => {
-        if(defPrompt) { defPrompt.prompt(); defPrompt = null; }
-        else window.showToast("Usa menú navegador -> Instalar", "info");
-    };
+    window.installApp = async () => { if(defPrompt) { defPrompt.prompt(); defPrompt = null; } else window.showToast("Usa menú navegador -> Instalar", "info"); };
 
 </script>
 </body>
