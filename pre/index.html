@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.7</title>
+    <title>AMPA Futsal v3.9</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -153,8 +153,7 @@
         }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
-        /* ROJO INTENSO PARA BORRARSE */
-        .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
+        .btn-leave { background: var(--danger); color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
         .btn-full { background: var(--disabled); color: white; cursor: not-allowed; }
         
         /* Stats Styles */
@@ -218,7 +217,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.7</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.9</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -229,6 +228,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <div style="color:#e11d48; font-weight:800;">ADMIN PRO</div>
             <button onclick="window.logoutAdmin()" style="background:none; border:none; font-size:0.8rem; text-decoration:underline; color:#64748b; cursor:pointer;">Salir</button>
+            <button onclick="window.requestNotificationPermission()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">🔔</button>
         </div>
         
         <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">⚠️ Reiniciar Partido (Nuevo Día)</button>
@@ -332,6 +332,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
     // -------------------------------------------------------------
     // ⚠️ CONFIGURACIÓN FIREBASE ⚠️
@@ -347,12 +348,13 @@
     };
     // -------------------------------------------------------------
 
-    let app, db, matchRef, configRef, auth;
+    let app, db, matchRef, configRef, auth, messaging;
     
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
+        messaging = getMessaging(app); // INICIALIZAR MESSAGING
         matchRef = doc(db, "partidos", "semana_actual");
         configRef = doc(db, "config", "admin_settings"); 
     } catch (e) { console.error("Error init firebase", e); }
@@ -422,6 +424,28 @@
             document.getElementById('admin-zone').style.display = 'none';
         }
     });
+
+    // --- NOTIFICATION LOGIC ---
+    window.requestNotificationPermission = () => {
+        Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+                console.log('Permiso de notificación concedido.');
+                getToken(messaging, { vapidKey: 'BJoIhFJXnhI4htFQYCfr8R0hhghSZeVUQKZHhnS60gZTq0eN-bMttFA5YFOFZlV03WTBlDQaoi8rmtFLNelIUHc' }).then((currentToken) => {
+                    if (currentToken) {
+                        console.log('Token de registro:', currentToken);
+                        window.showToast("Notificaciones Activadas", "success");
+                        // Opcional: Guardar este token en Firestore si quisieras enviar mensajes dirigidos
+                    } else {
+                        console.log('No se pudo obtener el token de registro.');
+                    }
+                }).catch((err) => {
+                    console.log('Error al obtener el token:', err);
+                });
+            } else {
+                window.showToast("Permiso denegado", "error");
+            }
+        });
+    }
 
     // --- UTILS UX ---
     window.showToast = (msg, type = 'info') => {
@@ -773,7 +797,6 @@
         let newGuestInviters = {...(currentData.guestInviters || {})};
         const now = new Date();
         const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        
         let inviterName = "";
         let actorName = "Alguien"; // Default
 
