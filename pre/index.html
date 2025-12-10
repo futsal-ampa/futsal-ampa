@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.15</title>
+    <title>AMPA Futsal v3.16</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -171,15 +171,7 @@
         }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
-        
-        /* MEJORA VISUAL BOTON BORRAR */
-        .btn-leave { 
-            background: #dc2626; 
-            color: white; 
-            border: 2px solid #b91c1c; 
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); 
-        }
-        
+        .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
         .btn-full { background: var(--disabled); color: white; cursor: not-allowed; }
         
         /* Stats Styles */
@@ -199,22 +191,25 @@
         .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
         .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
-        /* NUEVO ESTILO PARA EL BOTON "NO ERES TU" */
+        /* NUEVO ESTILO PARA EL BOTON "NO ERES TU" (v3.15) */
         .reset-id-btn {
-            background: #fff;
+            background: white;
             border: 1px solid #d97706;
             color: #d97706;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.65rem;
             font-weight: 800;
             cursor: pointer;
             margin-left: 10px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             text-transform: uppercase;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             vertical-align: middle;
+            transition: all 0.2s;
         }
+        .reset-id-btn:active { transform: scale(0.95); background: #fffbeb; }
 
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -455,12 +450,12 @@
         return array;
     };
     
-    // --- HELPER: RESET IDENTITY ---
+    // --- HELPER: RESET IDENTITY (MEJORADO CON MODAL) ---
     window.resetIdentity = () => {
-        if(confirm("¿Seguro que no eres tú? Se borrará tu identidad de este dispositivo.")) {
+        showConfirm("¿Cambiar de Usuario?", "¿Seguro que no eres tú? Se borrará tu identidad de este dispositivo.", () => {
             localStorage.removeItem('futsal_my_id');
             window.location.reload();
-        }
+        });
     };
 
     // --- AUTHENTICATION STATE ---
@@ -903,7 +898,6 @@
             } else {
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
                 newPlayers.push(id);
-                // Si me apunto a mí mismo, guardo mi ID. Si apunto a otro, NO cambio mi identidad.
                 if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
                 
                 await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} entra${actionSuffix}|${timeStr}`) });
@@ -953,6 +947,12 @@
              await updateDoc(matchRef, { lockTime: "00:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
              window.showToast("Botón desbloqueado para todos", "success");
              window.hideAdmin();
+        });
+    };
+    window.resetRosterOnly = async () => {
+        showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código? El historial NO se borrará.", async () => {
+            await updateDoc(matchRef, { roster: initialPlayers });
+            window.showToast("Plantilla actualizada", "success");
         });
     };
     
@@ -1126,16 +1126,13 @@
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         const canUnlock = (currentData.voteMode !== false && votes >= 3);
         
-        // Remove standard disabled attribute to allow click interaction
         btn.removeAttribute('disabled');
 
         if (now >= target || canUnlock) {
-            // Unlocked state
             btn.className = "action-btn btn-unlocked";
             btn.innerHTML = "⚽ CREAR EQUIPOS";
             msg.innerText = "";
         } else {
-            // Locked state
             btn.className = "action-btn btn-locked";
             btn.innerHTML = "🔒 CREAR EQUIPOS";
             msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
