@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.4</title>
+    <title>AMPA Futsal v3.5</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -221,7 +221,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.4</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.5</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -694,6 +694,9 @@
         // 5. Extraer solo los arrays de jugadores
         const finalTeams = teams.map(t => t.players);
         
+        // MEJORA: Barajar el orden DENTRO de cada equipo para ocultar el ranking
+        finalTeams.forEach(team => shuffle(team));
+
         // Guardar
         const teamsString = JSON.stringify(finalTeams);
         const myId = localStorage.getItem('futsal_my_id');
