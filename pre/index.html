@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.6 (Estable)</title>
+    <title>AMPA Futsal v3.7</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -153,7 +153,8 @@
         }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
-        .btn-leave { background: var(--danger); color: white; }
+        /* ROJO INTENSO PARA BORRARSE */
+        .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
         .btn-full { background: var(--disabled); color: white; cursor: not-allowed; }
         
         /* Stats Styles */
@@ -217,7 +218,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.6</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.7</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -633,7 +634,7 @@
         const logDiv = document.getElementById('activity-log');
         if (data.logs && data.logs.length > 0) {
             logDiv.innerHTML = "";
-            [...data.logs].reverse().slice(0, 15).forEach(logStr => {
+            [...data.logs].reverse().forEach(logStr => { // REMOVED SLICE(0,15) FOR FULL HISTORY
                 const parts = logStr.split('|');
                 if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
             });
@@ -772,36 +773,52 @@
         let newGuestInviters = {...(currentData.guestInviters || {})};
         const now = new Date();
         const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        
         let inviterName = "";
+        let actorName = "Alguien"; // Default
+
+        // Determinar quién realiza la acción (Usuario Logueado Localmente)
+        const myId = localStorage.getItem('futsal_my_id');
+        const roster = currentData.roster || initialPlayers;
+        const myObj = roster.find(p => p.id === myId);
+        if(myObj) actorName = myObj.name;
+
         if (type === 'guest') {
             const userIndex = localStorage.getItem('futsal_my_id');
             if (!userIndex || !newPlayers.includes(userIndex)) return window.showToast("⛔ Solo jugadores confirmados pueden invitar.", "error");
-            const roster = currentData.roster || initialPlayers;
-            const inviterObj = roster.find(p => p.id === userIndex);
-            if(inviterObj) inviterName = inviterObj.name;
+            inviterName = actorName;
         }
+
         if (type === 'player' && currentData.pinMode !== false) {
             if (currentPins[id]) {
                 showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => {
                     if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error");
-                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
+                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
                 }, true); return; 
             } else {
                 showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name.toUpperCase()}:`, (val) => {
                     if (!val || val.length < 3) return window.showToast("PIN inválido", "error");
                     currentPins[id] = val;
-                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
+                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
                 }, true); return;
             }
         } else {
+             // MENSAJES PERSONALIZADOS REQUERIDOS
              const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
-             const action = isSelected ? "BORRAR" : "AÑADIR";
-             showConfirm("Confirmar Acción", `¿Seguro que quieres ${action} a ${name.toUpperCase()}?`, () => {
-                 processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr);
+             let msg = "";
+             if (isSelected) {
+                 msg = `¿${name}, quieres salir de la convocatoria?`;
+             } else {
+                 msg = `¿${name}, quieres entrar en la convocatoria?`;
+             }
+             
+             showConfirm("Confirmar Acción", msg, () => {
+                 processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
              });
         }
     };
-    async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr) { /* ... existing code ... */
+    
+    async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName) {
         if (type === 'player') {
             if (newPlayers.includes(id)) {
                 newPlayers = newPlayers.filter(i => i !== id);
@@ -818,7 +835,8 @@
              if (newGuests.includes(id)) {
                 newGuests = newGuests.filter(i => i !== id);
                 delete newGuestInviters[id];
-                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} sale|${timeStr}`) });
+                // LOG DE QUIEN ELIMINA AL INVITADO
+                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} eliminado por ${actorName}|${timeStr}`) });
             } else {
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
                 newGuests.push(id);
@@ -827,6 +845,7 @@
             }
         }
     }
+    
     window.voteToUnlock = async () => { /* ... existing code ... */ 
         const myId = localStorage.getItem('futsal_my_id');
         if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo convocados pueden votar.", "error");
