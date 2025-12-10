@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v2.5</title>
+    <title>AMPA Futsal v2.6</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -49,9 +49,13 @@
         .rank-pos { width: 30px; font-weight: bold; color: var(--accent); }
         .rank-name { flex: 1; }
         .rank-val { font-weight: 800; color: var(--brand-dark); }
-        .history-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
-        .h-date { font-weight: 800; font-size: 0.8rem; color: #64748b; margin-bottom: 5px; }
-        .h-score { font-family: monospace; font-weight: bold; color: var(--brand-dark); }
+        .history-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 10px; display:flex; justify-content: space-between; align-items: center; }
+        .h-info { text-align: left; }
+        .h-date { font-weight: 800; font-size: 0.85rem; color: #334155; }
+        .h-score { font-family: monospace; font-weight: bold; color: #64748b; font-size: 0.8rem; margin-top:2px; }
+        .h-players { background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; }
+        .stats-footer { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ef4444; text-align: center; }
+        .reset-stats-btn { background: #fff1f2; color: #e11d48; border: 1px solid #fda4af; padding: 8px 15px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; width: 100%; }
 
         /* PLAYERS LIST */
         .player-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
@@ -204,7 +208,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.5</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v2.6</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -310,7 +314,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs, query, orderBy, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // -------------------------------------------------------------
     // ⚠️ CONFIGURACIÓN FIREBASE ⚠️
@@ -429,7 +433,6 @@
         // Cargar datos
         try {
             const histRef = collection(db, "history");
-            // Nota: Ordenar en cliente es más barato para pocos datos que crear índice compuesto
             const snap = await getDocs(histRef);
             
             const matches = [];
@@ -439,7 +442,6 @@
                 const d = doc.data();
                 matches.push(d);
                 
-                // Contar jugadores
                 if(d.teams) {
                     let teamsArr = [];
                     try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){}
@@ -476,10 +478,13 @@
                 `;
             });
             
-            // Render Partidos (ordenar por fecha descendente aprox)
-            // Si las fechas son strings 'YYYY-MM-DD', sort funciona.
-            matches.sort((a,b) => (a.date < b.date ? 1 : -1));
+            // Boton Reset en Ranking
+            if(sortedPlayers.length > 0) {
+                rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial y Resetear Ranking</button></div>`;
+            }
             
+            // Render Partidos
+            matches.sort((a,b) => (a.date < b.date ? 1 : -1));
             const histDiv = document.getElementById('tab-history');
             histDiv.innerHTML = '';
             
@@ -492,10 +497,21 @@
                 let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`;
                 if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`;
                 
+                // Conteo Jugadores
+                let pCount = 0;
+                if(m.teams) {
+                    let teamsArr = [];
+                    try { teamsArr = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; } catch(e){}
+                    teamsArr.forEach(t => pCount += t.length);
+                }
+                
                 histDiv.innerHTML += `
                     <div class="history-card">
-                        <div class="h-date">${dateStr}</div>
-                        <div class="h-score">${scoreStr}</div>
+                        <div class="h-info">
+                            <div class="h-date">${dateStr}</div>
+                            <div class="h-score">${scoreStr}</div>
+                        </div>
+                        <div class="h-players">👥 ${pCount} jug.</div>
                     </div>
                 `;
             });
@@ -504,6 +520,18 @@
             console.error(e);
             window.showToast("Error cargando historial", "error");
         }
+    };
+    
+    window.resetHistory = async () => {
+        showConfirm("⚠️ BORRAR HISTORIAL", "Esto eliminará todos los partidos pasados y pondrá el ranking a 0. ¿Estás seguro?", async () => {
+            const histRef = collection(db, "history");
+            const snap = await getDocs(histRef);
+            snap.forEach(async (d) => {
+                await deleteDoc(doc(db, "history", d.id));
+            });
+            window.showToast("Historial eliminado", "success");
+            setTimeout(() => window.openStats(), 500); 
+        });
     };
     
     window.switchTab = (tab) => {
