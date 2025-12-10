@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.2</title>
+    <title>AMPA Futsal v3.3</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -215,7 +215,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.2</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.3</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -230,6 +230,8 @@
         
         <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">⚠️ Reiniciar Partido (Nuevo Día)</button>
         <button class="admin-btn" style="background-color:#475569;" onclick="window.openStats()">📊 Ver Ranking y Historial</button>
+        <button class="admin-btn" style="background-color:#f59e0b;" onclick="window.resetRosterOnly()">👥 Actualizar Niveles/Plantilla</button>
+        
         <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🛡️ Seguridad & Votación:</div>
         <div style="display:flex; gap:5px;">
             <button id="pin-mode-btn" class="pin-toggle-btn" onclick="window.togglePinMode()">PIN...</button>
@@ -243,7 +245,7 @@
         <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; text-align:left;">➕ Alta Jugador:</div>
         <div class="new-player-form">
             <input type="text" id="new-player-name" placeholder="Nombre">
-            <select id="new-player-level"><option value="1">Nivel 1</option><option value="2" selected>Nivel 2</option><option value="3">Nivel 3</option></select>
+            <input type="number" id="new-player-level" placeholder="Nivel (ej: 2.5)" step="0.1" min="1" max="3" style="width: 30%;">
             <button class="new-player-btn" onclick="window.addNewPlayer()">+</button>
         </div>
         <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🚫 BLOQUEAR JUGADORES</div>
@@ -833,6 +835,12 @@
              window.hideAdmin();
         });
     };
+    window.resetRosterOnly = async () => {
+        showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código? El historial NO se borrará.", async () => {
+            await updateDoc(matchRef, { roster: initialPlayers });
+            window.showToast("Plantilla actualizada", "success");
+        });
+    };
     
     // ... (Keep renderTeams, shareFunctions, timers, stats logic unchanged from v2.6) ...
     // Just ensuring the logic for stats is included here for completeness
@@ -924,7 +932,7 @@
         });
         window.currentTeamsForCopy = teams;
     }
-    // RESET MANUAL CORREGIDO
+    // RESET MANUAL CORREGIDO (NO GUARDA HISTORIAL)
     window.resetCurrentMatch = async () => {
         showConfirm("⚠️ REINICIO MANUAL", "Se borrará la lista y NO se guardará historial (partido no jugado). ¿Continuar?", async () => {
              await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
