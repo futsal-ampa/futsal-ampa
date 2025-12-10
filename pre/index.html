@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.1</title>
+    <title>AMPA Futsal v3.2</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -12,7 +12,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ESTILOS (Optimizados y Completos) */
+        /* ESTILOS (Optimizados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -215,7 +215,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.1</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.2</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -228,7 +228,7 @@
             <button onclick="window.logoutAdmin()" style="background:none; border:none; font-size:0.8rem; text-decoration:underline; color:#64748b; cursor:pointer;">Salir</button>
         </div>
         
-        <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">🔄 Reiniciar Partido (Nuevo Día)</button>
+        <button class="admin-btn admin-btn-green" onclick="window.resetCurrentMatch()">⚠️ Reiniciar Partido (Nuevo Día)</button>
         <button class="admin-btn" style="background-color:#475569;" onclick="window.openStats()">📊 Ver Ranking y Historial</button>
         <div style="font-size:0.75rem; font-weight:bold; color:#334155; margin-bottom:5px; margin-top:10px; text-align:left;">🛡️ Seguridad & Votación:</div>
         <div style="display:flex; gap:5px;">
@@ -247,9 +247,9 @@
             <button class="new-player-btn" onclick="window.addNewPlayer()">+</button>
         </div>
         <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🚫 BLOQUEAR JUGADORES</div>
-        <div id="ban-list" class="chip-list"><div style="font-size:0.7rem; color:#999;">Cargando...</div></div>
+        <div id="ban-list" class="chip-list"></div>
         <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🔐 RESET PINS</div>
-        <div id="pin-list" class="chip-list"><div style="font-size:0.7rem; color:#999;">Cargando...</div></div>
+        <div id="pin-list" class="chip-list"></div>
         <button class="admin-btn admin-btn-blue" onclick="window.forceGeneration()">⚡ Forzar Desbloqueo (Permitir Crear)</button>
         <button class="admin-btn" onclick="window.undoTeams()">🔙 Deshacer Equipos</button>
         <button class="admin-btn" style="margin-top:15px; background:#000;" onclick="window.forceReset()">🔥 RESET TOTAL</button>
@@ -502,6 +502,25 @@
         const container = document.getElementById('player-container');
         const guestContainer = document.getElementById('guest-container');
         container.innerHTML = ''; guestContainer.innerHTML = '';
+
+        // --- ADMIN UI UPDATE FIX (CARGANDO INFINITO) ---
+        // Renderizamos las listas de admin aquí arriba para asegurar que se limpian
+        const banList = document.getElementById('ban-list');
+        const pinList = document.getElementById('pin-list');
+        if(banList && pinList) {
+            banList.innerHTML = ""; pinList.innerHTML = "";
+            activeRoster.forEach(p => {
+                 const isBanned = data.bannedIndices?.includes(p.id);
+                 const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
+                 const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
+                 banList.innerHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
+                 
+                 if(data.pins && data.pins[p.id]) {
+                     pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
+                 }
+            });
+            if(pinList.innerHTML === "") pinList.innerHTML = `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
+        }
 
         const myId = localStorage.getItem('futsal_my_id');
         const actionBar = document.getElementById('user-action-bar');
@@ -905,12 +924,9 @@
         });
         window.currentTeamsForCopy = teams;
     }
+    // RESET MANUAL CORREGIDO
     window.resetCurrentMatch = async () => {
-        if(currentData.matchDate && currentData.teams) {
-             const histRef = collection(db, "history");
-             await addDoc(histRef, { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
-        }
-        showConfirm("¿Reiniciar?", "Se guardará historial y limpiará lista.", async () => {
+        showConfirm("⚠️ REINICIO MANUAL", "Se borrará la lista y NO se guardará historial (partido no jugado). ¿Continuar?", async () => {
              await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
              window.hideAdmin();
         });
@@ -958,9 +974,24 @@
          t.forEach((team, i) => { txt += `${em[i]} *${names[i]}* (${team.length})\n`; team.forEach(p => txt += `- ${p.name}\n`); txt += `\n`; });
          window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
     };
-    // Timers & Scores (Keep existing logic)
-    setInterval(() => {
-        if (currentData.matchDate) { checkTimeLock(currentData.matchDate, currentData.lockTime); const matchDate = new Date(currentData.matchDate); const now = new Date(); const resetTime = new Date(matchDate); resetTime.setDate(resetTime.getDate() + 1); resetTime.setHours(10, 0, 0, 0); if (now >= resetTime) updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); }
+    // Timers & Scores
+    setInterval(async () => {
+        // AUTO RESET LOGIC (CHANGED)
+        if (currentData.matchDate) { 
+            checkTimeLock(currentData.matchDate, currentData.lockTime); 
+            const matchDate = new Date(currentData.matchDate); 
+            const now = new Date(); 
+            const resetTime = new Date(matchDate); 
+            resetTime.setDate(resetTime.getDate() + 1); 
+            resetTime.setHours(10, 0, 0, 0); 
+            if (now >= resetTime) {
+                // SAVE HISTORY AUTOMATICALLY IF TEAMS EXIST
+                if(currentData.teams) {
+                    await addDoc(collection(db, "history"), { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
+                }
+                updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); 
+            }
+        }
         if(currentData.timerState === 'running') {
             const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
             const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
