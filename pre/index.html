@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.18</title>
+    <title>AMPA Futsal v4.0 (Pizarra)</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -11,6 +11,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
     <style>
         /* ESTILOS (Optimizados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
@@ -66,7 +68,7 @@
         .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         
-        /* BOTONES & ESTILOS NUEVOS DE BOTON CREAR */
+        /* BOTONES */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .action-btn:active { transform: scale(0.98); }
         .btn-locked { background-color: #94a3b8 !important; opacity: 0.7; cursor: not-allowed; box-shadow: none; filter: grayscale(0.8); }
@@ -75,6 +77,10 @@
         .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
+        
+        /* NEW CAPTURE BTN */
+        .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+
         .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
         .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
         
@@ -171,15 +177,7 @@
         }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
-        
-        /* MEJORA VISUAL BOTON BORRAR */
-        .btn-leave { 
-            background: #dc2626; 
-            color: white; 
-            border: 2px solid #b91c1c; 
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); 
-        }
-        
+        .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
         .btn-full { background: var(--disabled); color: white; cursor: not-allowed; }
         
         /* Stats Styles */
@@ -199,25 +197,27 @@
         .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
         .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
-        /* NUEVO ESTILO PARA EL BOTON "NO ERES TU" (v3.15) */
         .reset-id-btn {
-            background: white;
-            border: 1px solid #d97706;
-            color: #d97706;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: 800;
-            cursor: pointer;
-            margin-left: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            vertical-align: middle;
-            transition: all 0.2s;
+            background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem;
+            font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase;
+            display: inline-flex; align-items: center; vertical-align: middle; transition: all 0.2s;
         }
         .reset-id-btn:active { transform: scale(0.95); background: #fffbeb; }
+
+        /* LINEUP CARD (HIDDEN FOR CAPTURE) */
+        #capture-container { position: absolute; left: -9999px; top: 0; width: 600px; }
+        .lineup-card { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 20px; border-radius: 0; color: white; font-family: 'Montserrat', sans-serif; text-align: center; border: 4px solid #f59e0b; }
+        .lc-header { border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; }
+        .lc-title { font-size: 1.8rem; font-weight: 800; color: #f59e0b; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        .lc-date { color: #cbd5e1; font-size: 1rem; font-weight: 600; margin-top: 5px; text-transform: uppercase; }
+        .lc-grid { display: flex; justify-content: space-around; gap: 10px; }
+        .lc-col { flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; }
+        .lc-team-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; padding-bottom: 5px; border-bottom: 2px solid; }
+        .lc-white .lc-team-title { color: #ffffff; border-color: #ffffff; }
+        .lc-black .lc-team-title { color: #94a3b8; border-color: #94a3b8; }
+        .lc-red .lc-team-title { color: #ef4444; border-color: #ef4444; }
+        .lc-player { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: #e2e8f0; }
+        .lc-footer { margin-top: 20px; font-size: 0.8rem; color: #64748b; font-weight: bold; letter-spacing: 1px; }
 
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -263,7 +263,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.18</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.0</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -364,6 +364,7 @@
             </div>
             <div class="teams-container" id="teams-result"></div>
             <button class="whatsapp-btn" style="display:flex; justify-content:center;" onclick="window.shareTeamsOnWhatsapp()">📲 Enviar Equipos al Grupo</button>
+            <button class="capture-btn" onclick="window.downloadLineup()">📸 Descargar Alineación</button>
         </div>
     </div>
 </div>
@@ -371,6 +372,17 @@
 <div id="user-action-bar">
     <div id="action-bar-text" class="action-bar-text"></div>
     <button id="action-bar-btn" class="action-bar-btn"></button>
+</div>
+
+<div id="capture-container">
+    <div class="lineup-card">
+        <div class="lc-header">
+            <div class="lc-title">CONVOCATORIA OFICIAL</div>
+            <div id="lc-date" class="lc-date"></div>
+        </div>
+        <div class="lc-grid" id="lc-grid"></div>
+        <div class="lc-footer">AMPA FUTSAL APP</div>
+    </div>
 </div>
 
 <script type="module">
@@ -466,20 +478,53 @@
             window.location.reload();
         });
     };
+    
+    // --- HELPER: CAPTURE LINEUP ---
+    window.downloadLineup = () => {
+        const teams = window.currentTeamsForCopy;
+        if (!teams) return window.showToast("No hay equipos", "error");
+
+        // 1. Populate Hidden Card
+        const dateStr = new Date(currentData.matchDate).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+        document.getElementById('lc-date').innerText = dateStr;
+        const grid = document.getElementById('lc-grid');
+        grid.innerHTML = '';
+        const names = ['BLANCO', 'NEGRO', 'ROJO'];
+        const classes = ['lc-white', 'lc-black', 'lc-red'];
+        
+        teams.forEach((team, i) => {
+            let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
+            team.forEach(p => {
+                html += `<div class="lc-player">${p.name}</div>`;
+            });
+            html += `</div>`;
+            grid.innerHTML += html;
+        });
+
+        // 2. Capture
+        const element = document.getElementById('capture-container');
+        html2canvas(document.querySelector(".lineup-card")).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `AMPA_Alineacion_${new Date().toISOString().split('T')[0]}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    };
+
+    // --- REST OF APP LOGIC REMAINS THE SAME ---
+    // (Including resetRosterOnly, Auth, updateUI, logic, etc.)
+    
     // RESET ROSTER (SMART MERGE)
     window.resetRosterOnly = async () => {
         showConfirm("Actualizar Plantilla", "¿Actualizar niveles manteniendo jugadores nuevos?", async () => {
             const currentRoster = currentData.roster || [];
             const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p]));
             let newRoster = [...initialPlayers];
-            
-            // Merge logic: Keep DB players not in code
             currentRoster.forEach(dbPlayer => {
                 if (!codePlayersMap.has(dbPlayer.id)) {
                     newRoster.push(dbPlayer);
                 }
             });
-            
             await updateDoc(matchRef, { roster: newRoster });
             window.showToast("Plantilla actualizada (Smart Merge)", "success");
         });
@@ -702,11 +747,11 @@
             if(votes >= 3) { voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true; }
         } else voteBtn.style.display = 'none';
 
-        // Render Teams / Logs etc.
+        // --- MEJORA HISTORIAL COMPLETO ---
         const logDiv = document.getElementById('activity-log');
         if (data.logs && data.logs.length > 0) {
             logDiv.innerHTML = "";
-            [...data.logs].reverse().forEach(logStr => { // REMOVED SLICE(0,15) FOR FULL HISTORY
+            [...data.logs].reverse().forEach(logStr => { 
                 const parts = logStr.split('|');
                 if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
             });
@@ -745,7 +790,6 @@
                 const p = roster.find(x => x.id === id);
                 if(p) {
                     // JITTER: Añadimos un pequeño valor aleatorio para el sorteo
-                    // pero mantenemos el nivel real para el equilibrio final
                     const jitter = (Math.random() * 0.5) - 0.25; // Entre -0.25 y +0.25
                     pool.push({ 
                         ...p, 
@@ -783,7 +827,7 @@
                 });
                 
                 teams[0].players.push(player);
-                teams[0].totalScore += player.level; // Sumamos nivel REAL, no el del sorteo
+                teams[0].totalScore += player.level; // Sumamos nivel REAL
             });
 
             // 5. Extraer solo los arrays de jugadores
@@ -821,11 +865,9 @@
         if(taps === 5) {
             // VERIFICACIÓN INTELIGENTE:
             if (auth.currentUser) {
-                // Si ya estoy logueado, solo muestro el panel y aviso
                 document.getElementById('admin-zone').style.display = 'block';
                 window.showToast("Sesión recuperada", "success");
             } else {
-                // Si no estoy logueado, abro el modal
                 window.showLoginModal();
             }
             taps = 0;
@@ -971,18 +1013,13 @@
             window.showToast("Voto registrado", "success");
         });
     };
-    window.attemptGeneration = () => {
+    window.attemptGeneration = () => { /* ... existing code ... */
         const targetTime = new Date(currentData.matchDate);
         const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
         targetTime.setHours(hours, minutes, 0, 0);
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
-        
-        // CHECK ONLY IF BUTTON IS CLICKED
-        if (new Date() < targetTime && !canUnlockByVote) {
-            return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
-        }
-        
+        if (new Date() < targetTime && !canUnlockByVote) return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
         const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
         if (total < 8) return window.showToast("Mínimo 8.", "error");
         if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
@@ -1144,22 +1181,7 @@
     };
     // Timers & Scores
     setInterval(async () => {
-        // AUTO RESET LOGIC (CHANGED)
-        if (currentData.matchDate) { 
-            checkTimeLock(currentData.matchDate, currentData.lockTime); 
-            const matchDate = new Date(currentData.matchDate); 
-            const now = new Date(); 
-            const resetTime = new Date(matchDate); 
-            resetTime.setDate(resetTime.getDate() + 1); 
-            resetTime.setHours(10, 0, 0, 0); 
-            if (now >= resetTime) {
-                // SAVE HISTORY AUTOMATICALLY IF TEAMS EXIST
-                if(currentData.teams) {
-                    await addDoc(collection(db, "history"), { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
-                }
-                updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); 
-            }
-        }
+        if (currentData.matchDate) { checkTimeLock(currentData.matchDate, currentData.lockTime); const matchDate = new Date(currentData.matchDate); const now = new Date(); const resetTime = new Date(matchDate); resetTime.setDate(resetTime.getDate() + 1); resetTime.setHours(10, 0, 0, 0); if (now >= resetTime) updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); }
         if(currentData.timerState === 'running') {
             const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
             const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
