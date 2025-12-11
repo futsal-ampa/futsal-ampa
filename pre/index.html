@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v4.1</title>
+    <title>AMPA Futsal v4.0</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -78,7 +78,7 @@
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
         
-        /* BOTON CAPTURA (NUEVO v4.0/4.1) */
+        /* BOTON CAPTURA (NUEVO v4.0) */
         .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
 
         .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
@@ -177,15 +177,7 @@
         }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
-        
-        /* BOTON BORRAR */
-        .btn-leave { 
-            background: #dc2626; 
-            color: white; 
-            border: 2px solid #b91c1c; 
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); 
-        }
-        
+        .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
         .btn-full { background: var(--disabled); color: white; cursor: not-allowed; }
         
         /* Stats Styles */
@@ -205,7 +197,7 @@
         .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
         .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
-        /* BOTON NO ERES TU */
+        /* NUEVO ESTILO PARA EL BOTON "NO ERES TU" (v3.15) */
         .reset-id-btn {
             background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem;
             font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase;
@@ -213,28 +205,21 @@
         }
         .reset-id-btn:active { transform: scale(0.95); background: #fffbeb; }
 
-        /* --- DISEÑO DE LA PIZARRA MEJORADO (v4.1) --- */
+        /* DISEÑO DE LA PIZARRA (OCULTO) */
         #capture-container { position: absolute; left: -9999px; top: 0; width: 600px; }
-        /* Fondo degradado oscuro y borde dorado */
         .lineup-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 25px; border-radius: 0; color: white; font-family: 'Montserrat', sans-serif; text-align: center; border: 3px solid #f59e0b; box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.2); }
-        /* Encabezado estilo mensaje de WhatsApp */
         .lc-header { border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 20px; }
         .lc-title { font-size: 1.6rem; font-weight: 900; color: #f59e0b; margin: 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
         .lc-subtitle { color: #e2e8f0; font-size: 1.1rem; font-weight: 700; margin-top: 8px; text-transform: uppercase; }
         .lc-location { color: #94a3b8; font-size: 0.9rem; font-weight: 600; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        /* Rejilla de equipos */
         .lc-grid { display: flex; justify-content: space-between; gap: 15px; }
         .lc-col { flex: 1; background: rgba(255,255,255,0.07); border-radius: 8px; padding: 15px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); }
-        /* Títulos de equipo */
         .lc-team-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 3px solid; letter-spacing: 1px; }
         .lc-white .lc-team-title { color: #ffffff; border-color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
         .lc-black .lc-team-title { color: #cbd5e1; border-color: #64748b; text-shadow: 0 0 10px rgba(0,0,0,0.3); }
         .lc-red .lc-team-title { color: #fca5a5; border-color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
-        /* Lista de jugadores */
         .lc-player { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #e2e8f0; letter-spacing: 0.5px; }
-        /* Pie de página */
         .lc-footer { margin-top: 20px; font-size: 0.7rem; color: #64748b; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; }
-
 
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -280,7 +265,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.1</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.0</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -401,7 +386,7 @@
             <div class="lc-location">📍 Pabellón Colegio Virgen de la Vega</div>
         </div>
         <div class="lc-grid" id="lc-grid"></div>
-        <div class="lc-footer">AMPA FUTSAL APP v4.1</div>
+        <div class="lc-footer">AMPA FUTSAL APP v4.0</div>
     </div>
 </div>
 
@@ -459,7 +444,7 @@
         { id: "ruben", name: "Rubén", level: 1.2 },
         { id: "eloy", name: "Eloy", level: 1.0 },
         { id: "luis", name: "Luis", level: 1.0 },
-        { id: "alfredo", name: "Alfredo", level: 1.0 }
+        { id: "alfredo", name: "Alfredo", level: 1.1 }
     ];
 
     const guestsDB = [
@@ -499,15 +484,14 @@
         });
     };
     
-    // --- HELPER: CAPTURE LINEUP (V4.1 - DISEÑO MEJORADO + WEB SHARE API) ---
+    // --- HELPER: CAPTURE LINEUP (V4.1) ---
     window.downloadLineup = () => {
         const teams = window.currentTeamsForCopy;
         if (!teams) return window.showToast("No hay equipos", "error");
 
-        // 1. Rellenar la tarjeta oculta con los datos
+        // 1. Populate Hidden Card
         const dateStr = new Date(currentData.matchDate).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
         document.getElementById('lc-date').innerText = dateStr;
-        // La hora y el lugar ya están fijos en el HTML, se podrían hacer dinámicos si se guardaran en Firebase
         
         const grid = document.getElementById('lc-grid');
         grid.innerHTML = '';
@@ -516,29 +500,30 @@
         
         teams.forEach((team, i) => {
             let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
-            team.forEach(p => { html += `<div class="lc-player">${p.name}</div>`; });
+            team.forEach(p => {
+                html += `<div class="lc-player">${p.name}</div>`;
+            });
             html += `</div>`;
             grid.innerHTML += html;
         });
 
-        // 2. Generar imagen y Compartir (Web Share API)
+        // 2. Capture and Share
         const element = document.querySelector(".lineup-card");
-        // Usamos backgroundColor null para que coja el gradiente CSS
         html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
             canvas.toBlob(blob => {
                 const file = new File([blob], `AMPA_Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
 
-                // Intentar usar la API nativa de compartir (Móviles)
+                // Try Web Share API (Mobile)
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     navigator.share({
                         files: [file],
                         title: 'Alineación AMPA Futsal',
                         text: 'Aquí están los equipos confirmados.'
                     }).catch(err => {
-                        console.error("Error compartiendo (usuario canceló o fallo):", err);
+                        console.error("Error compartiendo", err);
                     });
                 } else {
-                    // Fallback para PC (Descargar imagen)
+                    // Fallback PC
                     const link = document.createElement('a');
                     link.download = file.name;
                     link.href = canvas.toDataURL();
@@ -789,7 +774,7 @@
         if (data.logs && data.logs.length > 0) {
             logDiv.innerHTML = "";
             // Eliminamos el .slice(0, 15) para mostrar TODO el historial
-            [...data.logs].reverse().forEach(logStr => {
+            [...data.logs].reverse().forEach(logStr => { 
                 const parts = logStr.split('|');
                 if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
             });
@@ -907,18 +892,26 @@
              // --- MENSAJES PERSONALIZADOS ---
              const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
              let msg = "";
-             // Personalización si soy yo mismo
-             if (type === 'player' && id === myId) {
-                 msg = isSelected ? `¿${name}, quieres salir de la convocatoria?` : `¿${name}, quieres entrar en la convocatoria?`;
+             
+             // Si el actor tiene nombre conocido (ej: "Willi")
+             if (actorName && actorName !== "Alguien") {
+                 if (isSelected) {
+                     msg = `¿${actorName}, quieres que salga de la convocatoria ${name}?`;
+                 } else {
+                     msg = `¿${actorName}, quieres que entre en la convocatoria ${name}?`;
+                 }
+                 // Si soy yo mismo
+                 if(name === actorName) {
+                      msg = isSelected ? `¿${name}, quieres salir de la convocatoria?` : `¿${name}, quieres entrar en la convocatoria?`;
+                 }
              } else {
-                 // Mensaje genérico para invitados o terceros
-                 msg = isSelected ? `¿${actorName}, quieres que salga de la convocatoria ${name}?` : `¿${actorName}, quieres que entre en la convocatoria ${name}?`;
+                 // Fallback genérico
+                 msg = isSelected ? `¿Seguro que quieres borrar a ${name}?` : `¿Seguro que quieres añadir a ${name}?`;
              }
              
              showConfirm("Confirmar Acción", msg, () => {
                  processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
              });
-             return;
         }
     };
 
