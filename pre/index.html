@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v4.0</title>
+    <title>AMPA Futsal v4.1</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -14,7 +14,7 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <style>
-        /* ESTILOS (Optimizados) */
+        /* ESTILOS (Optimizados v3.18 + Pizarra) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -78,7 +78,7 @@
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
         
-        /* BOTON CAPTURA (NUEVO v4.0) */
+        /* BOTON CAPTURA */
         .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
 
         .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
@@ -197,7 +197,7 @@
         .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
         .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
-        /* NUEVO ESTILO PARA EL BOTON "NO ERES TU" (v3.15) */
+        /* BOTON NO ERES TU */
         .reset-id-btn {
             background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem;
             font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase;
@@ -366,7 +366,7 @@
             </div>
             <div class="teams-container" id="teams-result"></div>
             <button class="whatsapp-btn" style="display:flex; justify-content:center;" onclick="window.shareTeamsOnWhatsapp()">📲 Enviar Equipos al Grupo</button>
-            <button class="capture-btn" onclick="window.downloadLineup()">📤 Compartir Alineación (Imagen)</button>
+            <button class="capture-btn" onclick="window.downloadLineup()">📤 Compartir Alineación</button>
         </div>
     </div>
 </div>
@@ -420,7 +420,6 @@
     } catch (e) { console.error("Error init firebase", e); }
 
     // --- LISTA PRO CON SUB-NIVELES (Ocultos al usuario) ---
-    // Edita aquí los decimales para afinar el equilibrio
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3.2 },
         { id: "jhon", name: "Jhon", level: 3.0 },
@@ -444,7 +443,7 @@
         { id: "ruben", name: "Rubén", level: 1.2 },
         { id: "eloy", name: "Eloy", level: 1.0 },
         { id: "luis", name: "Luis", level: 1.0 },
-        { id: "alfredo", name: "Alfredo", level: 1.1 }
+        { id: "alfredo", name: "Alfredo", level: 1.0 }
     ];
 
     const guestsDB = [
