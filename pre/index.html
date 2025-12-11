@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v4.3 PRO</title>
+    <title>AMPA Futsal v3.18</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -11,10 +11,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-
     <style>
-        /* ESTILOS */
+        /* ESTILOS (Optimizados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -68,19 +66,15 @@
         .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         
-        /* BOTONES */
+        /* BOTONES & ESTILOS NUEVOS DE BOTON CREAR */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .action-btn:active { transform: scale(0.98); }
         .btn-locked { background-color: #94a3b8 !important; opacity: 0.7; cursor: not-allowed; box-shadow: none; filter: grayscale(0.8); }
         .btn-unlocked { background-color: var(--brand-blue) !important; opacity: 1; cursor: pointer; animation: pulseBtn 2s infinite; box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
-        
+
         .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
-        
-        /* BOTON CAPTURA (NUEVO) */
-        .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
-
         .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
         .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
         
@@ -177,7 +171,15 @@
         }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
-        .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
+        
+        /* MEJORA VISUAL BOTON BORRAR */
+        .btn-leave { 
+            background: #dc2626; 
+            color: white; 
+            border: 2px solid #b91c1c; 
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); 
+        }
+        
         .btn-full { background: var(--disabled); color: white; cursor: not-allowed; }
         
         /* Stats Styles */
@@ -197,29 +199,25 @@
         .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
         .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
-        /* RESET ID BTN */
+        /* NUEVO ESTILO PARA EL BOTON "NO ERES TU" (v3.15) */
         .reset-id-btn {
-            background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem;
-            font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase;
-            display: inline-flex; align-items: center; vertical-align: middle; transition: all 0.2s;
+            background: white;
+            border: 1px solid #d97706;
+            color: #d97706;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            cursor: pointer;
+            margin-left: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            transition: all 0.2s;
         }
         .reset-id-btn:active { transform: scale(0.95); background: #fffbeb; }
-
-        /* DISEÑO DE LA PIZARRA (OCULTO) */
-        #capture-container { position: absolute; left: -9999px; top: 0; width: 600px; }
-        .lineup-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 25px; border-radius: 0; color: white; font-family: 'Montserrat', sans-serif; text-align: center; border: 3px solid #f59e0b; box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.2); }
-        .lc-header { border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 20px; }
-        .lc-title { font-size: 1.6rem; font-weight: 900; color: #f59e0b; margin: 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .lc-subtitle { color: #e2e8f0; font-size: 1.1rem; font-weight: 700; margin-top: 8px; text-transform: uppercase; }
-        .lc-location { color: #94a3b8; font-size: 0.9rem; font-weight: 600; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .lc-grid { display: flex; justify-content: space-between; gap: 15px; }
-        .lc-col { flex: 1; background: rgba(255,255,255,0.07); border-radius: 8px; padding: 15px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); }
-        .lc-team-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 3px solid; letter-spacing: 1px; }
-        .lc-white .lc-team-title { color: #ffffff; border-color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-        .lc-black .lc-team-title { color: #cbd5e1; border-color: #64748b; text-shadow: 0 0 10px rgba(0,0,0,0.3); }
-        .lc-red .lc-team-title { color: #fca5a5; border-color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
-        .lc-player { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #e2e8f0; letter-spacing: 0.5px; }
-        .lc-footer { margin-top: 20px; font-size: 0.7rem; color: #64748b; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; }
 
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -265,7 +263,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.3 PRO</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.18</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -366,7 +364,6 @@
             </div>
             <div class="teams-container" id="teams-result"></div>
             <button class="whatsapp-btn" style="display:flex; justify-content:center;" onclick="window.shareTeamsOnWhatsapp()">📲 Enviar Equipos al Grupo</button>
-            <button class="capture-btn" onclick="window.downloadLineup()">📤 Compartir Alineación</button>
         </div>
     </div>
 </div>
@@ -374,20 +371,6 @@
 <div id="user-action-bar">
     <div id="action-bar-text" class="action-bar-text"></div>
     <button id="action-bar-btn" class="action-bar-btn"></button>
-</div>
-
-<div id="capture-container">
-    <div class="lineup-card">
-        <div class="lc-header">
-            <div class="lc-title">⚽ EQUIPOS CONFIRMADOS ⚽</div>
-            <div class="lc-subtitle">
-                <span id="lc-date"></span> - <span id="lc-time">20:30h</span>
-            </div>
-            <div class="lc-location">📍 Pabellón Colegio Virgen de la Vega</div>
-        </div>
-        <div class="lc-grid" id="lc-grid"></div>
-        <div class="lc-footer">AMPA FUTSAL APP v4.3</div>
-    </div>
 </div>
 
 <script type="module">
@@ -420,6 +403,7 @@
     } catch (e) { console.error("Error init firebase", e); }
 
     // --- LISTA PRO CON SUB-NIVELES (Ocultos al usuario) ---
+    // Edita aquí los decimales para afinar el equilibrio
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3.2 },
         { id: "jhon", name: "Jhon", level: 3.0 },
@@ -443,7 +427,7 @@
         { id: "ruben", name: "Rubén", level: 1.2 },
         { id: "eloy", name: "Eloy", level: 1.0 },
         { id: "luis", name: "Luis", level: 1.0 },
-        { id: "alfredo", name: "Alfredo", level: 1.0 }
+        { id: "alfredo", name: "Alfredo", level: 1.1 }
     ];
 
     const guestsDB = [
@@ -482,70 +466,20 @@
             window.location.reload();
         });
     };
-    
-    // --- HELPER: CAPTURE LINEUP (V4.1) ---
-    window.downloadLineup = () => {
-        const teams = window.currentTeamsForCopy;
-        if (!teams) return window.showToast("No hay equipos", "error");
-
-        // 1. Populate Hidden Card
-        const dateStr = new Date(currentData.matchDate).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-        document.getElementById('lc-date').innerText = dateStr;
-        
-        const grid = document.getElementById('lc-grid');
-        grid.innerHTML = '';
-        const names = ['BLANCO', 'NEGRO', 'ROJO'];
-        const classes = ['lc-white', 'lc-black', 'lc-red'];
-        
-        teams.forEach((team, i) => {
-            let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
-            team.forEach(p => {
-                html += `<div class="lc-player">${p.name}</div>`;
-            });
-            html += `</div>`;
-            grid.innerHTML += html;
-        });
-
-        // 2. Capture and Share
-        const element = document.querySelector(".lineup-card");
-        html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
-            canvas.toBlob(blob => {
-                const file = new File([blob], `AMPA_Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
-
-                // Try Web Share API (Mobile)
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'Alineación AMPA Futsal',
-                        text: 'Aquí están los equipos confirmados.'
-                    }).catch(err => {
-                        console.error("Error compartiendo", err);
-                    });
-                } else {
-                    // Fallback PC
-                    const link = document.createElement('a');
-                    link.download = file.name;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    window.showToast("Imagen descargada (PC)", "success");
-                }
-            }, 'image/png');
-        });
-    };
-
-    // REST OF APP LOGIC REMAINS THE SAME
-    
     // RESET ROSTER (SMART MERGE)
     window.resetRosterOnly = async () => {
         showConfirm("Actualizar Plantilla", "¿Actualizar niveles manteniendo jugadores nuevos?", async () => {
             const currentRoster = currentData.roster || [];
             const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p]));
             let newRoster = [...initialPlayers];
+            
+            // Merge logic: Keep DB players not in code
             currentRoster.forEach(dbPlayer => {
                 if (!codePlayersMap.has(dbPlayer.id)) {
                     newRoster.push(dbPlayer);
                 }
             });
+            
             await updateDoc(matchRef, { roster: newRoster });
             window.showToast("Plantilla actualizada (Smart Merge)", "success");
         });
@@ -768,12 +702,11 @@
             if(votes >= 3) { voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true; }
         } else voteBtn.style.display = 'none';
 
-        // --- MEJORA HISTORIAL COMPLETO ---
+        // Render Teams / Logs etc.
         const logDiv = document.getElementById('activity-log');
         if (data.logs && data.logs.length > 0) {
             logDiv.innerHTML = "";
-            // Eliminamos el .slice(0, 15) para mostrar TODO el historial
-            [...data.logs].reverse().forEach(logStr => { 
+            [...data.logs].reverse().forEach(logStr => { // REMOVED SLICE(0,15) FOR FULL HISTORY
                 const parts = logStr.split('|');
                 if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
             });
@@ -786,15 +719,11 @@
             document.getElementById('selection-phase').style.display = 'none';
             document.getElementById('results-phase').style.display = 'block';
             document.getElementById('notify-btn').style.display = 'none';
-            
-            if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex';
-            else document.getElementById('scoreboard').style.display = 'none';
-            
+            if(teamsData.length === 3) document.getElementById('scoreboard').style.display = 'flex'; else document.getElementById('scoreboard').style.display = 'none';
             const sc = data.scores || [0,0,0];
             document.getElementById('sc-blanco').innerText = sc[0];
             document.getElementById('sc-negro').innerText = sc[1];
             document.getElementById('sc-rojo').innerText = sc[2];
-
             renderTeams(teamsData);
         } else {
             document.getElementById('selection-phase').style.display = 'block';
@@ -804,47 +733,132 @@
         }
     }
 
-    // --- GLOBAL FUNCTIONS ---
-    window.startNewMatch = async () => {
+    // --- ALGORITMO GREEDY BALANCE (Equipos equilibrados invisibles) ---
+    window.triggerGeneration = async (numTeams) => {
+        try {
+            document.getElementById('loader').style.display = 'flex';
+            const roster = currentData.roster || initialPlayers;
+            
+            // 1. Obtener jugadores seleccionados y asignarles su nivel decimal + JITTER
+            const pool = [];
+            (currentData.selectedPlayers || []).forEach(id => {
+                const p = roster.find(x => x.id === id);
+                if(p) {
+                    // JITTER: Añadimos un pequeño valor aleatorio para el sorteo
+                    // pero mantenemos el nivel real para el equilibrio final
+                    const jitter = (Math.random() * 0.5) - 0.25; // Entre -0.25 y +0.25
+                    pool.push({ 
+                        ...p, 
+                        isGuest: false,
+                        sortLevel: p.level + jitter // Nivel "falso" para ordenar
+                    });
+                }
+            });
+            (currentData.selectedGuests || []).forEach(id => {
+                const g = guestsDB.find(x => x.id === id);
+                if(g) { 
+                    const jitter = (Math.random() * 0.5) - 0.25;
+                    const baseLevel = g.level || 1.5;
+                    pool.push({ 
+                        ...g, 
+                        level: baseLevel, 
+                        isGuest: true,
+                        sortLevel: baseLevel + jitter 
+                    });
+                }
+            });
+
+            // 2. Ordenar por nivel con JITTER (Mejor a Peor según la suerte del día)
+            pool.sort((a, b) => b.sortLevel - a.sortLevel);
+
+            // 3. Crear equipos vacios
+            let teams = Array.from({ length: numTeams }, () => ({ players: [], totalScore: 0 }));
+
+            // 4. Reparto Greedy: Asignar al siguiente mejor jugador al equipo más débil
+            pool.forEach(player => {
+                // Ordenar equipos por puntuación REAL ascendente (el más débil primero)
+                teams.sort((a, b) => {
+                    if (a.players.length !== b.players.length) return a.players.length - b.players.length; 
+                    return a.totalScore - b.totalScore; 
+                });
+                
+                teams[0].players.push(player);
+                teams[0].totalScore += player.level; // Sumamos nivel REAL, no el del sorteo
+            });
+
+            // 5. Extraer solo los arrays de jugadores
+            const finalTeams = teams.map(t => t.players);
+            
+            // MEJORA: Barajar el orden DENTRO de cada equipo para ocultar el ranking
+            finalTeams.forEach(team => window.shuffle(team));
+
+            // Guardar
+            const teamsString = JSON.stringify(finalTeams);
+            const myId = localStorage.getItem('futsal_my_id');
+            const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
+            const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+            await updateDoc(matchRef, { 
+                teams: teamsString,
+                logs: arrayUnion(`⚽ Equipos equilibrados creados por ${author}|${now}`)
+            });
+            document.getElementById('loader').style.display = 'none';
+        } catch (e) {
+            console.error(e);
+            document.getElementById('loader').style.display = 'none';
+            window.showToast("Error generando equipos: " + e.message, "error");
+        }
+    };
+
+    // --- AUTH LOGIN TRIGGER (CORREGIDO) ---
+    let taps = 0;
+    let tapTimer = null;
+    window.secretAdminTap = () => {
+        taps++; 
+        clearTimeout(tapTimer);
+        tapTimer = setTimeout(() => taps = 0, 2000);
+        
+        if(taps === 5) {
+            // VERIFICACIÓN INTELIGENTE:
+            if (auth.currentUser) {
+                // Si ya estoy logueado, solo muestro el panel y aviso
+                document.getElementById('admin-zone').style.display = 'block';
+                window.showToast("Sesión recuperada", "success");
+            } else {
+                // Si no estoy logueado, abro el modal
+                window.showLoginModal();
+            }
+            taps = 0;
+        }
+    };
+    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
+
+    // --- REST OF FUNCTIONS (Keep existing ones) ---
+    window.startNewMatch = async () => { /* ... existing code ... */ 
         const dateInput = document.getElementById('date-input').value;
         if (!dateInput) return window.showToast("Selecciona fecha", "error");
-        
         const selected = new Date(dateInput);
         const today = new Date(); today.setHours(0,0,0,0);
         if(selected < today) return window.showToast("Día pasado no válido", "error");
-
-        const adminSnap = await getDoc(configRef);
-        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
-
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
              const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
              const myId = localStorage.getItem('futsal_my_id');
              const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
-
              window.shareConvocation(dateInput);
-
              await setDoc(matchRef, { 
-                matchDate: dateInput, 
-                // KEEP PREVIOUS CONFIG
-                lockTime: currentData.lockTime || "18:00",
-                pinMode: currentData.pinMode !== false,
-                voteMode: currentData.voteMode !== false,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
-                pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
+                matchDate: dateInput, lockTime: currentData.lockTime || "18:00", pinMode: currentData.pinMode !== false, voteMode: currentData.voteMode !== false,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
+                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
             }, { merge: true });
         });
     };
-
-    window.toggleSelection = async (type, id, name) => {
+    window.toggleSelection = async (type, id, name) => { /* ... existing code ... */
         let newPlayers = [...(currentData.selectedPlayers || [])];
         let newGuests = [...(currentData.selectedGuests || [])];
         let currentPins = {...(currentData.pins || {})};
         let newGuestInviters = {...(currentData.guestInviters || {})};
         const now = new Date();
         const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        
         let inviterName = "";
         let actorName = "Alguien"; // Default
 
@@ -877,18 +891,16 @@
                 showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => {
                     if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error");
                     processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true);
-                return; 
+                }, true); return; 
             } else {
-                showConfirm("🛡️ Crear PIN", `Crea un PIN nuevo para ${name}:`, (val) => {
+                showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name.toUpperCase()}:`, (val) => {
                     if (!val || val.length < 3) return window.showToast("PIN inválido", "error");
                     currentPins[id] = val;
                     processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true);
-                return;
+                }, true); return;
             }
         } else {
-             // --- MENSAJES PERSONALIZADOS ---
+             // MENSAJES PERSONALIZADOS REQUERIDOS
              const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
              let msg = "";
              
@@ -913,7 +925,6 @@
              });
         }
     };
-
     async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName) {
         let actionSuffix = "";
         if (actorName && actorName !== "Alguien" && actorName !== name) {
@@ -937,7 +948,7 @@
              if (newGuests.includes(id)) {
                 newGuests = newGuests.filter(i => i !== id);
                 delete newGuestInviters[id];
-                // --- LOG DE QUIEN ELIMINA AL INVITADO ---
+                // LOG DE QUIEN ELIMINA AL INVITADO
                 await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} eliminado por ${actorName}|${timeStr}`) });
             } else {
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
@@ -947,85 +958,220 @@
             }
         }
     }
-
-    window.voteToUnlock = async () => {
+    window.voteToUnlock = async () => { /* ... existing code ... */ 
         const myId = localStorage.getItem('futsal_my_id');
         if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo convocados pueden votar.", "error");
         if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info");
-        
-        // Buscamos el nombre del usuario para el log
         const roster = currentData.roster || initialPlayers;
         const me = roster.find(p => p.id === myId);
         const myName = me ? me.name : "Alguien";
         const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
         showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => {
-            await updateDoc(matchRef, { 
-                unlockVotes: arrayUnion(myId),
-                logs: arrayUnion(`🗳️ Voto de ${myName}|${now}`) 
-            });
+            await updateDoc(matchRef, { unlockVotes: arrayUnion(myId), logs: arrayUnion(`🗳️ Voto de ${myName}|${now}`) });
             window.showToast("Voto registrado", "success");
         });
     };
-
-    setInterval(() => {
-        if (currentData.matchDate) {
-            checkTimeLock(currentData.matchDate, currentData.lockTime);
-            const matchDate = new Date(currentData.matchDate);
-            const now = new Date();
-            const resetTime = new Date(matchDate);
+    window.attemptGeneration = () => {
+        const targetTime = new Date(currentData.matchDate);
+        const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
+        targetTime.setHours(hours, minutes, 0, 0);
+        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
+        const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
+        
+        // CHECK ONLY IF BUTTON IS CLICKED
+        if (new Date() < targetTime && !canUnlockByVote) {
+            return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
+        }
+        
+        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
+        if (total < 8) return window.showToast("Mínimo 8.", "error");
+        if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
+    };
+    window.forceGeneration = () => { /* ... existing code ... */
+        showConfirm("🔓 Desbloquear Creación", "¿Quieres habilitar el botón 'Crear Equipos' para todos?", async () => {
+             const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+             await updateDoc(matchRef, { lockTime: "00:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
+             window.showToast("Botón desbloqueado para todos", "success");
+             window.hideAdmin();
+        });
+    };
+    window.resetRosterOnly = async () => {
+        showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código? El historial NO se borrará.", async () => {
+            await updateDoc(matchRef, { roster: initialPlayers });
+            window.showToast("Plantilla actualizada", "success");
+        });
+    };
+    
+    // ... (Keep renderTeams, shareFunctions, timers, stats logic unchanged from v2.6) ...
+    // Just ensuring the logic for stats is included here for completeness
+    window.openStats = async () => {
+        const modal = document.getElementById('modal-overlay');
+        document.getElementById('modal-title').innerText = "Estadísticas y Ranking";
+        document.getElementById('modal-text').style.display = 'none';
+        document.getElementById('modal-input').style.display = 'none';
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('stats-content').style.display = 'block';
+        const actions = document.getElementById('modal-actions');
+        actions.innerHTML = '';
+        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; };
+        actions.appendChild(btnClose);
+        modal.style.display = 'flex';
+        try {
+            const histRef = collection(db, "history");
+            const snap = await getDocs(histRef);
+            const matches = [];
+            const playerCounts = {};
+            snap.forEach(doc => {
+                const d = doc.data();
+                matches.push(d);
+                if(d.teams) {
+                    let teamsArr = [];
+                    try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){}
+                    teamsArr.forEach(team => {
+                        team.forEach(player => {
+                            if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; }
+                        });
+                    });
+                }
+            });
+            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]);
+            const rankDiv = document.getElementById('tab-ranking');
+            rankDiv.innerHTML = '';
+            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>';
+            sortedPlayers.forEach(([name, count], index) => {
+                let medal = '';
+                if(index === 0) medal = '🥇'; else if(index === 1) medal = '🥈'; else if(index === 2) medal = '🥉';
+                rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal || (index + 1)}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`;
+            });
+            if(sortedPlayers.length > 0) { rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial y Resetear Ranking</button></div>`; }
+            matches.sort((a,b) => (a.date < b.date ? 1 : -1));
+            const histDiv = document.getElementById('tab-history');
+            histDiv.innerHTML = '';
+            if(matches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos registrados</div>';
+            matches.forEach(m => {
+                const d = new Date(m.date);
+                const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
+                const s = m.scores || [0,0,0];
+                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`;
+                if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`;
+                let pCount = 0;
+                if(m.teams) {
+                    let teamsArr = [];
+                    try { teamsArr = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; } catch(e){}
+                    teamsArr.forEach(t => pCount += t.length);
+                }
+                histDiv.innerHTML += `<div class="history-card"><div class="h-info"><div class="h-date">${dateStr}</div><div class="h-score">${scoreStr}</div></div><div class="h-players">👥 ${pCount} jug.</div></div>`;
+            });
+        } catch(e) { window.showToast("Error cargando historial", "error"); }
+    };
+    window.resetHistory = async () => {
+        showConfirm("⚠️ BORRAR HISTORIAL", "Esto eliminará todos los partidos pasados. ¿Estás seguro?", async () => {
+            const histRef = collection(db, "history");
+            const snap = await getDocs(histRef);
+            snap.forEach(async (d) => { await deleteDoc(doc(db, "history", d.id)); });
+            window.showToast("Historial eliminado", "success");
+            setTimeout(() => window.openStats(), 500); 
+        });
+    };
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('[id^="tab-"]').forEach(d => d.style.display = 'none');
+        if(tab === 'ranking') { document.querySelector('.tab:nth-child(1)').classList.add('active'); document.getElementById('tab-ranking').style.display = 'block'; } 
+        else { document.querySelector('.tab:nth-child(2)').classList.add('active'); document.getElementById('tab-history').style.display = 'block'; }
+    };
+    window.renderTeams = (teams) => {
+        const resDiv = document.getElementById('teams-result');
+        resDiv.innerHTML = '';
+        const names = ['BLANCO', 'NEGRO', 'ROJO'];
+        const classes = ['team-blanco', 'team-negro', 'team-rojo'];
+        teams.forEach((team, idx) => {
+            let html = `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`;
+            team.forEach(p => { const name = p.isGuest ? `<span class="guest-result">${p.name}</span>` : p.name; html += `<li>${name}</li>`; });
+            html += `</ul></div>`;
+            resDiv.innerHTML += html;
+        });
+        window.currentTeamsForCopy = teams;
+    }
+    // RESET MANUAL CORREGIDO (NO GUARDA HISTORIAL)
+    window.resetCurrentMatch = async () => {
+        showConfirm("⚠️ REINICIO MANUAL", "Se borrará la lista y NO se guardará historial (partido no jugado). ¿Continuar?", async () => {
+             await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
+             window.hideAdmin();
+        });
+    };
+    window.changeLockTime = async () => { const t = document.getElementById('admin-time-input').value; await updateDoc(matchRef, { lockTime: t }); };
+    window.togglePinMode = async () => { const s = currentData.pinMode === false ? true : false; await updateDoc(matchRef, { pinMode: s }); };
+    window.toggleVoteMode = async () => { const s = currentData.voteMode === false ? true : false; await updateDoc(matchRef, { voteMode: s }); };
+    window.addNewPlayer = async () => {
+        const name = document.getElementById('new-player-name').value;
+        const level = parseFloat(document.getElementById('new-player-level').value); // Parse Float now
+        if(!name) return window.showToast("Falta nombre", "error");
+        const id = name.toLowerCase().replace(/\s/g, '_');
+        const newPlayer = { id: id, name: name, level: level };
+        await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
+        window.showToast("Jugador añadido", "success");
+    };
+    window.toggleBan = async (id, name) => {
+        let list = [...(currentData.bannedIndices || [])];
+        if(list.includes(id)) { list = list.filter(i => i !== id); window.showToast(`${name} desbloqueado`, "success"); } 
+        else { list.push(id); if(currentData.selectedPlayers.includes(id)) { let s = currentData.selectedPlayers.filter(i => i !== id); await updateDoc(matchRef, { selectedPlayers: s }); } window.showToast(`${name} bloqueado`, "error"); }
+        await updateDoc(matchRef, { bannedIndices: list });
+    };
+    window.resetPin = async (id, name) => {
+        showConfirm("Reset PIN", `¿Borrar PIN de ${name}?`, async () => { let p = {...currentData.pins}; delete p[id]; await updateDoc(matchRef, { pins: p }); window.showToast("PIN reseteado", "success"); });
+    };
+    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
+    window.forceReset = async () => {
+        showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => {
+             await setDoc(matchRef, { matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0], timerState: 'stopped', roster: initialPlayers });
+            window.hideAdmin();
+        });
+    };
+    window.shareConvocation = (d) => {
+        const date = d ? new Date(d) : new Date(currentData.matchDate);
+        const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    };
+    window.shareTeamsOnWhatsapp = () => {
+         const t = window.currentTeamsForCopy; if(!t) return;
+         const d = new Date(currentData.matchDate);
+         const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+         let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`;
+         const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴'];
+         t.forEach((team, i) => { txt += `${em[i]} *${names[i]}* (${team.length})\n`; team.forEach(p => txt += `- ${p.name}\n`); txt += `\n`; });
+         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    };
+    // Timers & Scores
+    setInterval(async () => {
+        // AUTO RESET LOGIC (CHANGED)
+        if (currentData.matchDate) { 
+            checkTimeLock(currentData.matchDate, currentData.lockTime); 
+            const matchDate = new Date(currentData.matchDate); 
+            const now = new Date(); 
+            const resetTime = new Date(matchDate); 
             resetTime.setDate(resetTime.getDate() + 1); 
             resetTime.setHours(10, 0, 0, 0); 
             if (now >= resetTime) {
                 // SAVE HISTORY AUTOMATICALLY IF TEAMS EXIST
                 if(currentData.teams) {
-                    addDoc(collection(db, "history"), { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
+                    await addDoc(collection(db, "history"), { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
                 }
                 updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); 
             }
         }
-        
         if(currentData.timerState === 'running') {
-            const display = document.getElementById('timer-display');
-            const btn = document.getElementById('timer-start-btn');
-            const txt = document.getElementById('timer-status-text');
+            const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
             const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
-            const m = Math.floor(left / 60).toString().padStart(2, '0');
-            const s = (left % 60).toString().padStart(2, '0');
-            display.innerText = `${m}:${s}`;
-            btn.innerText = "⏸ PAUSA"; btn.classList.add('t-stop');
-            if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; }
-            else if(left <= 0) { 
-                display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN";
-                if(!hasBeeped) {
-                     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                     const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000);
-                     hasBeeped = true;
-                }
-            }
+            const m = Math.floor(left / 60).toString().padStart(2, '0'); const s = (left % 60).toString().padStart(2, '0'); display.innerText = `${m}:${s}`; btn.innerText = "⏸ PAUSA"; btn.classList.add('t-stop');
+            if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; } else if(left <= 0) { display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN"; if(!hasBeeped) { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000); hasBeeped = true; } }
         }
     }, 1000);
-    
-    window.toggleTimer = async () => {
-        if (currentData.timerState === 'running') {
-            const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000));
-            await updateDoc(matchRef, { timerState: 'paused', timerLeft: left });
-        } else {
-            const target = Date.now() + (currentData.timerLeft * 1000);
-            await updateDoc(matchRef, { timerState: 'running', timerEnd: target });
-        }
-    };
-    window.resetTimer = async () => {
-        await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 });
-        hasBeeped = false;
-        document.getElementById('timer-display').classList.remove('finished', 'last-minute');
-        document.getElementById('timer-display').innerText = "05:00";
-    };
-    window.updateScore = async (idx, delta) => {
-        let s = [...(currentData.scores || [0,0,0])];
-        s[idx] = Math.max(0, s[idx] + delta);
-        await updateDoc(matchRef, { scores: s });
-    };
+    window.toggleTimer = async () => { if (currentData.timerState === 'running') { const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000)); await updateDoc(matchRef, { timerState: 'paused', timerLeft: left }); } else { const target = Date.now() + (currentData.timerLeft * 1000); await updateDoc(matchRef, { timerState: 'running', timerEnd: target }); } };
+    window.resetTimer = async () => { await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 }); hasBeeped = false; document.getElementById('timer-display').classList.remove('finished', 'last-minute'); document.getElementById('timer-display').innerText = "05:00"; };
+    window.updateScore = async (idx, delta) => { let s = [...(currentData.scores || [0,0,0])]; s[idx] = Math.max(0, s[idx] + delta); await updateDoc(matchRef, { scores: s }); };
+    let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
+    window.installApp = async () => { if(defPrompt) { defPrompt.prompt(); defPrompt = null; } else window.showToast("Usa menú navegador -> Instalar", "info"); };
 
     function checkTimeLock(dateStr, lockTimeStr) {
         const btn = document.getElementById('btn-create');
