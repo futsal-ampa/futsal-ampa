@@ -11,6 +11,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         /* ESTILOS (Optimizados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
@@ -225,6 +226,33 @@
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        /* --- ESTILOS DE LA PIZARRA (NUEVO) --- */
+    
+    /* Botón de compartir */
+    .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+    
+    /* Contenedor oculto para la captura */
+    #capture-container { position: absolute; left: -9999px; top: 0; width: 600px; }
+    
+    /* Diseño de la Tarjeta */
+    .lineup-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 25px; border-radius: 0; color: white; font-family: 'Montserrat', sans-serif; text-align: center; border: 3px solid #f59e0b; box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.2); }
+    .lc-header { border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 20px; }
+    .lc-title { font-size: 1.6rem; font-weight: 900; color: #f59e0b; margin: 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .lc-subtitle { color: #e2e8f0; font-size: 1.1rem; font-weight: 700; margin-top: 8px; text-transform: uppercase; }
+    .lc-location { color: #94a3b8; font-size: 0.9rem; font-weight: 600; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    
+    /* Rejilla de equipos */
+    .lc-grid { display: flex; justify-content: space-between; gap: 15px; }
+    .lc-col { flex: 1; background: rgba(255,255,255,0.07); border-radius: 8px; padding: 15px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); }
+    
+    /* Colores de equipo en la tarjeta */
+    .lc-team-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 3px solid; letter-spacing: 1px; }
+    .lc-white .lc-team-title { color: #ffffff; border-color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+    .lc-black .lc-team-title { color: #cbd5e1; border-color: #64748b; text-shadow: 0 0 10px rgba(0,0,0,0.3); }
+    .lc-red .lc-team-title { color: #fca5a5; border-color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+    
+    .lc-player { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #e2e8f0; letter-spacing: 0.5px; }
+    .lc-footer { margin-top: 20px; font-size: 0.7rem; color: #64748b; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -364,6 +392,7 @@
             </div>
             <div class="teams-container" id="teams-result"></div>
             <button class="whatsapp-btn" style="display:flex; justify-content:center;" onclick="window.shareTeamsOnWhatsapp()">📲 Enviar Equipos al Grupo</button>
+            <button class="capture-btn" onclick="window.downloadLineup()">📤 Compartir Alineación (Imagen)</button>
         </div>
     </div>
 </div>
@@ -372,7 +401,20 @@
     <div id="action-bar-text" class="action-bar-text"></div>
     <button id="action-bar-btn" class="action-bar-btn"></button>
 </div>
-
+<div id="capture-container">
+    <div class="lineup-card">
+        <div class="lc-header">
+            <div class="lc-title">⚽ EQUIPOS CONFIRMADOS ⚽</div>
+            <div class="lc-subtitle">
+                <span id="lc-date">FECHA</span> - <span id="lc-time">20:30h</span>
+            </div>
+            <div class="lc-location">📍 Pabellón Colegio Virgen de la Vega</div>
+        </div>
+        <div class="lc-grid" id="lc-grid">
+            </div>
+        <div class="lc-footer">AMPA FUTSAL APP</div>
+    </div>
+</div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -1207,7 +1249,67 @@
             cd.innerText = `Cierre en: ${hh}h ${mm}m`;
         } else cd.innerText = "Cierre alcanzado";
     }
+// --- NUEVA FUNCIÓN: DESCARGAR/COMPARTIR PIZARRA ---
+    window.downloadLineup = () => {
+        // 1. Verificamos si hay equipos generados (usamos la variable global donde guardaste los equipos en renderTeams)
+        const teams = window.currentTeamsForCopy;
+        if (!teams || teams.length === 0) return window.showToast("No hay equipos para generar imagen", "error");
 
+        window.showToast("Generando imagen...", "info");
+
+        // 2. Rellenamos la tarjeta oculta con los datos reales
+        if(currentData.matchDate) {
+            const dateObj = new Date(currentData.matchDate);
+            const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+            document.getElementById('lc-date').innerText = dateStr;
+        }
+        
+        const grid = document.getElementById('lc-grid');
+        grid.innerHTML = '';
+        const names = ['BLANCO', 'NEGRO', 'ROJO'];
+        const classes = ['lc-white', 'lc-black', 'lc-red']; // Clases CSS que definimos en el Paso 2
+        
+        teams.forEach((team, i) => {
+            let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
+            team.forEach(p => {
+                // Quitamos etiquetas HTML si las hubiera (como el span de invitado) para que salga limpio
+                const cleanName = p.name.replace(/<[^>]*>/g, ''); 
+                html += `<div class="lc-player">${cleanName}</div>`;
+            });
+            html += `</div>`;
+            grid.innerHTML += html;
+        });
+
+        // 3. Convertimos el HTML a Imagen usando la librería
+        const element = document.querySelector(".lineup-card");
+        
+        // Usamos scale: 2 para que la foto salga con buena calidad (HD)
+        html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+                const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
+
+                // 4. Intentamos compartir nativamente (Móviles: WhatsApp, Telegram...)
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file],
+                        title: 'Alineación AMPA',
+                        text: 'Aquí tenéis los equipos confirmados.'
+                    }).catch(err => console.log("Compartir cancelado o error", err));
+                } else {
+                    // 5. Si es PC o no soporta compartir, descargamos el archivo
+                    const link = document.createElement('a');
+                    link.download = file.name;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    window.showToast("Imagen descargada", "success");
+                }
+            }, 'image/png');
+        }).catch(err => {
+            console.error(err);
+            window.showToast("Error al generar imagen", "error");
+        });
+    };
 </script>
 </body>
 </html>
+
