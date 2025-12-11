@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.16</title>
+    <title>AMPA Futsal v3.17</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -255,7 +255,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.15</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.16</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -401,25 +401,25 @@
         { id: "jhon", name: "Jhon", level: 3.0 },
         { id: "santi", name: "Santi", level: 3.1 },
         { id: "ivan", name: "Ivan", level: 3.0 },
-        { id: "gus", name: "Gus", level: 3.4 },
-        { id: "fabian", name: "Fabián", level: 3.1 },
-        { id: "arturo", name: "Arturo", level: 3.1 },
+        { id: "gus", name: "Gus", level: 3.0 },
+        { id: "fabian", name: "Fabián", level: 2.9 },
+        { id: "arturo", name: "Arturo", level: 2.8 },
         { id: "abraham", name: "Abraham", level: 2.5 },
-        { id: "ivan_n", name: "Iván N", level: 2.8 },
-        { id: "adrian", name: "Adrián", level: 2.5 },
-        { id: "Gabriel", name: "Gabriel", level: 2.5 },
+        { id: "ivan_n", name: "Iván N", level: 2.4 },
+        { id: "adrian", name: "Adrián", level: 2.3 },
         { id: "yusto", name: "Yusto", level: 2.2 },
-        { id: "jose", name: "José", level: 2.8 },
-        { id: "tono", name: "Toño", level: 2.2 },
+        { id: "jose", name: "José", level: 2.1 },
+        { id: "tono", name: "Toño", level: 2.0 },
         { id: "rafa", name: "Rafa", level: 2.0 },
-        { id: "edu", name: "Edu", level: 2.1 },
-        { id: "jesus_s", name: "Jesús S", level: 1.2 },
+        { id: "edu", name: "Edu", level: 2.0 },
+        { id: "jesus_s", name: "Jesús S", level: 1.8 },
         { id: "norvey", name: "Norvey", level: 1.5 },
-        { id: "richard", name: "Richard", level: 1.7 },
+        { id: "richard", name: "Richard", level: 1.5 },
         { id: "ruben", name: "Rubén", level: 1.2 },
-        { id: "eloy", name: "Eloy", level: 1.1 },
+        { id: "eloy", name: "Eloy", level: 1.0 },
         { id: "luis", name: "Luis", level: 1.0 },
-        { id: "alfredo", name: "Alfredo", level: 1.1 }
+        { id: "alfredo", name: "Alfredo", level: 1.0 },
+        { id: "gabriel", name: "Gabriel", level: 2.5 }
     ];
 
     const guestsDB = [
@@ -456,6 +456,24 @@
         showConfirm("¿Cambiar de Usuario?", "¿Seguro que no eres tú? Se borrará tu identidad de este dispositivo.", () => {
             localStorage.removeItem('futsal_my_id');
             window.location.reload();
+        });
+    };
+    // RESET ROSTER (SMART MERGE)
+    window.resetRosterOnly = async () => {
+        showConfirm("Actualizar Plantilla", "¿Actualizar niveles manteniendo jugadores nuevos?", async () => {
+            const currentRoster = currentData.roster || [];
+            const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p]));
+            let newRoster = [...initialPlayers];
+            
+            // Merge logic: Keep DB players not in code
+            currentRoster.forEach(dbPlayer => {
+                if (!codePlayersMap.has(dbPlayer.id)) {
+                    newRoster.push(dbPlayer);
+                }
+            });
+            
+            await updateDoc(matchRef, { roster: newRoster });
+            window.showToast("Plantilla actualizada (Smart Merge)", "success");
         });
     };
 
@@ -1127,13 +1145,16 @@
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         const canUnlock = (currentData.voteMode !== false && votes >= 3);
         
+        // Remove standard disabled attribute to allow click interaction
         btn.removeAttribute('disabled');
 
         if (now >= target || canUnlock) {
+            // Unlocked state
             btn.className = "action-btn btn-unlocked";
             btn.innerHTML = "⚽ CREAR EQUIPOS";
             msg.innerText = "";
         } else {
+            // Locked state
             btn.className = "action-btn btn-locked";
             btn.innerHTML = "🔒 CREAR EQUIPOS";
             msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
@@ -1151,5 +1172,3 @@
 </script>
 </body>
 </html>
-
-
