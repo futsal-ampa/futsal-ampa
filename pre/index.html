@@ -12,7 +12,6 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-
     <style>
         /* ESTILOS (Optimizados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
@@ -25,7 +24,7 @@
         
         .container { width: 90%; max-width: 600px; padding: 15px 0; padding-bottom: 120px; flex: 1; }
         
-        /* UX */
+        /* UX: TOAST & MODAL */
         #toast-container { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
         .toast { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: auto; border-left: 4px solid var(--accent); }
         .toast.show { opacity: 1; transform: translateY(0); }
@@ -53,8 +52,10 @@
         .player-checkbox.banned::after { content: '⛔'; position: absolute; right: 10px; }
         .player-checkbox.is-me { border: 2px solid var(--gold); background-color: #fffbeb; }
         .lock-icon { font-size: 0.8em; margin-left: auto; opacity: 0.6; }
+        
         .order-badge { position: absolute; top: -6px; right: -6px; background: var(--brand-blue); color: white; font-size: 0.6rem; width: 22px; height: 22px; border-radius: 50%; display: none; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: popIn 0.2s; }
         .player-checkbox.selected .order-badge { display: flex; }
+        
         .guest-label { border-style: dashed; }
         .guest-label.selected { background-color: #fffbeb; border-color: var(--accent); color: #b45309; border-style: solid; }
         
@@ -71,8 +72,12 @@
         .action-btn:active { transform: scale(0.98); }
         .btn-locked { background-color: #94a3b8 !important; opacity: 0.7; cursor: not-allowed; box-shadow: none; filter: grayscale(0.8); }
         .btn-unlocked { background-color: var(--brand-blue) !important; opacity: 1; cursor: pointer; animation: pulseBtn 2s infinite; box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
-        .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
+        .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
+        .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
         .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
         .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
         
@@ -137,23 +142,54 @@
         #user-greeting { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold; font-size: 0.85rem; display: none; animation: fadeIn 0.5s; }
         h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
 
-        /* IDENTITY SELECTOR & RESET BUTTON */
-        #identity-select { padding: 12px; width: 100%; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; color: #334155; font-family: 'Montserrat', sans-serif; background-color: white; }
-        .reset-id-btn { background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase; display: inline-flex; align-items: center; vertical-align: middle; transition: all 0.2s; }
-        .reset-id-btn:active { transform: scale(0.95); background: #fffbeb; }
-
-        /* STICKY USER BAR */
-        #user-action-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: none; justify-content: space-between; align-items: center; z-index: 1100; animation: slideUp 0.3s ease-out; padding-bottom: max(15px, env(safe-area-inset-bottom)); }
+        /* --- STICKY USER BAR --- */
+        #user-action-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid #e2e8f0; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: none;
+            justify-content: space-between; align-items: center; z-index: 1100; animation: slideUp 0.3s ease-out;
+            padding-bottom: max(15px, env(safe-area-inset-bottom));
+        }
         .action-bar-text { font-size: 0.9rem; color: var(--brand-dark); font-weight: 700; }
-        .action-bar-btn { padding: 12px 25px; border-radius: 30px; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.1s; }
+        .action-bar-btn {
+            padding: 12px 25px; border-radius: 30px; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.1s;
+        }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
         .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
         .btn-full { background: var(--disabled); color: white; cursor: not-allowed; }
+        
+        /* Stats Styles */
+        .ranking-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .ranking-row:first-child { font-weight: 800; color: var(--brand-dark); border-bottom: 2px solid #cbd5e1; }
+        .rank-pos { width: 30px; font-weight: bold; color: var(--accent); }
+        .rank-name { flex: 1; }
+        .rank-val { font-weight: 800; color: var(--brand-dark); }
+        .history-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 10px; display:flex; justify-content: space-between; align-items: center; }
+        .h-info { text-align: left; }
+        .h-date { font-weight: 800; font-size: 0.85rem; color: #334155; }
+        .h-score { font-family: monospace; font-weight: bold; color: #64748b; font-size: 0.8rem; margin-top:2px; }
+        .h-players { background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; }
+        .stats-footer { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ef4444; text-align: center; }
+        .reset-stats-btn { background: #fff1f2; color: #e11d48; border: 1px solid #fda4af; padding: 8px 15px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; width: 100%; }
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
+        .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
-        /* PIZARRA */
+        /* --- NUEVO ESTILO: BOTON RESET IDENTIDAD --- */
+        .reset-id-btn {
+            background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem;
+            font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase;
+            display: inline-flex; align-items: center; vertical-align: middle; transition: all 0.2s;
+        }
+        .reset-id-btn:active { transform: scale(0.95); background: #fffbeb; }
+
+        /* --- DISEÑO DE LA PIZARRA (OCULTO) --- */
         #capture-container { position: absolute; left: -9999px; top: 0; width: 600px; }
-        .lineup-card { background: #161B22; padding: 30px; border-radius: 0; color: white; font-family: 'Montserrat', sans-serif; text-align: center; border-top: 5px solid #F59E0B; }
+        .lineup-card { 
+            background: #161B22; padding: 30px; border-radius: 0; color: white; font-family: 'Montserrat', sans-serif; text-align: center; 
+            border-top: 5px solid #F59E0B; 
+        }
         .lc-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px; }
         .lc-title { font-size: 2rem; font-weight: 900; color: #F59E0B; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
         .lc-subtitle { color: #e2e8f0; font-size: 1.1rem; font-weight: 700; margin-top: 8px; text-transform: uppercase; }
@@ -182,15 +218,16 @@
 <div id="toast-container"></div>
 
 <div id="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box" id="generic-modal-box">
         <div id="modal-title" class="modal-title"></div>
         <div id="modal-text" class="modal-text"></div>
-        <input type="text" id="modal-input" class="modal-input">
         
         <div id="login-form">
             <input type="email" id="login-email" placeholder="Email admin">
             <input type="password" id="login-pass" placeholder="Contraseña">
         </div>
+
+        <input type="text" id="modal-input" class="modal-input">
         
         <div id="stats-content" style="display:none;">
             <div class="tabs">
@@ -198,10 +235,10 @@
                 <div class="tab" onclick="window.switchTab('history')">📅 Partidos</div>
             </div>
             <div id="tab-ranking" style="display:block;">
-                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando...</div>
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando datos...</div>
             </div>
             <div id="tab-history" style="display:none;">
-                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando...</div>
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando datos...</div>
             </div>
         </div>
 
@@ -260,7 +297,7 @@
         <select id="identity-select" style="display:none; width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; color: #334155; font-family: 'Montserrat', sans-serif;">
             <option value="">¿Quién eres?</option>
         </select>
-        
+
         <input type="date" id="date-input">
         <button class="action-btn" onclick="window.startNewMatch()">ABRIR CONVOCATORIA</button>
         <div class="install-center"><button class="install-app-btn" onclick="window.installApp()">📲 Instalar App</button></div>
@@ -335,8 +372,7 @@
             </div>
             <div class="lc-location">📍 Pabellón Colegio Virgen de la Vega</div>
         </div>
-        <div class="lc-grid" id="lc-grid">
-            </div>
+        <div class="lc-grid" id="lc-grid"></div>
         <div class="lc-footer">AMPA FUTSAL APP</div>
     </div>
 </div>
@@ -465,8 +501,13 @@
         html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
             canvas.toBlob(blob => {
                 const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
+
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({ files: [file], title: 'Alineación AMPA Futsal', text: 'Aquí están los equipos confirmados.' }).catch(console.error);
+                    navigator.share({
+                        files: [file],
+                        title: 'Alineación AMPA',
+                        text: 'Aquí tenéis los equipos confirmados.'
+                    }).catch(err => console.log("Compartir cancelado o error", err));
                 } else {
                     const link = document.createElement('a');
                     link.download = file.name;
@@ -521,7 +562,7 @@
         modal.style.display = 'flex';
     }
 
-    // --- LOGIN MODAL (EMAIL) ---
+    // --- LOGIN MODAL ---
     window.showLoginModal = () => {
         const modal = document.getElementById('modal-overlay');
         document.getElementById('modal-title').innerText = "Acceso Admin Seguro";
@@ -578,10 +619,11 @@
     });
 
     function updateUI(data) {
-        // --- IDENTITY SELECTOR LOGIC ---
-        const selector = document.getElementById('identity-select');
+        // SORT ALPHABETICALLY
         const activeRoster = [...(data.roster || initialPlayers)].sort((a, b) => a.name.localeCompare(b.name));
         
+        // --- IDENTITY SELECTOR LOGIC ---
+        const selector = document.getElementById('identity-select');
         if (selector.options.length <= 1) {
             activeRoster.forEach(p => {
                 const opt = document.createElement('option');
@@ -623,7 +665,7 @@
                 const greet = document.getElementById('user-greeting');
                 greet.innerHTML = `👋 Hola, ${me.name} <span class="reset-id-btn" onclick="window.resetIdentity()">¿NO ERES TÚ?</span>`;
                 greet.style.display = 'block';
-                selector.style.display = 'none'; // Hide selector if known
+                selector.style.display = 'none';
 
                 if (data.matchDate && !data.teams) {
                     actionBar.style.display = 'flex';
@@ -642,7 +684,6 @@
                 }
             }
         } else {
-            // Show selector only on setup screen
             if (!data.matchDate) selector.style.display = 'block';
         }
 
@@ -740,15 +781,10 @@
 
     // --- GLOBAL FUNCTIONS ---
     window.startNewMatch = async () => {
-        // ID CHECK ON CREATE
         const myId = localStorage.getItem('futsal_my_id');
         const selectedId = document.getElementById('identity-select').value;
-        
         if (!myId && !selectedId) return window.showToast("⚠️ Debes decirme quién eres primero", "error");
-        
-        if (selectedId) {
-            localStorage.setItem('futsal_my_id', selectedId);
-        }
+        if (selectedId) localStorage.setItem('futsal_my_id', selectedId);
 
         const dateInput = document.getElementById('date-input').value;
         if (!dateInput) return window.showToast("Selecciona fecha", "error");
@@ -756,9 +792,11 @@
         const today = new Date(); today.setHours(0,0,0,0);
         if(selected < today) return window.showToast("Día pasado no válido", "error");
 
+        const adminSnap = await getDoc(configRef);
+        if(!adminSnap.exists()) await setDoc(configRef, { pin: "9386" });
+
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
              const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-             // Re-read ID
              const finalId = localStorage.getItem('futsal_my_id');
              const author = currentData.roster?.find(p=>p.id===finalId)?.name || "Alguien";
 
@@ -779,7 +817,6 @@
         let newGuestInviters = {...(currentData.guestInviters || {})};
         const now = new Date();
         const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        
         let inviterName = "";
         let actorName = "Alguien"; 
 
@@ -993,7 +1030,6 @@
         });
         window.currentTeamsForCopy = teams;
     }
-    // RESET MANUAL CORREGIDO (NO GUARDA HISTORIAL)
     window.resetCurrentMatch = async () => {
         showConfirm("⚠️ REINICIO MANUAL", "Se borrará la lista y NO se guardará historial (partido no jugado). ¿Continuar?", async () => {
              await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
