@@ -1013,20 +1013,40 @@
             window.showToast("Voto registrado", "success");
         });
     };
-    window.attemptGeneration = () => {
+window.attemptGeneration = () => {
+        // --- NUEVA VALIDACIÓN: SOLO CONVOCADOS O ADMIN ---
+        // 1. Recuperamos quién eres
+        const myId = localStorage.getItem('futsal_my_id');
+        
+        // 2. Verificamos si eres Admin (por si acaso el admin quiere probar el botón)
+        const amIAdmin = auth.currentUser; 
+        
+        // 3. Verificamos si estás en la lista de jugadores apuntados
+        const amISelected = currentData.selectedPlayers && currentData.selectedPlayers.includes(myId);
+
+        // SI NO eres admin Y NO estás convocado -> TE BLOQUEA AQUÍ y no sigue leyendo
+        if (!amIAdmin && !amISelected) {
+            return window.showToast("⛔ Solo los jugadores convocados pueden crear los equipos.", "error");
+        }
+        // -----------------------------------------------------
+
+        // --- REGLAS EXISTENTES (HORA Y VOTOS) ---
         const targetTime = new Date(currentData.matchDate);
         const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
         targetTime.setHours(hours, minutes, 0, 0);
+        
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
         
-        // CHECK ONLY IF BUTTON IS CLICKED
+        // Si no ha llegado la hora Y no hay suficientes votos -> BLOQUEA (incluso si eres convocado)
         if (new Date() < targetTime && !canUnlockByVote) {
             return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
         }
         
+        // --- LÓGICA DE GENERACIÓN ---
         const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
         if (total < 8) return window.showToast("Mínimo 8.", "error");
+        
         if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
     };
     window.forceGeneration = () => { /* ... existing code ... */
@@ -1312,6 +1332,7 @@
 </script>
 </body>
 </html>
+
 
 
 
