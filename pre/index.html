@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v3.18</title>
+    <title>AMPA Futsal v4.6</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -142,45 +142,19 @@
 
         /* --- STICKY USER BAR --- */
         #user-action-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid #e2e8f0;
-            padding: 15px 20px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
-            display: none; /* Se activa con JS */
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1100; animation: slideUp 0.3s ease-out;
+            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid #e2e8f0; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: none;
+            justify-content: space-between; align-items: center; z-index: 1100; animation: slideUp 0.3s ease-out;
             padding-bottom: max(15px, env(safe-area-inset-bottom));
         }
         .action-bar-text { font-size: 0.9rem; color: var(--brand-dark); font-weight: 700; }
         .action-bar-btn {
-            padding: 12px 25px;
-            border-radius: 30px;
-            border: none;
-            font-weight: 800;
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            transition: transform 0.1s;
+            padding: 12px 25px; border-radius: 30px; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.1s;
         }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
-        
-        /* MEJORA VISUAL BOTON BORRAR */
-        .btn-leave { 
-            background: #dc2626; 
-            color: white; 
-            border: 2px solid #b91c1c; 
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); 
-        }
-        
+        .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
         .btn-full { background: var(--disabled); color: white; cursor: not-allowed; }
         
         /* Stats Styles */
@@ -202,23 +176,34 @@
 
         /* NUEVO ESTILO PARA EL BOTON "NO ERES TU" (v3.15) */
         .reset-id-btn {
-            background: white;
-            border: 1px solid #d97706;
-            color: #d97706;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: 800;
-            cursor: pointer;
-            margin-left: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            vertical-align: middle;
-            transition: all 0.2s;
+            background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem;
+            font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase;
+            display: inline-flex; align-items: center; vertical-align: middle; transition: all 0.2s;
         }
         .reset-id-btn:active { transform: scale(0.95); background: #fffbeb; }
+
+        /* --- ESTILOS DE LA PIZARRA (NUEVO) --- */
+    
+        /* Botón de compartir */
+        .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        /* Contenedor oculto (fuera de la pantalla) */
+        #capture-container { position: absolute; left: -9999px; top: 0; width: 600px; }
+        
+        /* Diseño de la Tarjeta */
+        .lineup-card { background: #161B22; padding: 30px; border-radius: 0; color: white; font-family: 'Montserrat', sans-serif; text-align: center; border-top: 5px solid #F59E0B; }
+        .lc-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px; }
+        .lc-title { font-size: 2rem; font-weight: 900; color: #F59E0B; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        .lc-subtitle { color: #e2e8f0; font-size: 1.1rem; font-weight: 700; margin-top: 8px; text-transform: uppercase; }
+        .lc-location { color: #94a3b8; font-size: 0.9rem; font-weight: 600; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .lc-grid { display: flex; justify-content: space-between; gap: 15px; }
+        .lc-col { flex: 1; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .lc-team-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; padding-bottom: 10px; border-bottom: 3px solid; letter-spacing: 1px; }
+        .lc-white .lc-team-title { color: #ffffff; border-color: #ffffff; }
+        .lc-black .lc-team-title { color: #94a3b8; border-color: #64748b; }
+        .lc-red .lc-team-title { color: #ef4444; border-color: #ef4444; }
+        .lc-player { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: #e2e8f0; letter-spacing: 0.5px; }
+        .lc-footer { margin-top: 25px; font-size: 0.8rem; color: #64748b; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; }
 
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -226,33 +211,6 @@
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
-        /* --- ESTILOS DE LA PIZARRA (NUEVO) --- */
-    
-    /* Botón de compartir */
-    .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; gap: 10px; }
-    
-    /* Contenedor oculto para la captura */
-    #capture-container { position: absolute; left: -9999px; top: 0; width: 600px; }
-    
-    /* Diseño de la Tarjeta */
-    .lineup-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 25px; border-radius: 0; color: white; font-family: 'Montserrat', sans-serif; text-align: center; border: 4px solid #f59e0b; box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5); }
-    .lc-header { border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 20px; }
-    .lc-title { font-size: 1.6rem; font-weight: 900; color: #f59e0b; margin: 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-    .lc-subtitle { color: #e2e8f0; font-size: 1.1rem; font-weight: 700; margin-top: 8px; text-transform: uppercase; }
-    .lc-location { color: #94a3b8; font-size: 0.9rem; font-weight: 600; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
-    
-    /* Rejilla de equipos */
-    .lc-grid { display: flex; justify-content: space-between; gap: 15px; }
-    .lc-col { flex: 1; background: rgba(255,255,255,0.07); border-radius: 8px; padding: 15px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); }
-    
-    /* Colores de equipo en la tarjeta */
-    .lc-team-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 3px solid; letter-spacing: 1px; }
-    .lc-white .lc-team-title { color: #ffffff; border-color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-    .lc-black .lc-team-title { color: #cbd5e1; border-color: #64748b; text-shadow: 0 0 10px rgba(0,0,0,0.3); }
-    .lc-red .lc-team-title { color: #fca5a5; border-color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
-    
-    .lc-player { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #e2e8f0; letter-spacing: 0.5px; }
-    .lc-footer { margin-top: 20px; font-size: 0.7rem; color: #64748b; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -291,7 +249,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v3.18</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.6</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -337,6 +295,11 @@
     <div id="setup-panel" style="display:none;">
         <h2 style="margin-top:0; color:var(--brand-dark)">⚽ Nuevo Partido</h2>
         <p style="color:#64748b; margin-bottom:20px;">Elige la fecha para abrir la convocatoria:</p>
+        
+        <select id="identity-select" style="display:none; width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; color: #334155; font-family: 'Montserrat', sans-serif;">
+            <option value="">¿Quién eres?</option>
+        </select>
+        
         <input type="date" id="date-input">
         <button class="action-btn" onclick="window.startNewMatch()">ABRIR CONVOCATORIA</button>
         <div class="install-center"><button class="install-app-btn" onclick="window.installApp()">📲 Instalar App</button></div>
@@ -401,12 +364,13 @@
     <div id="action-bar-text" class="action-bar-text"></div>
     <button id="action-bar-btn" class="action-bar-btn"></button>
 </div>
+
 <div id="capture-container">
     <div class="lineup-card">
         <div class="lc-header">
             <div class="lc-title">⚽ EQUIPOS CONFIRMADOS ⚽</div>
             <div class="lc-subtitle">
-                <span id="lc-date">FECHA</span> - <span id="lc-time">20:30h</span>
+                <span id="lc-date">FECHA</span> - 20:30h
             </div>
             <div class="lc-location">📍 Pabellón Colegio Virgen de la Vega</div>
         </div>
@@ -415,6 +379,7 @@
         <div class="lc-footer">AMPA FUTSAL APP</div>
     </div>
 </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion, getDoc, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -469,7 +434,7 @@
         { id: "ruben", name: "Rubén", level: 1.2 },
         { id: "eloy", name: "Eloy", level: 1.0 },
         { id: "luis", name: "Luis", level: 1.0 },
-        { id: "alfredo", name: "Alfredo", level: 1.1 }
+        { id: "alfredo", name: "Alfredo", level: 1.0 }
     ];
 
     const guestsDB = [
@@ -508,20 +473,73 @@
             window.location.reload();
         });
     };
+    
+    // --- HELPER: CAPTURE LINEUP (V4.1 - WEB SHARE API) ---
+    window.downloadLineup = () => {
+        const teams = window.currentTeamsForCopy;
+        if (!teams) return window.showToast("No hay equipos", "error");
+
+        window.showToast("Generando imagen...", "info");
+
+        // 1. Populate Hidden Card
+        const dateStr = new Date(currentData.matchDate).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+        document.getElementById('lc-date').innerText = dateStr;
+        
+        const grid = document.getElementById('lc-grid');
+        grid.innerHTML = '';
+        const names = ['BLANCO', 'NEGRO', 'ROJO'];
+        const classes = ['lc-white', 'lc-black', 'lc-red'];
+        
+        teams.forEach((team, i) => {
+            let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
+            team.forEach(p => {
+                const cleanName = p.name.replace(/<[^>]*>/g, '');
+                html += `<div class="lc-player">${cleanName}</div>`;
+            });
+            html += `</div>`;
+            grid.innerHTML += html;
+        });
+
+        // 2. Capture and Share
+        const element = document.querySelector(".lineup-card");
+        html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+                const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
+
+                // Try Web Share API (Mobile)
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file],
+                        title: 'Alineación AMPA Futsal',
+                        text: 'Aquí están los equipos confirmados.'
+                    }).catch(err => {
+                        console.error("Error compartiendo", err);
+                    });
+                } else {
+                    // Fallback PC
+                    const link = document.createElement('a');
+                    link.download = file.name;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    window.showToast("Imagen descargada (PC)", "success");
+                }
+            }, 'image/png');
+        });
+    };
+
+    // REST OF APP LOGIC REMAINS THE SAME
+    
     // RESET ROSTER (SMART MERGE)
     window.resetRosterOnly = async () => {
         showConfirm("Actualizar Plantilla", "¿Actualizar niveles manteniendo jugadores nuevos?", async () => {
             const currentRoster = currentData.roster || [];
             const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p]));
             let newRoster = [...initialPlayers];
-            
-            // Merge logic: Keep DB players not in code
             currentRoster.forEach(dbPlayer => {
                 if (!codePlayersMap.has(dbPlayer.id)) {
                     newRoster.push(dbPlayer);
                 }
             });
-            
             await updateDoc(matchRef, { roster: newRoster });
             window.showToast("Plantilla actualizada (Smart Merge)", "success");
         });
@@ -629,6 +647,17 @@
         // SORT ALPHABETICALLY FOR DISPLAY ONLY
         const activeRoster = [...(data.roster || initialPlayers)].sort((a, b) => a.name.localeCompare(b.name));
         
+        // --- IDENTITY SELECTOR LOGIC ---
+        const selector = document.getElementById('identity-select');
+        if (selector.options.length <= 1) {
+            activeRoster.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerText = p.name;
+                selector.appendChild(opt);
+            });
+        }
+
         const container = document.getElementById('player-container');
         const guestContainer = document.getElementById('guest-container');
         container.innerHTML = ''; guestContainer.innerHTML = '';
@@ -663,6 +692,7 @@
                 // LINK DE RESET AÑADIDO (BOTON TIPO CHIP)
                 greet.innerHTML = `👋 Hola, ${me.name} <span class="reset-id-btn" onclick="window.resetIdentity()">¿NO ERES TÚ?</span>`;
                 greet.style.display = 'block';
+                selector.style.display = 'none'; // Hide if identified
 
                 if (data.matchDate && !data.teams) {
                     actionBar.style.display = 'flex';
@@ -680,6 +710,9 @@
                     }
                 }
             }
+        } else {
+            // Show selector only on setup screen
+            if (!data.matchDate) selector.style.display = 'block';
         }
 
         activeRoster.forEach((p) => {
@@ -775,108 +808,19 @@
         }
     }
 
-    // --- ALGORITMO GREEDY BALANCE (Equipos equilibrados invisibles) ---
-    window.triggerGeneration = async (numTeams) => {
-        try {
-            document.getElementById('loader').style.display = 'flex';
-            const roster = currentData.roster || initialPlayers;
-            
-            // 1. Obtener jugadores seleccionados y asignarles su nivel decimal + JITTER
-            const pool = [];
-            (currentData.selectedPlayers || []).forEach(id => {
-                const p = roster.find(x => x.id === id);
-                if(p) {
-                    // JITTER: Añadimos un pequeño valor aleatorio para el sorteo
-                    // pero mantenemos el nivel real para el equilibrio final
-                    const jitter = (Math.random() * 0.5) - 0.25; // Entre -0.25 y +0.25
-                    pool.push({ 
-                        ...p, 
-                        isGuest: false,
-                        sortLevel: p.level + jitter // Nivel "falso" para ordenar
-                    });
-                }
-            });
-            (currentData.selectedGuests || []).forEach(id => {
-                const g = guestsDB.find(x => x.id === id);
-                if(g) { 
-                    const jitter = (Math.random() * 0.5) - 0.25;
-                    const baseLevel = g.level || 1.5;
-                    pool.push({ 
-                        ...g, 
-                        level: baseLevel, 
-                        isGuest: true,
-                        sortLevel: baseLevel + jitter 
-                    });
-                }
-            });
-
-            // 2. Ordenar por nivel con JITTER (Mejor a Peor según la suerte del día)
-            pool.sort((a, b) => b.sortLevel - a.sortLevel);
-
-            // 3. Crear equipos vacios
-            let teams = Array.from({ length: numTeams }, () => ({ players: [], totalScore: 0 }));
-
-            // 4. Reparto Greedy: Asignar al siguiente mejor jugador al equipo más débil
-            pool.forEach(player => {
-                // Ordenar equipos por puntuación REAL ascendente (el más débil primero)
-                teams.sort((a, b) => {
-                    if (a.players.length !== b.players.length) return a.players.length - b.players.length; 
-                    return a.totalScore - b.totalScore; 
-                });
-                
-                teams[0].players.push(player);
-                teams[0].totalScore += player.level; // Sumamos nivel REAL, no el del sorteo
-            });
-
-            // 5. Extraer solo los arrays de jugadores
-            const finalTeams = teams.map(t => t.players);
-            
-            // MEJORA: Barajar el orden DENTRO de cada equipo para ocultar el ranking
-            finalTeams.forEach(team => window.shuffle(team));
-
-            // Guardar
-            const teamsString = JSON.stringify(finalTeams);
-            const myId = localStorage.getItem('futsal_my_id');
-            const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
-            const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
-            await updateDoc(matchRef, { 
-                teams: teamsString,
-                logs: arrayUnion(`⚽ Equipos equilibrados creados por ${author}|${now}`)
-            });
-            document.getElementById('loader').style.display = 'none';
-        } catch (e) {
-            console.error(e);
-            document.getElementById('loader').style.display = 'none';
-            window.showToast("Error generando equipos: " + e.message, "error");
-        }
-    };
-
-    // --- AUTH LOGIN TRIGGER (CORREGIDO) ---
-    let taps = 0;
-    let tapTimer = null;
-    window.secretAdminTap = () => {
-        taps++; 
-        clearTimeout(tapTimer);
-        tapTimer = setTimeout(() => taps = 0, 2000);
+    // --- GLOBAL FUNCTIONS ---
+    window.startNewMatch = async () => {
+        // --- IDENTITY CHECK ---
+        const myId = localStorage.getItem('futsal_my_id');
+        const selectedId = document.getElementById('identity-select').value;
         
-        if(taps === 5) {
-            // VERIFICACIÓN INTELIGENTE:
-            if (auth.currentUser) {
-                // Si ya estoy logueado, solo muestro el panel y aviso
-                document.getElementById('admin-zone').style.display = 'block';
-                window.showToast("Sesión recuperada", "success");
-            } else {
-                // Si no estoy logueado, abro el modal
-                window.showLoginModal();
-            }
-            taps = 0;
+        if (!myId && !selectedId) return window.showToast("⚠️ Debes decirme quién eres primero", "error");
+        
+        if (selectedId) {
+            localStorage.setItem('futsal_my_id', selectedId);
         }
-    };
-    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
+        // -----------------------
 
-    // --- REST OF FUNCTIONS (Keep existing ones) ---
-    window.startNewMatch = async () => { /* ... existing code ... */ 
         const dateInput = document.getElementById('date-input').value;
         if (!dateInput) return window.showToast("Selecciona fecha", "error");
         const selected = new Date(dateInput);
@@ -884,9 +828,12 @@
         if(selected < today) return window.showToast("Día pasado no válido", "error");
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
              const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-             const myId = localStorage.getItem('futsal_my_id');
-             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Admin";
+             // Re-read ID in case it was just set
+             const finalId = localStorage.getItem('futsal_my_id');
+             const author = currentData.roster?.find(p=>p.id===finalId)?.name || "Admin";
+
              window.shareConvocation(dateInput);
+
              await setDoc(matchRef, { 
                 matchDate: dateInput, lockTime: currentData.lockTime || "18:00", pinMode: currentData.pinMode !== false, voteMode: currentData.voteMode !== false,
                 selectedPlayers: [], selectedGuests: [], guestInviters: {}, scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
@@ -919,6 +866,7 @@
             // Check de permiso para borrar invitados
             if (newGuests.includes(id)) {
                  const originalInviter = newGuestInviters[id];
+                 // Si no soy el que invitó Y no soy admin, error
                  if (originalInviter !== actorName && !auth.currentUser) {
                      return window.showToast(`⛔ Solo ${originalInviter} o el Admin pueden eliminar a este invitado.`, "error");
                  }
@@ -1013,18 +961,13 @@
             window.showToast("Voto registrado", "success");
         });
     };
-    window.attemptGeneration = () => {
+    window.attemptGeneration = () => { /* ... existing code ... */
         const targetTime = new Date(currentData.matchDate);
         const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
         targetTime.setHours(hours, minutes, 0, 0);
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
-        
-        // CHECK ONLY IF BUTTON IS CLICKED
-        if (new Date() < targetTime && !canUnlockByVote) {
-            return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
-        }
-        
+        if (new Date() < targetTime && !canUnlockByVote) return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
         const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
         if (total < 8) return window.showToast("Mínimo 8.", "error");
         if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
@@ -1186,22 +1129,12 @@
     };
     // Timers & Scores
     setInterval(async () => {
-        // AUTO RESET LOGIC (CHANGED)
-        if (currentData.matchDate) { 
-            checkTimeLock(currentData.matchDate, currentData.lockTime); 
-            const matchDate = new Date(currentData.matchDate); 
-            const now = new Date(); 
-            const resetTime = new Date(matchDate); 
-            resetTime.setDate(resetTime.getDate() + 1); 
-            resetTime.setHours(10, 0, 0, 0); 
-            if (now >= resetTime) {
-                // SAVE HISTORY AUTOMATICALLY IF TEAMS EXIST
+        if (currentData.matchDate) { checkTimeLock(currentData.matchDate, currentData.lockTime); const matchDate = new Date(currentData.matchDate); const now = new Date(); const resetTime = new Date(matchDate); resetTime.setDate(resetTime.getDate() + 1); resetTime.setHours(10, 0, 0, 0); if (now >= resetTime) {
                 if(currentData.teams) {
                     await addDoc(collection(db, "history"), { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
                 }
                 updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); 
-            }
-        }
+            } }
         if(currentData.timerState === 'running') {
             const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
             const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
@@ -1249,71 +1182,104 @@
             cd.innerText = `Cierre en: ${hh}h ${mm}m`;
         } else cd.innerText = "Cierre alcanzado";
     }
-// --- NUEVA FUNCIÓN: DESCARGAR/COMPARTIR PIZARRA ---
-    window.downloadLineup = () => {
-        // 1. Verificamos si hay equipos generados (usamos la variable global donde guardaste los equipos en renderTeams)
-        const teams = window.currentTeamsForCopy;
-        if (!teams || teams.length === 0) return window.showToast("No hay equipos para generar imagen", "error");
 
-        window.showToast("Generando imagen...", "info");
-
-        // 2. Rellenamos la tarjeta oculta con los datos reales
-        if(currentData.matchDate) {
-            const dateObj = new Date(currentData.matchDate);
-            const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-            document.getElementById('lc-date').innerText = dateStr;
-        }
-        
-        const grid = document.getElementById('lc-grid');
-        grid.innerHTML = '';
-        const names = ['BLANCO', 'NEGRO', 'ROJO'];
-        const classes = ['lc-white', 'lc-black', 'lc-red']; // Clases CSS que definimos en el Paso 2
-        
-        teams.forEach((team, i) => {
-            let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
-            team.forEach(p => {
-                // Quitamos etiquetas HTML si las hubiera (como el span de invitado) para que salga limpio
-                const cleanName = p.name.replace(/<[^>]*>/g, ''); 
-                html += `<div class="lc-player">${cleanName}</div>`;
-            });
-            html += `</div>`;
-            grid.innerHTML += html;
-        });
-
-        // 3. Convertimos el HTML a Imagen usando la librería
-        const element = document.querySelector(".lineup-card");
-        
-        // Usamos scale: 2 para que la foto salga con buena calidad (HD)
-        html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
-            canvas.toBlob(blob => {
-                const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
-
-                // 4. Intentamos compartir nativamente (Móviles: WhatsApp, Telegram...)
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'Alineación AMPA',
-                        text: 'Aquí tenéis los equipos confirmados.'
-                    }).catch(err => console.log("Compartir cancelado o error", err));
-                } else {
-                    // 5. Si es PC o no soporta compartir, descargamos el archivo
-                    const link = document.createElement('a');
-                    link.download = file.name;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    window.showToast("Imagen descargada", "success");
+    // --- ALGORITMO GREEDY BALANCE (Equipos equilibrados invisibles) ---
+    window.triggerGeneration = async (numTeams) => {
+        try {
+            document.getElementById('loader').style.display = 'flex';
+            const roster = currentData.roster || initialPlayers;
+            
+            // 1. Obtener jugadores seleccionados y asignarles su nivel decimal + JITTER
+            const pool = [];
+            (currentData.selectedPlayers || []).forEach(id => {
+                const p = roster.find(x => x.id === id);
+                if(p) {
+                    // JITTER: Añadimos un pequeño valor aleatorio para el sorteo
+                    const jitter = (Math.random() * 0.5) - 0.25; // Entre -0.25 y +0.25
+                    pool.push({ 
+                        ...p, 
+                        isGuest: false,
+                        sortLevel: p.level + jitter // Nivel "falso" para ordenar
+                    });
                 }
-            }, 'image/png');
-        }).catch(err => {
-            console.error(err);
-            window.showToast("Error al generar imagen", "error");
-        });
+            });
+            (currentData.selectedGuests || []).forEach(id => {
+                const g = guestsDB.find(x => x.id === id);
+                if(g) { 
+                    const jitter = (Math.random() * 0.5) - 0.25;
+                    const baseLevel = g.level || 1.5;
+                    pool.push({ 
+                        ...g, 
+                        level: baseLevel, 
+                        isGuest: true,
+                        sortLevel: baseLevel + jitter 
+                    });
+                }
+            });
+
+            // 2. Ordenar por nivel con JITTER (Mejor a Peor según la suerte del día)
+            pool.sort((a, b) => b.sortLevel - a.sortLevel);
+
+            // 3. Crear equipos vacios
+            let teams = Array.from({ length: numTeams }, () => ({ players: [], totalScore: 0 }));
+
+            // 4. Reparto Greedy: Asignar al siguiente mejor jugador al equipo más débil
+            pool.forEach(player => {
+                // Ordenar equipos por puntuación REAL ascendente (el más débil primero)
+                teams.sort((a, b) => {
+                    if (a.players.length !== b.players.length) return a.players.length - b.players.length; 
+                    return a.totalScore - b.totalScore; 
+                });
+                
+                teams[0].players.push(player);
+                teams[0].totalScore += player.level; // Sumamos nivel REAL
+            });
+
+            // 5. Extraer solo los arrays de jugadores
+            const finalTeams = teams.map(t => t.players);
+            
+            // MEJORA: Barajar el orden DENTRO de cada equipo para ocultar el ranking
+            finalTeams.forEach(team => window.shuffle(team));
+
+            // Guardar
+            const teamsString = JSON.stringify(finalTeams);
+            const myId = localStorage.getItem('futsal_my_id');
+            const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
+            const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+            await updateDoc(matchRef, { 
+                teams: teamsString,
+                logs: arrayUnion(`⚽ Equipos equilibrados creados por ${author}|${now}`)
+            });
+            document.getElementById('loader').style.display = 'none';
+        } catch (e) {
+            console.error(e);
+            document.getElementById('loader').style.display = 'none';
+            window.showToast("Error generando equipos: " + e.message, "error");
+        }
     };
+
+    // --- AUTH LOGIN TRIGGER (CORREGIDO) ---
+    let taps = 0;
+    let tapTimer = null;
+    window.secretAdminTap = () => {
+        taps++; clearTimeout(tapTimer);
+        tapTimer = setTimeout(() => taps = 0, 2000);
+        if(taps === 5) {
+            // VERIFICACIÓN INTELIGENTE:
+            if (auth.currentUser) {
+                // Si ya estoy logueado, solo muestro el panel y aviso
+                document.getElementById('admin-zone').style.display = 'block';
+                window.showToast("Sesión recuperada", "success");
+            } else {
+                // Si no estoy logueado, abro el modal
+                window.showLoginModal();
+            }
+            taps = 0;
+        }
+    };
+    window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
+
 </script>
 </body>
 </html>
-
-
-
-
-
