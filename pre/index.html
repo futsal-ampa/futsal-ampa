@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v4.6</title>
+    <title>AMPA Futsal v4.8</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -12,6 +12,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
     <style>
         /* ESTILOS (Optimizados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
@@ -67,15 +68,19 @@
         .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
         
-        /* BOTONES & ESTILOS NUEVOS DE BOTON CREAR */
+        /* BOTONES */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .action-btn:active { transform: scale(0.98); }
         .btn-locked { background-color: #94a3b8 !important; opacity: 0.7; cursor: not-allowed; box-shadow: none; filter: grayscale(0.8); }
         .btn-unlocked { background-color: var(--brand-blue) !important; opacity: 1; cursor: pointer; animation: pulseBtn 2s infinite; box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
-
+        
         .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
         .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
+        
+        /* BOTON CAPTURA */
+        .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+
         .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
         .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
         
@@ -141,17 +146,9 @@
         h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
 
         /* --- STICKY USER BAR --- */
-        #user-action-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-            border-top: 1px solid #e2e8f0; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: none;
-            justify-content: space-between; align-items: center; z-index: 1100; animation: slideUp 0.3s ease-out;
-            padding-bottom: max(15px, env(safe-area-inset-bottom));
-        }
+        #user-action-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: none; justify-content: space-between; align-items: center; z-index: 1100; animation: slideUp 0.3s ease-out; padding-bottom: max(15px, env(safe-area-inset-bottom)); }
         .action-bar-text { font-size: 0.9rem; color: var(--brand-dark); font-weight: 700; }
-        .action-bar-btn {
-            padding: 12px 25px; border-radius: 30px; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.1s;
-        }
+        .action-bar-btn { padding: 12px 25px; border-radius: 30px; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.1s; }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
         .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
@@ -174,23 +171,15 @@
         .tab { flex: 1; padding: 10px; font-weight: bold; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 0.9rem; }
         .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
-        /* NUEVO ESTILO PARA EL BOTON "NO ERES TU" (v3.15) */
-        .reset-id-btn {
-            background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem;
-            font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase;
-            display: inline-flex; align-items: center; vertical-align: middle; transition: all 0.2s;
-        }
+        /* RESET ID BTN (v3.15) */
+        .reset-id-btn { background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase; display: inline-flex; align-items: center; vertical-align: middle; transition: all 0.2s; }
         .reset-id-btn:active { transform: scale(0.95); background: #fffbeb; }
 
-        /* --- ESTILOS DE LA PIZARRA (NUEVO) --- */
-    
-        /* Botón de compartir */
-        .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
-        
-        /* Contenedor oculto (fuera de la pantalla) */
+        /* IDENTITY SELECTOR (v4.5) */
+        #identity-select { padding: 12px; width: 100%; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; color: #334155; font-family: 'Montserrat', sans-serif; background-color: white; }
+
+        /* DISEÑO DE LA PIZARRA (v4.0) */
         #capture-container { position: absolute; left: -9999px; top: 0; width: 600px; }
-        
-        /* Diseño de la Tarjeta */
         .lineup-card { background: #161B22; padding: 30px; border-radius: 0; color: white; font-family: 'Montserrat', sans-serif; text-align: center; border-top: 5px solid #F59E0B; }
         .lc-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px; }
         .lc-title { font-size: 2rem; font-weight: 900; color: #F59E0B; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
@@ -237,10 +226,10 @@
                 <div class="tab" onclick="window.switchTab('history')">📅 Partidos</div>
             </div>
             <div id="tab-ranking" style="display:block;">
-                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando datos...</div>
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando...</div>
             </div>
             <div id="tab-history" style="display:none;">
-                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando datos...</div>
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando...</div>
             </div>
         </div>
 
@@ -249,7 +238,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.6</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.7</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -284,6 +273,8 @@
         </div>
         <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🚫 BLOQUEAR JUGADORES</div>
         <div id="ban-list" class="chip-list"></div>
+        <div style="font-size:0.7rem; color:#ef4444; font-weight:bold; margin-top:10px;">🗑️ BORRADO DEFINITIVO</div>
+        <div id="delete-list" class="chip-list"></div>
         <div style="font-size:0.7rem; color:#e11d48; font-weight:bold; margin-top:10px;">🔐 RESET PINS</div>
         <div id="pin-list" class="chip-list"></div>
         <button class="admin-btn admin-btn-blue" onclick="window.forceGeneration()">⚡ Forzar Desbloqueo (Permitir Crear)</button>
@@ -355,7 +346,7 @@
             </div>
             <div class="teams-container" id="teams-result"></div>
             <button class="whatsapp-btn" style="display:flex; justify-content:center;" onclick="window.shareTeamsOnWhatsapp()">📲 Enviar Equipos al Grupo</button>
-            <button class="capture-btn" onclick="window.downloadLineup()">📤 Compartir Alineación (Imagen)</button>
+            <button class="capture-btn" onclick="window.downloadLineup()">📤 Compartir Alineación</button>
         </div>
     </div>
 </div>
@@ -370,13 +361,12 @@
         <div class="lc-header">
             <div class="lc-title">⚽ EQUIPOS CONFIRMADOS ⚽</div>
             <div class="lc-subtitle">
-                <span id="lc-date">FECHA</span> - 20:30h
+                <span id="lc-date">FECHA</span> - <span id="lc-time">20:30h</span>
             </div>
             <div class="lc-location">📍 Pabellón Colegio Virgen de la Vega</div>
         </div>
-        <div class="lc-grid" id="lc-grid">
-            </div>
-        <div class="lc-footer">AMPA FUTSAL APP</div>
+        <div class="lc-grid" id="lc-grid"></div>
+        <div class="lc-footer">AMPA FUTSAL APP v4.7</div>
     </div>
 </div>
 
@@ -409,8 +399,7 @@
         configRef = doc(db, "config", "admin_settings"); 
     } catch (e) { console.error("Error init firebase", e); }
 
-    // --- LISTA PRO CON SUB-NIVELES (Ocultos al usuario) ---
-    // Edita aquí los decimales para afinar el equilibrio
+    // --- LISTA PRO CON SUB-NIVELES ---
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3.2 },
         { id: "jhon", name: "Jhon", level: 3.0 },
@@ -474,7 +463,7 @@
         });
     };
     
-    // --- HELPER: CAPTURE LINEUP (V4.1 - WEB SHARE API) ---
+    // --- HELPER: CAPTURE LINEUP (V4.1) ---
     window.downloadLineup = () => {
         const teams = window.currentTeamsForCopy;
         if (!teams) return window.showToast("No hay equipos", "error");
@@ -506,7 +495,6 @@
             canvas.toBlob(blob => {
                 const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
 
-                // Try Web Share API (Mobile)
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     navigator.share({
                         files: [file],
@@ -516,7 +504,6 @@
                         console.error("Error compartiendo", err);
                     });
                 } else {
-                    // Fallback PC
                     const link = document.createElement('a');
                     link.download = file.name;
                     link.href = canvas.toDataURL();
@@ -524,24 +511,6 @@
                     window.showToast("Imagen descargada (PC)", "success");
                 }
             }, 'image/png');
-        });
-    };
-
-    // REST OF APP LOGIC REMAINS THE SAME
-    
-    // RESET ROSTER (SMART MERGE)
-    window.resetRosterOnly = async () => {
-        showConfirm("Actualizar Plantilla", "¿Actualizar niveles manteniendo jugadores nuevos?", async () => {
-            const currentRoster = currentData.roster || [];
-            const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p]));
-            let newRoster = [...initialPlayers];
-            currentRoster.forEach(dbPlayer => {
-                if (!codePlayersMap.has(dbPlayer.id)) {
-                    newRoster.push(dbPlayer);
-                }
-            });
-            await updateDoc(matchRef, { roster: newRoster });
-            window.showToast("Plantilla actualizada (Smart Merge)", "success");
         });
     };
 
@@ -572,7 +541,6 @@
         document.getElementById('modal-text').innerText = text;
         const input = document.getElementById('modal-input');
         
-        // Reset visuales
         document.getElementById('stats-content').style.display = 'none';
         document.getElementById('login-form').style.display = 'none';
         document.getElementById('modal-text').style.display = 'block';
@@ -644,13 +612,14 @@
     });
 
     function updateUI(data) {
-        // SORT ALPHABETICALLY FOR DISPLAY ONLY
+        // SORT ALPHABETICALLY
         const activeRoster = [...(data.roster || initialPlayers)].sort((a, b) => a.name.localeCompare(b.name));
         
         // --- IDENTITY SELECTOR LOGIC ---
         const selector = document.getElementById('identity-select');
-        if (selector.options.length <= 1) {
-            activeRoster.forEach(p => {
+        // Clear and repopulate to avoid duplicates, but keep default option
+        if(selector.options.length <= 1) {
+             activeRoster.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.id;
                 opt.innerText = p.name;
@@ -665,17 +634,25 @@
         // Render Admin Lists first to clear loading
         const banList = document.getElementById('ban-list');
         const pinList = document.getElementById('pin-list');
-        if(banList && pinList) {
-            banList.innerHTML = ""; pinList.innerHTML = "";
+        const deleteList = document.getElementById('delete-list');
+        
+        if(banList && pinList && deleteList) {
+            banList.innerHTML = ""; pinList.innerHTML = ""; deleteList.innerHTML = "";
             activeRoster.forEach(p => {
                  const isBanned = data.bannedIndices?.includes(p.id);
+                 
+                 // BLOQUEAR/DESBLOQUEAR (Admin)
                  const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
                  const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
                  banList.innerHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
                  
+                 // RESET PINS (Admin)
                  if(data.pins && data.pins[p.id]) {
                      pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
                  }
+
+                 // DELETE PERMANENT (Admin) - v4.7 feature
+                 deleteList.innerHTML += `<div class="chip chip-ban" style="border-color:black; color:black;" onclick="window.deletePlayerPermanent('${p.id}', '${p.name}')">❌ ${p.name}</div>`;
             });
             if(pinList.innerHTML === "") pinList.innerHTML = `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
         }
@@ -689,7 +666,6 @@
             const me = activeRoster.find(p => p.id === myId);
             if (me) {
                 const greet = document.getElementById('user-greeting');
-                // LINK DE RESET AÑADIDO (BOTON TIPO CHIP)
                 greet.innerHTML = `👋 Hola, ${me.name} <span class="reset-id-btn" onclick="window.resetIdentity()">¿NO ERES TÚ?</span>`;
                 greet.style.display = 'block';
                 selector.style.display = 'none'; // Hide if identified
@@ -711,23 +687,25 @@
                 }
             }
         } else {
-            // Show selector only on setup screen
             if (!data.matchDate) selector.style.display = 'block';
         }
 
         activeRoster.forEach((p) => {
+            const isBanned = data.bannedIndices?.includes(p.id);
+            if (isBanned) return; // HIDE BANNED PLAYERS FROM LIST (v4.7)
+
             const div = document.createElement('div');
             div.className = 'player-checkbox';
             if (p.id === myId) div.classList.add('is-me');
+            
             const isSelected = data.selectedPlayers?.includes(p.id);
-            const isBanned = data.bannedIndices?.includes(p.id);
             const pins = data.pins || {};
             const lockIcon = (data.pinMode !== false && pins[p.id]) ? '<span class="lock-icon">🔒</span>' : '';
             let badgeContent = '';
             if(isSelected) { div.classList.add('selected'); badgeContent = data.selectedPlayers.indexOf(p.id) + 1; }
-            if(isBanned) div.classList.add('banned');
+            
             div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
-            if(!isBanned) div.onclick = () => window.toggleSelection('player', p.id, p.name);
+            div.onclick = () => window.toggleSelection('player', p.id, p.name);
             container.appendChild(div);
         });
 
@@ -777,11 +755,11 @@
             if(votes >= 3) { voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true; }
         } else voteBtn.style.display = 'none';
 
-        // Render Teams / Logs etc.
+        // --- MEJORA HISTORIAL COMPLETO ---
         const logDiv = document.getElementById('activity-log');
         if (data.logs && data.logs.length > 0) {
             logDiv.innerHTML = "";
-            [...data.logs].reverse().forEach(logStr => { // REMOVED SLICE(0,15) FOR FULL HISTORY
+            [...data.logs].reverse().forEach(logStr => { 
                 const parts = logStr.split('|');
                 if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
             });
@@ -828,9 +806,9 @@
         if(selected < today) return window.showToast("Día pasado no válido", "error");
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
              const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-             // Re-read ID in case it was just set
+             // Re-read ID
              const finalId = localStorage.getItem('futsal_my_id');
-             const author = currentData.roster?.find(p=>p.id===finalId)?.name || "Admin";
+             const author = currentData.roster?.find(p=>p.id===finalId)?.name || "Alguien";
 
              window.shareConvocation(dateInput);
 
@@ -841,7 +819,8 @@
             }, { merge: true });
         });
     };
-    window.toggleSelection = async (type, id, name) => { /* ... existing code ... */
+
+    window.toggleSelection = async (type, id, name) => {
         let newPlayers = [...(currentData.selectedPlayers || [])];
         let newGuests = [...(currentData.selectedGuests || [])];
         let currentPins = {...(currentData.pins || {})};
@@ -849,9 +828,8 @@
         const now = new Date();
         const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         let inviterName = "";
-        let actorName = "Alguien"; // Default
+        let actorName = "Alguien"; 
 
-        // Determinar quién realiza la acción (Usuario Logueado Localmente)
         const myId = localStorage.getItem('futsal_my_id');
         const roster = currentData.roster || initialPlayers;
         if (myId) {
@@ -881,32 +859,24 @@
                 showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => {
                     if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error");
                     processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true); return; 
+                }, true);
+                return; 
             } else {
-                showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name.toUpperCase()}:`, (val) => {
+                showConfirm("🛡️ Crear PIN", `Crea un PIN nuevo para ${name}:`, (val) => {
                     if (!val || val.length < 3) return window.showToast("PIN inválido", "error");
                     currentPins[id] = val;
                     processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true); return;
+                }, true);
+                return;
             }
         } else {
-             // MENSAJES PERSONALIZADOS REQUERIDOS
              const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
              let msg = "";
-             
-             // Si el actor tiene nombre conocido (ej: "Willi")
              if (actorName && actorName !== "Alguien") {
-                 if (isSelected) {
-                     msg = `¿${actorName}, quieres que salga de la convocatoria ${name}?`;
-                 } else {
-                     msg = `¿${actorName}, quieres que entre en la convocatoria ${name}?`;
-                 }
-                 // Si soy yo mismo
-                 if(name === actorName) {
-                      msg = isSelected ? `¿${name}, quieres salir de la convocatoria?` : `¿${name}, quieres entrar en la convocatoria?`;
-                 }
+                 if (isSelected) msg = `¿${actorName}, quieres que salga de la convocatoria ${name}?`;
+                 else msg = `¿${actorName}, quieres que entre en la convocatoria ${name}?`;
+                 if(name === actorName) msg = isSelected ? `¿${name}, quieres salir de la convocatoria?` : `¿${name}, quieres entrar en la convocatoria?`;
              } else {
-                 // Fallback genérico
                  msg = isSelected ? `¿Seguro que quieres borrar a ${name}?` : `¿Seguro que quieres añadir a ${name}?`;
              }
              
@@ -915,6 +885,7 @@
              });
         }
     };
+
     async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName) {
         let actionSuffix = "";
         if (actorName && actorName !== "Alguien" && actorName !== name) {
@@ -930,7 +901,6 @@
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
                 newPlayers.push(id);
                 if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
-                
                 await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} entra${actionSuffix}|${timeStr}`) });
                 window.showToast(`¡Bienvenido ${name}!`, "success");
             }
@@ -938,7 +908,6 @@
              if (newGuests.includes(id)) {
                 newGuests = newGuests.filter(i => i !== id);
                 delete newGuestInviters[id];
-                // LOG DE QUIEN ELIMINA AL INVITADO
                 await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} eliminado por ${actorName}|${timeStr}`) });
             } else {
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
@@ -948,7 +917,8 @@
             }
         }
     }
-    window.voteToUnlock = async () => { /* ... existing code ... */ 
+
+    window.voteToUnlock = async () => { 
         const myId = localStorage.getItem('futsal_my_id');
         if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo convocados pueden votar.", "error");
         if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info");
@@ -961,34 +931,76 @@
             window.showToast("Voto registrado", "success");
         });
     };
-    window.attemptGeneration = () => { /* ... existing code ... */
+    window.attemptGeneration = () => {
+        // --- VALIDACIÓN: SOLO CONVOCADOS O ADMIN ---
+        const myId = localStorage.getItem('futsal_my_id');
+        const amIAdmin = auth.currentUser; 
+        const amISelected = currentData.selectedPlayers && currentData.selectedPlayers.includes(myId);
+
+        if (!amIAdmin && !amISelected) {
+            return window.showToast("⛔ Solo los jugadores convocados pueden crear los equipos.", "error");
+        }
+
         const targetTime = new Date(currentData.matchDate);
         const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
         targetTime.setHours(hours, minutes, 0, 0);
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
-        if (new Date() < targetTime && !canUnlockByVote) return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
+        
+        if (new Date() < targetTime && !canUnlockByVote && !amIAdmin) {
+            return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
+        }
+        
         const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
         if (total < 8) return window.showToast("Mínimo 8.", "error");
         if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
     };
-    window.forceGeneration = () => { /* ... existing code ... */
+    window.forceGeneration = () => { 
         showConfirm("🔓 Desbloquear Creación", "¿Quieres habilitar el botón 'Crear Equipos' para todos?", async () => {
              const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-             await updateDoc(matchRef, { lockTime: "00:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
+             await updateDoc(matchRef, { lockTime: "18:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
              window.showToast("Botón desbloqueado para todos", "success");
              window.hideAdmin();
         });
     };
     window.resetRosterOnly = async () => {
-        showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código? El historial NO se borrará.", async () => {
-            await updateDoc(matchRef, { roster: initialPlayers });
-            window.showToast("Plantilla actualizada", "success");
+        showConfirm("Actualizar Plantilla", "¿Actualizar niveles manteniendo jugadores nuevos?", async () => {
+            const currentRoster = currentData.roster || [];
+            const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p]));
+            let newRoster = [...initialPlayers];
+            // Smart Merge: Keep new players not in code
+            currentRoster.forEach(dbPlayer => {
+                if (!codePlayersMap.has(dbPlayer.id)) {
+                    newRoster.push(dbPlayer);
+                }
+            });
+            await updateDoc(matchRef, { roster: newRoster });
+            window.showToast("Plantilla actualizada (Smart Merge)", "success");
         });
     };
     
-    // ... (Keep renderTeams, shareFunctions, timers, stats logic unchanged from v2.6) ...
-    // Just ensuring the logic for stats is included here for completeness
+    // --- FUNCIÓN DE BORRADO DEFINITIVO (v4.7) ---
+    window.deletePlayerPermanent = async (id, name) => {
+        showConfirm("🗑️ Eliminar Definitivamente", `¿Borrar a ${name} de la base de datos? No se puede deshacer.`, async () => {
+             // Filter out from roster
+             const newRoster = (currentData.roster || initialPlayers).filter(p => p.id !== id);
+             
+             // Clean up other references just in case
+             let newSelected = (currentData.selectedPlayers || []).filter(i => i !== id);
+             let newBans = (currentData.bannedIndices || []).filter(i => i !== id);
+             let newPins = {...(currentData.pins || {})};
+             delete newPins[id];
+             
+             await updateDoc(matchRef, { 
+                 roster: newRoster,
+                 selectedPlayers: newSelected,
+                 bannedIndices: newBans,
+                 pins: newPins
+             });
+             window.showToast(`${name} eliminado para siempre`, "success");
+        });
+    };
+
     window.openStats = async () => {
         const modal = document.getElementById('modal-overlay');
         document.getElementById('modal-title').innerText = "Estadísticas y Ranking";
@@ -1012,11 +1024,7 @@
                 if(d.teams) {
                     let teamsArr = [];
                     try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){}
-                    teamsArr.forEach(team => {
-                        team.forEach(player => {
-                            if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; }
-                        });
-                    });
+                    teamsArr.forEach(team => { team.forEach(player => { if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; } }); });
                 }
             });
             const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]);
@@ -1040,11 +1048,7 @@
                 let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`;
                 if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`;
                 let pCount = 0;
-                if(m.teams) {
-                    let teamsArr = [];
-                    try { teamsArr = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; } catch(e){}
-                    teamsArr.forEach(t => pCount += t.length);
-                }
+                if(m.teams) { let teamsArr = []; try { teamsArr = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; } catch(e){} teamsArr.forEach(t => pCount += t.length); }
                 histDiv.innerHTML += `<div class="history-card"><div class="h-info"><div class="h-date">${dateStr}</div><div class="h-score">${scoreStr}</div></div><div class="h-players">👥 ${pCount} jug.</div></div>`;
             });
         } catch(e) { window.showToast("Error cargando historial", "error"); }
@@ -1089,7 +1093,7 @@
     window.toggleVoteMode = async () => { const s = currentData.voteMode === false ? true : false; await updateDoc(matchRef, { voteMode: s }); };
     window.addNewPlayer = async () => {
         const name = document.getElementById('new-player-name').value;
-        const level = parseFloat(document.getElementById('new-player-level').value); // Parse Float now
+        const level = parseFloat(document.getElementById('new-player-level').value); 
         if(!name) return window.showToast("Falta nombre", "error");
         const id = name.toLowerCase().replace(/\s/g, '_');
         const newPlayer = { id: id, name: name, level: level };
@@ -1182,82 +1186,6 @@
             cd.innerText = `Cierre en: ${hh}h ${mm}m`;
         } else cd.innerText = "Cierre alcanzado";
     }
-
-    // --- ALGORITMO GREEDY BALANCE (Equipos equilibrados invisibles) ---
-    window.triggerGeneration = async (numTeams) => {
-        try {
-            document.getElementById('loader').style.display = 'flex';
-            const roster = currentData.roster || initialPlayers;
-            
-            // 1. Obtener jugadores seleccionados y asignarles su nivel decimal + JITTER
-            const pool = [];
-            (currentData.selectedPlayers || []).forEach(id => {
-                const p = roster.find(x => x.id === id);
-                if(p) {
-                    // JITTER: Añadimos un pequeño valor aleatorio para el sorteo
-                    const jitter = (Math.random() * 0.5) - 0.25; // Entre -0.25 y +0.25
-                    pool.push({ 
-                        ...p, 
-                        isGuest: false,
-                        sortLevel: p.level + jitter // Nivel "falso" para ordenar
-                    });
-                }
-            });
-            (currentData.selectedGuests || []).forEach(id => {
-                const g = guestsDB.find(x => x.id === id);
-                if(g) { 
-                    const jitter = (Math.random() * 0.5) - 0.25;
-                    const baseLevel = g.level || 1.5;
-                    pool.push({ 
-                        ...g, 
-                        level: baseLevel, 
-                        isGuest: true,
-                        sortLevel: baseLevel + jitter 
-                    });
-                }
-            });
-
-            // 2. Ordenar por nivel con JITTER (Mejor a Peor según la suerte del día)
-            pool.sort((a, b) => b.sortLevel - a.sortLevel);
-
-            // 3. Crear equipos vacios
-            let teams = Array.from({ length: numTeams }, () => ({ players: [], totalScore: 0 }));
-
-            // 4. Reparto Greedy: Asignar al siguiente mejor jugador al equipo más débil
-            pool.forEach(player => {
-                // Ordenar equipos por puntuación REAL ascendente (el más débil primero)
-                teams.sort((a, b) => {
-                    if (a.players.length !== b.players.length) return a.players.length - b.players.length; 
-                    return a.totalScore - b.totalScore; 
-                });
-                
-                teams[0].players.push(player);
-                teams[0].totalScore += player.level; // Sumamos nivel REAL
-            });
-
-            // 5. Extraer solo los arrays de jugadores
-            const finalTeams = teams.map(t => t.players);
-            
-            // MEJORA: Barajar el orden DENTRO de cada equipo para ocultar el ranking
-            finalTeams.forEach(team => window.shuffle(team));
-
-            // Guardar
-            const teamsString = JSON.stringify(finalTeams);
-            const myId = localStorage.getItem('futsal_my_id');
-            const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
-            const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
-            await updateDoc(matchRef, { 
-                teams: teamsString,
-                logs: arrayUnion(`⚽ Equipos equilibrados creados por ${author}|${now}`)
-            });
-            document.getElementById('loader').style.display = 'none';
-        } catch (e) {
-            console.error(e);
-            document.getElementById('loader').style.display = 'none';
-            window.showToast("Error generando equipos: " + e.message, "error");
-        }
-    };
 
     // --- AUTH LOGIN TRIGGER (CORREGIDO) ---
     let taps = 0;
