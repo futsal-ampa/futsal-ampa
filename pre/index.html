@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal v4.5 Final</title>
+    <title>AMPA Futsal v4.6</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -14,7 +14,7 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <style>
-        /* ESTILOS GLOBALES */
+        /* ESTILOS (Optimizados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -56,6 +56,7 @@
         
         .order-badge { position: absolute; top: -6px; right: -6px; background: var(--brand-blue); color: white; font-size: 0.6rem; width: 22px; height: 22px; border-radius: 50%; display: none; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: popIn 0.2s; }
         .player-checkbox.selected .order-badge { display: flex; }
+        
         .guest-label { border-style: dashed; }
         .guest-label.selected { background-color: #fffbeb; border-color: var(--accent); color: #b45309; border-style: solid; }
         
@@ -72,11 +73,14 @@
         .action-btn:active { transform: scale(0.98); }
         .btn-locked { background-color: #94a3b8 !important; opacity: 0.7; cursor: not-allowed; box-shadow: none; filter: grayscale(0.8); }
         .btn-unlocked { background-color: var(--brand-blue) !important; opacity: 1; cursor: pointer; animation: pulseBtn 2s infinite; box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); }
-        .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
-
+        
         .vote-btn { width: 100%; background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; padding: 10px; font-size: 0.8rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; display: none; }
         .notify-btn { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; transition: background 0.3s; }
+        .whatsapp-btn { width: 100%; background-color: var(--whatsapp); color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 40px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
+        
+        /* BOTON CAPTURA */
+        .capture-btn { width: 100%; background-color: #7c3aed; color: white; border: none; padding: 16px; font-size: 1rem; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+
         .install-center { width: 100%; text-align: center; margin-bottom: 15px; }
         .install-app-btn { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s; }
         
@@ -215,7 +219,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.5</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.6</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -340,7 +344,8 @@
             </div>
             <div class="lc-location">📍 Pabellón Colegio Virgen de la Vega</div>
         </div>
-        <div class="lc-grid" id="lc-grid"></div>
+        <div class="lc-grid" id="lc-grid">
+            </div>
         <div class="lc-footer">AMPA FUTSAL APP</div>
     </div>
 </div>
@@ -374,6 +379,7 @@
         configRef = doc(db, "config", "admin_settings"); 
     } catch (e) { console.error("Error init firebase", e); }
 
+    // --- LISTA PRO CON SUB-NIVELES (Ocultos al usuario) ---
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3.2 },
         { id: "jhon", name: "Jhon", level: 3.0 },
@@ -473,7 +479,7 @@
                         files: [file],
                         title: 'Alineación AMPA Futsal',
                         text: 'Aquí están los equipos confirmados.'
-                    }).catch(err => { console.log("Compartir cancelado", err); });
+                    }).catch(err => { console.log("Compartir cancelado o error", err); });
                 } else {
                     const link = document.createElement('a');
                     link.download = file.name;
@@ -482,6 +488,9 @@
                     window.showToast("Imagen descargada (PC)", "success");
                 }
             }, 'image/png');
+        }).catch(err => {
+            console.error(err);
+            window.showToast("Error al generar imagen", "error");
         });
     };
 
@@ -582,6 +591,7 @@
     });
 
     function updateUI(data) {
+        // SORT ALPHABETICALLY FOR DISPLAY ONLY
         const activeRoster = [...(data.roster || initialPlayers)].sort((a, b) => a.name.localeCompare(b.name));
         
         // --- IDENTITY SELECTOR LOGIC ---
@@ -627,7 +637,7 @@
                 const greet = document.getElementById('user-greeting');
                 greet.innerHTML = `👋 Hola, ${me.name} <span class="reset-id-btn" onclick="window.resetIdentity()">¿NO ERES TÚ?</span>`;
                 greet.style.display = 'block';
-                selector.style.display = 'none'; 
+                selector.style.display = 'none';
 
                 if (data.matchDate && !data.teams) {
                     actionBar.style.display = 'flex';
@@ -646,7 +656,6 @@
                 }
             }
         } else {
-            // Show selector only on setup screen
             if (!data.matchDate) selector.style.display = 'block';
         }
 
@@ -789,6 +798,7 @@
         const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         let inviterName = "";
         let actorName = "Alguien"; 
+
         const myId = localStorage.getItem('futsal_my_id');
         const roster = currentData.roster || initialPlayers;
         if (myId) {
@@ -816,13 +826,15 @@
                 showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => {
                     if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error");
                     processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true); return; 
+                }, true);
+                return; 
             } else {
                 showConfirm("🛡️ Crear PIN", `Crea un PIN nuevo para ${name}:`, (val) => {
                     if (!val || val.length < 3) return window.showToast("PIN inválido", "error");
                     currentPins[id] = val;
                     processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true); return;
+                }, true);
+                return;
             }
         } else {
              const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
@@ -834,6 +846,7 @@
              } else {
                  msg = isSelected ? `¿Seguro que quieres borrar a ${name}?` : `¿Seguro que quieres añadir a ${name}?`;
              }
+             
              showConfirm("Confirmar Acción", msg, () => {
                  processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
              });
@@ -855,6 +868,7 @@
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
                 newPlayers.push(id);
                 if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
+                
                 await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} entra${actionSuffix}|${timeStr}`) });
                 window.showToast(`¡Bienvenido ${name}!`, "success");
             }
@@ -996,6 +1010,7 @@
         });
         window.currentTeamsForCopy = teams;
     }
+    // RESET MANUAL CORREGIDO (NO GUARDA HISTORIAL)
     window.resetCurrentMatch = async () => {
         showConfirm("⚠️ REINICIO MANUAL", "Se borrará la lista y NO se guardará historial (partido no jugado). ¿Continuar?", async () => {
              await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
