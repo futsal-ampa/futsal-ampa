@@ -14,7 +14,7 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <style>
-        /* ESTILOS (Optimizados) */
+        /* ESTILOS GLOBALES */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -146,9 +146,17 @@
         h3 { font-size: 0.9rem; color: var(--brand-dark); text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px; }
 
         /* --- STICKY USER BAR --- */
-        #user-action-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: none; justify-content: space-between; align-items: center; z-index: 1100; animation: slideUp 0.3s ease-out; padding-bottom: max(15px, env(safe-area-inset-bottom)); }
+        #user-action-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid #e2e8f0; padding: 15px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: none;
+            justify-content: space-between; align-items: center; z-index: 1100; animation: slideUp 0.3s ease-out;
+            padding-bottom: max(15px, env(safe-area-inset-bottom));
+        }
         .action-bar-text { font-size: 0.9rem; color: var(--brand-dark); font-weight: 700; }
-        .action-bar-btn { padding: 12px 25px; border-radius: 30px; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.1s; }
+        .action-bar-btn {
+            padding: 12px 25px; border-radius: 30px; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.1s;
+        }
         .action-bar-btn:active { transform: scale(0.95); }
         .btn-join { background: var(--success); color: white; }
         .btn-leave { background: #dc2626; color: white; border: 2px solid #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
@@ -172,7 +180,11 @@
         .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
         /* RESET ID BTN (v3.15) */
-        .reset-id-btn { background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase; display: inline-flex; align-items: center; vertical-align: middle; transition: all 0.2s; }
+        .reset-id-btn {
+            background: white; border: 1px solid #d97706; color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem;
+            font-weight: 800; cursor: pointer; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-transform: uppercase;
+            display: inline-flex; align-items: center; vertical-align: middle; transition: all 0.2s;
+        }
         .reset-id-btn:active { transform: scale(0.95); background: #fffbeb; }
 
         /* IDENTITY SELECTOR (v4.5) */
@@ -238,7 +250,7 @@
 </div>
 
 <header>
-    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.7</h1>
+    <h1 onclick="window.secretAdminTap()">AMPA Futsal v4.8</h1>
     <div id="header-date" class="match-date-display"></div>
 </header>
 
@@ -366,7 +378,7 @@
             <div class="lc-location">📍 Pabellón Colegio Virgen de la Vega</div>
         </div>
         <div class="lc-grid" id="lc-grid"></div>
-        <div class="lc-footer">AMPA FUTSAL APP v4.7</div>
+        <div class="lc-footer">AMPA FUTSAL APP v4.8</div>
     </div>
 </div>
 
@@ -577,7 +589,7 @@
             signInWithEmailAndPassword(auth, email, pass)
                 .then(() => { 
                     modal.style.display = 'none'; 
-                    document.getElementById('admin-zone').style.display = 'block'; // FORCE SHOW
+                    document.getElementById('admin-zone').style.display = 'block'; 
                 })
                 .catch((e) => { window.showToast("Error de acceso: " + e.message, "error"); });
         };
@@ -615,15 +627,20 @@
         // SORT ALPHABETICALLY
         const activeRoster = [...(data.roster || initialPlayers)].sort((a, b) => a.name.localeCompare(b.name));
         
-        // --- IDENTITY SELECTOR LOGIC ---
+        // --- IDENTITY SELECTOR LOGIC (v4.8 FIX) ---
         const selector = document.getElementById('identity-select');
         // Clear and repopulate to avoid duplicates, but keep default option
         if(selector.options.length <= 1) {
              activeRoster.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.innerText = p.name;
-                selector.appendChild(opt);
+                // v4.8: FILTER BANNED PLAYERS FROM SELECTOR
+                const isBanned = data.bannedIndices && data.bannedIndices.includes(p.id);
+                
+                if (!isBanned) {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.innerText = p.name;
+                    selector.appendChild(opt);
+                }
             });
         }
 
@@ -631,7 +648,7 @@
         const guestContainer = document.getElementById('guest-container');
         container.innerHTML = ''; guestContainer.innerHTML = '';
 
-        // Render Admin Lists first to clear loading
+        // Render Admin Lists
         const banList = document.getElementById('ban-list');
         const pinList = document.getElementById('pin-list');
         const deleteList = document.getElementById('delete-list');
@@ -932,7 +949,6 @@
         });
     };
     window.attemptGeneration = () => {
-        // --- VALIDACIÓN: SOLO CONVOCADOS O ADMIN ---
         const myId = localStorage.getItem('futsal_my_id');
         const amIAdmin = auth.currentUser; 
         const amISelected = currentData.selectedPlayers && currentData.selectedPlayers.includes(myId);
@@ -958,13 +974,13 @@
     window.forceGeneration = () => { 
         showConfirm("🔓 Desbloquear Creación", "¿Quieres habilitar el botón 'Crear Equipos' para todos?", async () => {
              const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-             await updateDoc(matchRef, { lockTime: "18:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
+             await updateDoc(matchRef, { lockTime: "14:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
              window.showToast("Botón desbloqueado para todos", "success");
              window.hideAdmin();
         });
     };
     window.resetRosterOnly = async () => {
-        showConfirm("Actualizar Plantilla", "¿Actualizar niveles manteniendo jugadores nuevos?", async () => {
+        showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código? El historial NO se borrará.", async () => {
             const currentRoster = currentData.roster || [];
             const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p]));
             let newRoster = [...initialPlayers];
