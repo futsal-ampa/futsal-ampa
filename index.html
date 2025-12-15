@@ -969,7 +969,7 @@
                  else msg = `¿${actorName}, quieres que entre en la convocatoria ${name}?`;
                  if(name === actorName) msg = isSelected ? `¿${name}, quieres salir de la convocatoria?` : `¿${name}, quieres entrar en la convocatoria?`;
              } else {
-                 msg = isSelected ? `¿Seguro que quieres borrar a ${name}?` : `¿Seguro que quieres añadir a ${name}?`;
+                 msg = isSelected ? `¿Seguro que quieres borrar a ${name}?` : `${name}, ¿Te apuntas?`;
              }
              
              showConfirm("Confirmar Acción", msg, () => {
@@ -1326,4 +1326,5 @@
 </script>
 </body>
 </html>
+
 
