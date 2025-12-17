@@ -377,7 +377,7 @@
             <div class="lc-location">📍 Pabellón Colegio Virgen de la Vega</div>
         </div>
         <div class="lc-grid" id="lc-grid"></div>
-        <div class="lc-footer">AMPA FUTSAL APP v4.11</div>
+        <div class="lc-footer">AMPA FUTSAL APP</div>
     </div>
 </div>
 
@@ -967,7 +967,7 @@
              if (actorName && actorName !== "Alguien") {
                  if (isSelected) msg = `¿${actorName}, quieres que salga ${name}?`;
                  else msg = `¿${actorName}, quieres que entre ${name}?`;
-                 if(name === actorName) msg = isSelected ? `¿${name}, quieres salir?` : `¿${name}, quieres entrar?`;
+                 if(name === actorName) msg = isSelected ? `¿${name}, quieres salir?` : `¿${name}, quieres apuntarte?`;
              } else {
                  msg = isSelected ? `${name}, ¿Te borras?` : `${name}, ¿Te apuntas?`;
              }
@@ -992,7 +992,7 @@
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
                 newPlayers.push(id);
                 if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
-                await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} entra${actionSuffix}|${timeStr}`) });
+                await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} se apunta${actionSuffix}|${timeStr}`) });
                 window.showToast(`¡Bienvenido ${name}!`, "success");
             }
         } else {
@@ -1326,6 +1326,7 @@
 </script>
 </body>
 </html>
+
 
 
 
