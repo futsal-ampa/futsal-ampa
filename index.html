@@ -312,7 +312,7 @@
 
         <div class="status-bar">
             <div class="status-header">
-                <div><span class="status-label">CONVOCADOS</span> <span class="status-sub" id="status-text">Máx 18</span></div>
+                <div><span class="status-label">APUNTADOS</span> <span class="status-sub" id="status-text">Máx 18</span></div>
                 <span class="status-count" id="player-count">0 / 18</span>
             </div>
             <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
@@ -965,9 +965,9 @@
              const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
              let msg = "";
              if (actorName && actorName !== "Alguien") {
-                 if (isSelected) msg = `¿${actorName}, quieres que salga de la convocatoria ${name}?`;
-                 else msg = `¿${actorName}, quieres que entre en la convocatoria ${name}?`;
-                 if(name === actorName) msg = isSelected ? `¿${name}, quieres salir de la convocatoria?` : `¿${name}, quieres entrar en la convocatoria?`;
+                 if (isSelected) msg = `¿${actorName}, quieres que salga ${name}?`;
+                 else msg = `¿${actorName}, quieres que entre ${name}?`;
+                 if(name === actorName) msg = isSelected ? `¿${name}, quieres salir?` : `¿${name}, quieres entrar?`;
              } else {
                  msg = isSelected ? `${name}, ¿Te borras?` : `${name}, ¿Te apuntas?`;
              }
@@ -1010,7 +1010,7 @@
     }
     window.voteToUnlock = async () => { 
         const myId = localStorage.getItem('futsal_my_id');
-        if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo convocados pueden votar.", "error");
+        if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo apuntados pueden votar.", "error");
         if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info");
         const roster = currentData.roster || initialPlayers;
         const me = roster.find(p => p.id === myId);
@@ -1027,7 +1027,7 @@
         const amISelected = currentData.selectedPlayers && currentData.selectedPlayers.includes(myId);
 
         if (!amIAdmin && !amISelected) {
-            return window.showToast("⛔ Solo los jugadores convocados pueden crear los equipos.", "error");
+            return window.showToast("⛔ Solo los jugadores apuntados pueden crear los equipos.", "error");
         }
 
         const targetTime = new Date(currentData.matchDate);
@@ -1326,6 +1326,7 @@
 </script>
 </body>
 </html>
+
 
 
 
