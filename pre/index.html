@@ -1229,24 +1229,46 @@
     };
     
     // Timers & Scores Loop
+   // --- TIMERS Y LIMPIEZA AUTOMÁTICA CON "CHIVATO" ---
     setInterval(async () => {
-        // CORRECCIÓN: Chequear bloqueo constantemente para actualizar UI
-        if (currentData.matchDate) { checkTimeLock(currentData.matchDate, currentData.lockTime); }
-
         if (currentData.matchDate) { 
-            const matchDate = new Date(currentData.matchDate); 
-            const now = new Date(); 
-            const resetTime = new Date(matchDate); 
-            resetTime.setDate(resetTime.getDate() + 1); 
-            resetTime.setHours(10, 0, 0, 0); 
+            checkTimeLock(currentData.matchDate, currentData.lockTime); 
             
-            if (now >= resetTime) {
+            const matchDate = new Date(currentData.matchDate);
+            const now = new Date();
+            
+            // Umbral de seguridad (ej: día siguiente a las 06:00 AM)
+            const safetyResetTime = new Date(matchDate);
+            safetyResetTime.setDate(safetyResetTime.getDate() + 1); 
+            safetyResetTime.setHours(6, 0, 0, 0); 
+            
+            if (now >= safetyResetTime) {
+                // --- AQUÍ IDENTIFICAMOS AL "CULPABLE" ---
+                const myId = localStorage.getItem('futsal_my_id');
+                const roster = currentData.roster || initialPlayers;
+                const me = roster.find(p => p.id === myId);
+                const culpritName = me ? me.name : "Un dispositivo anónimo";
+                // ----------------------------------------
+
+                console.log("Limpieza automática ejecutada por:", culpritName);
+                
+                // Archivar primero
                 if(currentData.teams) {
                     await addDoc(collection(db, "history"), { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
                 }
-                updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); 
+                
+                // Borrar y DEJAR LA FIRMA DE QUIÉN FUE
+                updateDoc(matchRef, { 
+                    matchDate: null, 
+                    selectedPlayers: [], 
+                    teams: null,
+                    // Añadimos esto al log para que lo veas en la pantalla
+                    logs: arrayUnion(`⚠️ Limpieza automática disparada por ${culpritName} (posible hora errónea)`)
+                }); 
             } 
         }
+        
+        // ... resto del código del timer ...
         
         if(currentData.timerState === 'running') {
             const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
@@ -1298,4 +1320,5 @@
 </script>
 </body>
 </html>
+
 
