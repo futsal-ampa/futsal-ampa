@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal Test</title>
+    <title>AMPA Futsal 25/26 (Seguro)</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -66,7 +66,8 @@
         .status-count { font-size: 1.4rem; font-weight: 800; color: var(--brand-dark); }
         .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
-        
+        .countdown-text { font-size: 0.8rem; font-weight: bold; color: var(--reserve); text-align: right; margin-top: 5px; height: 16px; }
+
         /* BOTONES */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .action-btn:active { transform: scale(0.98); }
@@ -298,7 +299,7 @@
         <h2 style="margin-top:0; color:var(--brand-dark)">⚽ Nuevo Partido</h2>
         <p style="color:#64748b; margin-bottom:20px;">Elige la fecha para abrir la convocatoria:</p>
         
-        <select id="identity-select" style="display:none; width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; color: #334155; font-family: 'Montserrat', sans-serif;">
+        <div id="reset-alert-container"></div> <select id="identity-select" style="display:none; width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; color: #334155; font-family: 'Montserrat', sans-serif;">
             <option value="">¿Quién eres?</option>
         </select>
         
@@ -387,17 +388,16 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     // -------------------------------------------------------------
-    // ⚠️ CONFIGURACIÓN FIREBASE ⚠️
+    // ⚠️ CONFIGURACIÓN FIREBASE (TEST - AMPA TEST FFF41) ⚠️
     // -------------------------------------------------------------
     const firebaseConfig = {
-  apiKey: "AIzaSyAVTxYarB7cZzrZcm2ns5DaDsRgf2VaDpA",
-  authDomain: "ampa-test-fff41.firebaseapp.com",
-  projectId: "ampa-test-fff41",
-  storageBucket: "ampa-test-fff41.firebasestorage.app",
-  messagingSenderId: "966954997542",
-  appId: "1:966954997542:web:0db03a4a88d14ac96453e7"
-};
-    // -------------------------------------------------------------
+      apiKey: "AIzaSyAVTxYarB7cZzrZcm2ns5DaDsRgf2VaDpA",
+      authDomain: "ampa-test-fff41.firebaseapp.com",
+      projectId: "ampa-test-fff41",
+      storageBucket: "ampa-test-fff41.firebasestorage.app",
+      messagingSenderId: "966954997542",
+      appId: "1:966954997542:web:0db03a4a88d14ac96453e7"
+    };
 
     let app, db, matchRef, configRef, auth;
     
@@ -465,7 +465,7 @@
         return array;
     };
     
-    // --- HELPER: RESET IDENTITY (MEJORADO CON MODAL) ---
+    // --- HELPER: RESET IDENTITY ---
     window.resetIdentity = () => {
         showConfirm("¿Cambiar de Usuario?", "¿Seguro que no eres tú? Se borrará tu identidad de este dispositivo.", () => {
             localStorage.removeItem('futsal_my_id');
@@ -473,16 +473,18 @@
         });
     };
     
-    // --- HELPER: CAPTURE LINEUP (V4.1) ---
+    // --- HELPER: CAPTURE LINEUP ---
     window.downloadLineup = () => {
         const teams = window.currentTeamsForCopy;
-        if (!teams) return window.showToast("No hay equipos", "error");
+        if (!teams || teams.length === 0) return window.showToast("No hay equipos para generar imagen", "error");
 
         window.showToast("Generando imagen...", "info");
 
-        // 1. Populate Hidden Card
-        const dateStr = new Date(currentData.matchDate).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-        document.getElementById('lc-date').innerText = dateStr;
+        if(currentData.matchDate) {
+            const dateObj = new Date(currentData.matchDate);
+            const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+            document.getElementById('lc-date').innerText = dateStr;
+        }
         
         const grid = document.getElementById('lc-grid');
         grid.innerHTML = '';
@@ -492,19 +494,17 @@
         teams.forEach((team, i) => {
             let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
             team.forEach(p => {
-                const cleanName = p.name.replace(/<[^>]*>/g, '');
+                const cleanName = p.name.replace(/<[^>]*>/g, ''); 
                 html += `<div class="lc-player">${cleanName}</div>`;
             });
             html += `</div>`;
             grid.innerHTML += html;
         });
 
-        // 2. Capture and Share
         const element = document.querySelector(".lineup-card");
         html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
             canvas.toBlob(blob => {
                 const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
-
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     navigator.share({
                         files: [file],
@@ -648,24 +648,26 @@
         const deleteList = document.getElementById('delete-list');
         
         if(banList && pinList && deleteList) {
-            banList.innerHTML = ""; pinList.innerHTML = ""; deleteList.innerHTML = "";
+            let banHTML = ""; let pinHTML = ""; let delHTML = "";
             activeRoster.forEach(p => {
                  const isBanned = data.bannedIndices?.includes(p.id);
                  
                  // BLOQUEAR/DESBLOQUEAR (Admin)
                  const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
                  const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
-                 banList.innerHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
+                 banHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
                  
                  // RESET PINS (Admin)
                  if(data.pins && data.pins[p.id]) {
-                     pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
+                     pinHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
                  }
 
                  // DELETE PERMANENT (Admin) - v4.11
-                 deleteList.innerHTML += `<div class="chip chip-ban" style="border-color:black; color:black;" onclick="window.deletePlayerPermanent('${p.id}', '${p.name}')">❌ ${p.name}</div>`;
+                 delHTML += `<div class="chip chip-ban" style="border-color:black; color:black;" onclick="window.deletePlayerPermanent('${p.id}', '${p.name}')">❌ ${p.name}</div>`;
             });
-            if(pinList.innerHTML === "") pinList.innerHTML = `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
+            banList.innerHTML = banHTML;
+            pinList.innerHTML = pinHTML || `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
+            deleteList.innerHTML = delHTML;
         }
 
         const myId = localStorage.getItem('futsal_my_id');
@@ -701,37 +703,43 @@
              if (!data.matchDate) selector.style.display = 'block';
         }
 
+        // OPTIMIZACIÓN DE DOM: Construir HTML en string antes de inyectar
+        let playersHTML = "";
         activeRoster.forEach((p) => {
             const isBanned = data.bannedIndices?.includes(p.id);
-            if (isBanned) return; // HIDE BANNED PLAYERS (v4.11)
+            if (isBanned) return;
 
-            const div = document.createElement('div');
-            div.className = 'player-checkbox';
-            if (p.id === myId) div.classList.add('is-me');
-            
+            const isMeClass = (p.id === myId) ? ' is-me' : '';
             const isSelected = data.selectedPlayers?.includes(p.id);
             const pins = data.pins || {};
             const lockIcon = (data.pinMode !== false && pins[p.id]) ? '<span class="lock-icon">🔒</span>' : '';
             let badgeContent = '';
-            if(isSelected) { div.classList.add('selected'); badgeContent = data.selectedPlayers.indexOf(p.id) + 1; }
+            let selectedClass = '';
             
-            div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
-            div.onclick = () => window.toggleSelection('player', p.id, p.name);
-            container.appendChild(div);
+            if(isSelected) { 
+                selectedClass = ' selected'; 
+                badgeContent = `<span class="order-badge" style="display:flex;">${data.selectedPlayers.indexOf(p.id) + 1}</span>`; 
+            } else {
+                badgeContent = `<span class="order-badge"></span>`;
+            }
+            
+            playersHTML += `<div class="player-checkbox${selectedClass}${isMeClass}" onclick="window.toggleSelection('player', '${p.id}', '${p.name}')">
+                ${badgeContent} ${p.name} ${lockIcon}
+            </div>`;
         });
+        container.innerHTML = playersHTML;
 
+        let guestsHTML = "";
         guestsDB.forEach((g) => {
-            const div = document.createElement('div');
-            div.className = 'player-checkbox guest-label';
             const isSelected = data.selectedGuests?.includes(g.id);
             const inviter = (data.guestInviters && data.guestInviters[g.id]) ? data.guestInviters[g.id] : null;
-            if(isSelected) div.classList.add('selected');
-            let html = `<div class="guest-name"><span class="order-badge">${isSelected ? 'G' : ''}</span> ${g.name}</div>`;
-            if (isSelected && inviter) { html += `<div class="invited-by">↳ por ${inviter}</div>`; }
-            div.innerHTML = html;
-            div.onclick = () => window.toggleSelection('guest', g.id, g.name);
-            guestContainer.appendChild(div);
+            const selectedClass = isSelected ? ' selected' : '';
+            let content = `<div class="guest-name"><span class="order-badge" style="${isSelected ? 'display:flex' : ''}">G</span> ${g.name}</div>`;
+            if (isSelected && inviter) { content += `<div class="invited-by">↳ por ${inviter}</div>`; }
+            
+            guestsHTML += `<div class="player-checkbox guest-label${selectedClass}" onclick="window.toggleSelection('guest', '${g.id}', '${g.name}')">${content}</div>`;
         });
+        guestContainer.innerHTML = guestsHTML;
 
         const setupPanel = document.getElementById('setup-panel');
         const activePanel = document.getElementById('active-match-panel');
@@ -740,6 +748,20 @@
         if (!data.matchDate) {
             setupPanel.style.display = 'block'; activePanel.style.display = 'none';
             headerDate.innerText = "PRÓXIMO PARTIDO";
+
+            // ⚠️ 1. MENSAJE DE ALERTA DE CULPABLE EN PANTALLA PRINCIPAL ⚠️
+            if (data.lastResetMsg) {
+               let alertDiv = document.getElementById('reset-alert');
+               if (!alertDiv) {
+                   alertDiv = document.createElement('div');
+                   alertDiv.id = 'reset-alert';
+                   alertDiv.style.cssText = "background:#fee2e2; color:#b91c1c; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.8rem; font-weight:bold;";
+                   const dateInput = document.getElementById('date-input');
+                   dateInput.parentNode.insertBefore(alertDiv, dateInput);
+               }
+               alertDiv.innerText = data.lastResetMsg;
+            }
+
         } else {
             setupPanel.style.display = 'none'; activePanel.style.display = 'block';
             const d = new Date(data.matchDate);
@@ -766,14 +788,15 @@
             if(votes >= 3) { voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true; }
         } else voteBtn.style.display = 'none';
 
-        // Render Teams / Logs etc.
+        // Render Logs
         const logDiv = document.getElementById('activity-log');
         if (data.logs && data.logs.length > 0) {
-            logDiv.innerHTML = "";
+            let logHTML = "";
             [...data.logs].reverse().forEach(logStr => { 
                 const parts = logStr.split('|');
-                if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
+                if(parts.length === 2) logHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
             });
+            logDiv.innerHTML = logHTML;
         }
 
         let teamsData = data.teams;
@@ -788,7 +811,7 @@
             document.getElementById('sc-blanco').innerText = sc[0];
             document.getElementById('sc-negro').innerText = sc[1];
             document.getElementById('sc-rojo').innerText = sc[2];
-            renderTeams(teamsData);
+            window.renderTeams(teamsData);
         } else {
             document.getElementById('selection-phase').style.display = 'block';
             document.getElementById('results-phase').style.display = 'none';
@@ -910,7 +933,8 @@
              await setDoc(matchRef, { 
                 matchDate: dateInput, lockTime: currentData.lockTime || "18:00", pinMode: currentData.pinMode !== false, voteMode: currentData.voteMode !== false,
                 selectedPlayers: [], selectedGuests: [], guestInviters: {}, scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
+                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers,
+                lastResetMsg: null // BORRAR MENSAJE DE ERROR ANTIGUO AL ABRIR NUEVO
             }, { merge: true });
         });
     };
@@ -1086,65 +1110,85 @@
     };
 
     window.openStats = async () => {
-        const modal = document.getElementById('modal-overlay');
-        document.getElementById('modal-title').innerText = "Estadísticas y Ranking";
-        document.getElementById('modal-text').style.display = 'none';
-        document.getElementById('modal-input').style.display = 'none';
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('stats-content').style.display = 'block';
-        const actions = document.getElementById('modal-actions');
-        actions.innerHTML = '';
-        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; };
-        actions.appendChild(btnClose);
-        modal.style.display = 'flex';
+        const modal = document.getElementById('modal-overlay'); 
+        document.getElementById('modal-title').innerText = "Estadísticas y Ranking"; 
+        document.getElementById('modal-text').style.display = 'none'; 
+        document.getElementById('modal-input').style.display = 'none'; 
+        document.getElementById('login-form').style.display = 'none'; 
+        document.getElementById('stats-content').style.display = 'block'; 
+        
+        const actions = document.getElementById('modal-actions'); 
+        actions.innerHTML = ''; 
+        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; }; 
+        actions.appendChild(btnClose); 
+        modal.style.display = 'flex'; 
+        
         try {
-            const histRef = collection(db, "history");
-            const snap = await getDocs(histRef);
-            const matches = [];
-            const playerCounts = {};
-            snap.forEach(doc => {
-                const d = doc.data();
-                matches.push(d);
-                if(d.teams) {
-                    let teamsArr = [];
-                    try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){}
-                    teamsArr.forEach(team => { team.forEach(player => { if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; } }); });
-                }
+            const histRef = collection(db, "history"); 
+            const snap = await getDocs(histRef); 
+            const matches = []; 
+            const playerCounts = {}; 
+            
+            snap.forEach(doc => { 
+                const d = doc.data(); 
+                matches.push(d); 
+                if(d.teams) { 
+                    let teamsArr = []; 
+                    try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){} 
+                    teamsArr.forEach(team => { 
+                        team.forEach(player => { 
+                            if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; } 
+                        }); 
+                    }); 
+                } 
             });
-            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]);
-            const rankDiv = document.getElementById('tab-ranking');
-            rankDiv.innerHTML = '';
-            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>';
-            sortedPlayers.forEach(([name, count], index) => {
-                let medal = '';
-                if(index === 0) medal = '🥇'; else if(index === 1) medal = '🥈'; else if(index === 2) medal = '🥉';
-                rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal || (index + 1)}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`;
+            
+            // RANKING
+            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]); 
+            const rankDiv = document.getElementById('tab-ranking'); 
+            rankDiv.innerHTML = ''; 
+            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>'; 
+            sortedPlayers.forEach(([name, count], index) => { 
+                let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index+1; 
+                rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`; 
             });
-            if(sortedPlayers.length > 0) { rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial y Resetear Ranking</button></div>`; }
-            matches.sort((a,b) => (a.date < b.date ? 1 : -1));
-            const histDiv = document.getElementById('tab-history');
-            histDiv.innerHTML = '';
-            if(matches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos registrados</div>';
-            matches.forEach(m => {
-                const d = new Date(m.date);
+            if(sortedPlayers.length > 0) { rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Todo</button></div>`; }
+            
+            // HISTORIAL (Aquí añadimos el chivato)
+            matches.sort((a,b) => (a.date < b.date ? 1 : -1)); 
+            const histDiv = document.getElementById('tab-history'); 
+            histDiv.innerHTML = ''; 
+            if(matches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos registrados</div>'; 
+            
+            matches.forEach(m => { 
+                const d = new Date(m.date); 
                 const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
-                const s = m.scores || [0,0,0];
-                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`;
-                if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`;
-                let pCount = 0;
-                if(m.teams) { let teamsArr = []; try { teamsArr = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; } catch(e){} teamsArr.forEach(t => pCount += t.length); }
-                histDiv.innerHTML += `<div class="history-card"><div class="h-info"><div class="h-date">${dateStr}</div><div class="h-score">${scoreStr}</div></div><div class="h-players">👥 ${pCount} jug.</div></div>`;
-            });
-        } catch(e) { window.showToast("Error cargando historial", "error"); }
-    };
-    window.resetHistory = async () => {
-        showConfirm("⚠️ BORRAR HISTORIAL", "Esto eliminará todos los partidos pasados. ¿Estás seguro?", async () => {
-            const histRef = collection(db, "history");
-            const snap = await getDocs(histRef);
-            snap.forEach(async (d) => { await deleteDoc(doc(db, "history", d.id)); });
-            window.showToast("Historial eliminado", "success");
-            setTimeout(() => window.openStats(), 500); 
-        });
+                const s = m.scores || [0,0,0]; 
+                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`; 
+                if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`; 
+                
+                let pCount = 0; 
+                if(m.teams) { 
+                    let t = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; 
+                    t.forEach(g => pCount += g.length); 
+                } 
+                
+                // ⚠️ 3. DETECTAR CULPABLE EN HISTORIAL ⚠️
+                let resetInfo = '';
+                if (m.resetBy) {
+                    resetInfo = `<div style="font-size:0.65rem; color:#ef4444; font-weight:bold; margin-top:4px;">⚠️ Auto-cierre por: ${m.resetBy}</div>`;
+                }
+
+                histDiv.innerHTML += `<div class="history-card">
+                    <div class="h-info">
+                        <div class="h-date">${dateStr}</div>
+                        <div class="h-score">${scoreStr}</div>
+                        ${resetInfo}
+                    </div>
+                    <div class="h-players">👥 ${pCount} jug.</div>
+                </div>`; 
+            }); 
+        } catch(e) { window.showToast("Error stats", "error"); }
     };
     window.switchTab = (tab) => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1157,12 +1201,14 @@
         resDiv.innerHTML = '';
         const names = ['BLANCO', 'NEGRO', 'ROJO'];
         const classes = ['team-blanco', 'team-negro', 'team-rojo'];
+        
+        let html = '';
         teams.forEach((team, idx) => {
-            let html = `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`;
+            html += `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`;
             team.forEach(p => { const name = p.isGuest ? `<span class="guest-result">${p.name}</span>` : p.name; html += `<li>${name}</li>`; });
             html += `</ul></div>`;
-            resDiv.innerHTML += html;
         });
+        resDiv.innerHTML = html;
         window.currentTeamsForCopy = teams;
     }
     // RESET MANUAL CORREGIDO (NO GUARDA HISTORIAL)
@@ -1215,14 +1261,60 @@
          t.forEach((team, i) => { txt += `${em[i]} *${names[i]}* (${team.length})\n`; team.forEach(p => txt += `- ${p.name}\n`); txt += `\n`; });
          window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
     };
-    // Timers & Scores
+    
+    // --- ⚠️ 2. TIMERS Y LIMPIEZA AUTOMÁTICA SEGURA ⚠️ ---
     setInterval(async () => {
-        if (currentData.matchDate) { checkTimeLock(currentData.matchDate, currentData.lockTime); const matchDate = new Date(currentData.matchDate); const now = new Date(); const resetTime = new Date(matchDate); resetTime.setDate(resetTime.getDate() + 1); resetTime.setHours(10, 0, 0, 0); if (now >= resetTime) {
-                if(currentData.teams) {
-                    await addDoc(collection(db, "history"), { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
+        if (currentData.matchDate) { 
+            checkTimeLock(currentData.matchDate, currentData.lockTime); 
+            
+            const matchDate = new Date(currentData.matchDate);
+            const now = new Date();
+            
+            // Umbral: Día siguiente a las 06:00 AM
+            const safetyResetTime = new Date(matchDate);
+            safetyResetTime.setDate(safetyResetTime.getDate() + 1); 
+            safetyResetTime.setHours(6, 0, 0, 0); 
+            
+            if (now >= safetyResetTime) {
+                // 1. IDENTIFICAR AL SUJETO
+                const myId = localStorage.getItem('futsal_my_id');
+                const roster = currentData.roster || initialPlayers;
+                const me = roster.find(p => p.id === myId);
+                
+                // Detectar tipo de dispositivo (Detective)
+                let deviceType = "PC/Desconocido";
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) deviceType = "iPhone";
+                else if (/Android/i.test(navigator.userAgent)) deviceType = "Android";
+                
+                let culpritName = me ? me.name : `Anónimo (${deviceType})`;
+
+                // 2. REGLA DEL PORTERO: ¿Tiene permiso para borrar?
+                // Si es anónimo (no sé quién es), NO permito que su móvil borre la base de datos.
+                if (!me && !auth.currentUser) {
+                    console.log("⚠️ Intento de borrado automático bloqueado por anónimo.");
+                    return; // <--- SE DETIENE AQUÍ Y NO BORRA NADA
                 }
-                updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); 
-            } }
+                
+                // 3. EJECUTAR LIMPIEZA (Solo si es un usuario identificado)
+                console.log("Limpieza ejecutada por:", culpritName);
+                if(currentData.teams) {
+                    await addDoc(collection(db, "history"), { 
+                        date: currentData.matchDate, 
+                        teams: currentData.teams, 
+                        scores: currentData.scores,
+                        resetBy: culpritName 
+                    });
+                }
+                updateDoc(matchRef, { 
+                    matchDate: null, 
+                    selectedPlayers: [], 
+                    teams: null,
+                    logs: [],
+                    lastResetMsg: `⚠️ El último partido fue cerrado automáticamente por: ${culpritName}`
+                }); 
+            } 
+        }
+        
         if(currentData.timerState === 'running') {
             const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
             const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
@@ -1230,9 +1322,11 @@
             if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; } else if(left <= 0) { display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN"; if(!hasBeeped) { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000); hasBeeped = true; } }
         }
     }, 1000);
+
     window.toggleTimer = async () => { if (currentData.timerState === 'running') { const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000)); await updateDoc(matchRef, { timerState: 'paused', timerLeft: left }); } else { const target = Date.now() + (currentData.timerLeft * 1000); await updateDoc(matchRef, { timerState: 'running', timerEnd: target }); } };
     window.resetTimer = async () => { await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 }); hasBeeped = false; document.getElementById('timer-display').classList.remove('finished', 'last-minute'); document.getElementById('timer-display').innerText = "05:00"; };
     window.updateScore = async (idx, delta) => { let s = [...(currentData.scores || [0,0,0])]; s[idx] = Math.max(0, s[idx] + delta); await updateDoc(matchRef, { scores: s }); };
+    
     let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
     window.installApp = async () => { if(defPrompt) { defPrompt.prompt(); defPrompt = null; } else window.showToast("Usa menú navegador -> Instalar", "info"); };
 
@@ -1247,16 +1341,13 @@
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         const canUnlock = (currentData.voteMode !== false && votes >= 3);
         
-        // Remove standard disabled attribute to allow click interaction
         btn.removeAttribute('disabled');
 
         if (now >= target || canUnlock) {
-            // Unlocked state
             btn.className = "action-btn btn-unlocked";
             btn.innerHTML = "⚽ CREAR EQUIPOS";
             msg.innerText = "";
         } else {
-            // Locked state
             btn.className = "action-btn btn-locked";
             btn.innerHTML = "🔒 CREAR EQUIPOS";
             msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
@@ -1267,69 +1358,10 @@
             const diff = target - now;
             const hh = Math.floor(diff/(1000*60*60));
             const mm = Math.floor((diff%(1000*60*60))/(1000*60));
-            cd.innerText = `Cierre en: ${hh}h ${mm}m`;
+            const ss = Math.floor((diff%(1000*60))/1000);
+            cd.innerText = `Cierre en: ${hh}h ${mm}m ${ss}s`;
         } else cd.innerText = "Cierre alcanzado";
     }
-
-    // --- NEW FEATURE: DOWNLOAD LINEUP (PIZARRA) ---
-    window.downloadLineup = () => {
-        const teams = window.currentTeamsForCopy;
-        if (!teams || teams.length === 0) return window.showToast("No hay equipos para generar imagen", "error");
-
-        window.showToast("Generando imagen...", "info");
-
-        if(currentData.matchDate) {
-            const dateObj = new Date(currentData.matchDate);
-            const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-            document.getElementById('lc-date').innerText = dateStr;
-        }
-        
-        const grid = document.getElementById('lc-grid');
-        grid.innerHTML = '';
-        const names = ['BLANCO', 'NEGRO', 'ROJO'];
-        const classes = ['lc-white', 'lc-black', 'lc-red'];
-        
-        teams.forEach((team, i) => {
-            let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
-            team.forEach(p => {
-                const cleanName = p.name.replace(/<[^>]*>/g, ''); 
-                html += `<div class="lc-player">${cleanName}</div>`;
-            });
-            html += `</div>`;
-            grid.innerHTML += html;
-        });
-
-        const element = document.querySelector(".lineup-card");
-        html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
-            canvas.toBlob(blob => {
-                const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'Alineación AMPA',
-                        text: 'Aquí tenéis los equipos confirmados.'
-                    }).catch(err => console.log("Compartir cancelado o error", err));
-                } else {
-                    const link = document.createElement('a');
-                    link.download = file.name;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    window.showToast("Imagen descargada", "success");
-                }
-            }, 'image/png');
-        }).catch(err => {
-            console.error(err);
-            window.showToast("Error al generar imagen", "error");
-        });
-    };
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
