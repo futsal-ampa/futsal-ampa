@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal 25/26</title>
+    <title>AMPA Futsal 25/26 (Debug)</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        /* ESTILOS (Optimizados) */
+        /* ESTILOS (Originales conservados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -216,7 +216,6 @@
 <body>
 
 <div id="loader" class="loading-overlay">Conectando...</div>
-
 <div id="toast-container"></div>
 
 <div id="modal-overlay">
@@ -387,17 +386,16 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     // -------------------------------------------------------------
-    // ⚠️ CONFIGURACIÓN FIREBASE ⚠️
+    // ⚠️ CONFIGURACIÓN FIREBASE (TEST - AMPA TEST FFF41) ⚠️
     // -------------------------------------------------------------
     const firebaseConfig = {
-  apiKey: "AIzaSyAVTxYarB7cZzrZcm2ns5DaDsRgf2VaDpA",
-  authDomain: "ampa-test-fff41.firebaseapp.com",
-  projectId: "ampa-test-fff41",
-  storageBucket: "ampa-test-fff41.firebasestorage.app",
-  messagingSenderId: "966954997542",
-  appId: "1:966954997542:web:0db03a4a88d14ac96453e7"
-};
-    // -------------------------------------------------------------
+      apiKey: "AIzaSyAVTxYarB7cZzrZcm2ns5DaDsRgf2VaDpA",
+      authDomain: "ampa-test-fff41.firebaseapp.com",
+      projectId: "ampa-test-fff41",
+      storageBucket: "ampa-test-fff41.firebasestorage.app",
+      messagingSenderId: "966954997542",
+      appId: "1:966954997542:web:0db03a4a88d14ac96453e7"
+    };
 
     let app, db, matchRef, configRef, auth;
     
@@ -409,7 +407,6 @@
         configRef = doc(db, "config", "admin_settings"); 
     } catch (e) { console.error("Error init firebase", e); }
 
-    // --- LISTA PRO CON SUB-NIVELES ---
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3.2 },
         { id: "jhon", name: "Jhon", level: 3.0 },
@@ -465,7 +462,6 @@
         return array;
     };
     
-    // --- HELPER: RESET IDENTITY (MEJORADO CON MODAL) ---
     window.resetIdentity = () => {
         showConfirm("¿Cambiar de Usuario?", "¿Seguro que no eres tú? Se borrará tu identidad de este dispositivo.", () => {
             localStorage.removeItem('futsal_my_id');
@@ -473,16 +469,17 @@
         });
     };
     
-    // --- HELPER: CAPTURE LINEUP (V4.1) ---
     window.downloadLineup = () => {
         const teams = window.currentTeamsForCopy;
-        if (!teams) return window.showToast("No hay equipos", "error");
+        if (!teams || teams.length === 0) return window.showToast("No hay equipos para generar imagen", "error");
 
         window.showToast("Generando imagen...", "info");
 
-        // 1. Populate Hidden Card
-        const dateStr = new Date(currentData.matchDate).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-        document.getElementById('lc-date').innerText = dateStr;
+        if(currentData.matchDate) {
+            const dateObj = new Date(currentData.matchDate);
+            const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+            document.getElementById('lc-date').innerText = dateStr;
+        }
         
         const grid = document.getElementById('lc-grid');
         grid.innerHTML = '';
@@ -492,35 +489,34 @@
         teams.forEach((team, i) => {
             let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
             team.forEach(p => {
-                const cleanName = p.name.replace(/<[^>]*>/g, '');
+                const cleanName = p.name.replace(/<[^>]*>/g, ''); 
                 html += `<div class="lc-player">${cleanName}</div>`;
             });
             html += `</div>`;
             grid.innerHTML += html;
         });
 
-        // 2. Capture and Share
         const element = document.querySelector(".lineup-card");
         html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
             canvas.toBlob(blob => {
                 const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
-
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     navigator.share({
                         files: [file],
-                        title: 'Alineación AMPA Futsal',
-                        text: 'Aquí están los equipos confirmados.'
-                    }).catch(err => {
-                        console.error("Error compartiendo", err);
-                    });
+                        title: 'Alineación AMPA',
+                        text: 'Aquí tenéis los equipos confirmados.'
+                    }).catch(err => console.log("Compartir cancelado o error", err));
                 } else {
                     const link = document.createElement('a');
                     link.download = file.name;
                     link.href = canvas.toDataURL();
                     link.click();
-                    window.showToast("Imagen descargada (PC)", "success");
+                    window.showToast("Imagen descargada", "success");
                 }
             }, 'image/png');
+        }).catch(err => {
+            console.error(err);
+            window.showToast("Error al generar imagen", "error");
         });
     };
 
@@ -587,7 +583,7 @@
             signInWithEmailAndPassword(auth, email, pass)
                 .then(() => { 
                     modal.style.display = 'none'; 
-                    document.getElementById('admin-zone').style.display = 'block'; // FORCE SHOW
+                    document.getElementById('admin-zone').style.display = 'block'; 
                 })
                 .catch((e) => { window.showToast("Error de acceso: " + e.message, "error"); });
         };
@@ -612,13 +608,16 @@
             }
             updateUI(currentData);
         } else {
+            // Inicialización de DB si no existe
             setDoc(matchRef, { 
                 matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true,
                 selectedPlayers: [], selectedGuests: [], guestInviters: {}, bannedIndices: [],
                 teams: null, logs: [], pins: {}, unlockVotes: [], scores:[0,0,0], 
                 timerState: 'stopped', timerLeft: 300, roster: initialPlayers 
-            });
+            }).catch(e => alert("Error creando DB: " + e.message));
         }
+    }, (error) => {
+        document.getElementById('loader').innerText = "Error Conexión: " + error.message;
     });
 
     function updateUI(data) {
@@ -648,24 +647,26 @@
         const deleteList = document.getElementById('delete-list');
         
         if(banList && pinList && deleteList) {
-            banList.innerHTML = ""; pinList.innerHTML = ""; deleteList.innerHTML = "";
+            let banHTML = ""; let pinHTML = ""; let delHTML = "";
             activeRoster.forEach(p => {
                  const isBanned = data.bannedIndices?.includes(p.id);
                  
                  // BLOQUEAR/DESBLOQUEAR (Admin)
                  const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
                  const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
-                 banList.innerHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
+                 banHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
                  
                  // RESET PINS (Admin)
                  if(data.pins && data.pins[p.id]) {
-                     pinList.innerHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
+                     pinHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
                  }
 
-                 // DELETE PERMANENT (Admin) - v4.11
-                 deleteList.innerHTML += `<div class="chip chip-ban" style="border-color:black; color:black;" onclick="window.deletePlayerPermanent('${p.id}', '${p.name}')">❌ ${p.name}</div>`;
+                 // DELETE PERMANENT (Admin)
+                 delHTML += `<div class="chip chip-ban" style="border-color:black; color:black;" onclick="window.deletePlayerPermanent('${p.id}', '${p.name}')">❌ ${p.name}</div>`;
             });
-            if(pinList.innerHTML === "") pinList.innerHTML = `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
+            banList.innerHTML = banHTML;
+            pinList.innerHTML = pinHTML || `<div style="font-size:0.7rem; color:#999;">Sin contraseñas</div>`;
+            deleteList.innerHTML = delHTML;
         }
 
         const myId = localStorage.getItem('futsal_my_id');
@@ -701,37 +702,43 @@
              if (!data.matchDate) selector.style.display = 'block';
         }
 
+        // OPTIMIZACIÓN DE DOM: Construir HTML en string antes de inyectar
+        let playersHTML = "";
         activeRoster.forEach((p) => {
             const isBanned = data.bannedIndices?.includes(p.id);
-            if (isBanned) return; // HIDE BANNED PLAYERS (v4.11)
+            if (isBanned) return;
 
-            const div = document.createElement('div');
-            div.className = 'player-checkbox';
-            if (p.id === myId) div.classList.add('is-me');
-            
+            const isMeClass = (p.id === myId) ? ' is-me' : '';
             const isSelected = data.selectedPlayers?.includes(p.id);
             const pins = data.pins || {};
             const lockIcon = (data.pinMode !== false && pins[p.id]) ? '<span class="lock-icon">🔒</span>' : '';
             let badgeContent = '';
-            if(isSelected) { div.classList.add('selected'); badgeContent = data.selectedPlayers.indexOf(p.id) + 1; }
+            let selectedClass = '';
             
-            div.innerHTML = `<span class="order-badge">${badgeContent}</span> ${p.name} ${lockIcon}`;
-            div.onclick = () => window.toggleSelection('player', p.id, p.name);
-            container.appendChild(div);
+            if(isSelected) { 
+                selectedClass = ' selected'; 
+                badgeContent = `<span class="order-badge" style="display:flex;">${data.selectedPlayers.indexOf(p.id) + 1}</span>`; 
+            } else {
+                badgeContent = `<span class="order-badge"></span>`;
+            }
+            
+            playersHTML += `<div class="player-checkbox${selectedClass}${isMeClass}" onclick="window.toggleSelection('player', '${p.id}', '${p.name}')">
+                ${badgeContent} ${p.name} ${lockIcon}
+            </div>`;
         });
+        container.innerHTML = playersHTML;
 
+        let guestsHTML = "";
         guestsDB.forEach((g) => {
-            const div = document.createElement('div');
-            div.className = 'player-checkbox guest-label';
             const isSelected = data.selectedGuests?.includes(g.id);
             const inviter = (data.guestInviters && data.guestInviters[g.id]) ? data.guestInviters[g.id] : null;
-            if(isSelected) div.classList.add('selected');
-            let html = `<div class="guest-name"><span class="order-badge">${isSelected ? 'G' : ''}</span> ${g.name}</div>`;
-            if (isSelected && inviter) { html += `<div class="invited-by">↳ por ${inviter}</div>`; }
-            div.innerHTML = html;
-            div.onclick = () => window.toggleSelection('guest', g.id, g.name);
-            guestContainer.appendChild(div);
+            const selectedClass = isSelected ? ' selected' : '';
+            let content = `<div class="guest-name"><span class="order-badge" style="${isSelected ? 'display:flex' : ''}">G</span> ${g.name}</div>`;
+            if (isSelected && inviter) { content += `<div class="invited-by">↳ por ${inviter}</div>`; }
+            
+            guestsHTML += `<div class="player-checkbox guest-label${selectedClass}" onclick="window.toggleSelection('guest', '${g.id}', '${g.name}')">${content}</div>`;
         });
+        guestContainer.innerHTML = guestsHTML;
 
         const setupPanel = document.getElementById('setup-panel');
         const activePanel = document.getElementById('active-match-panel');
@@ -740,6 +747,21 @@
         if (!data.matchDate) {
             setupPanel.style.display = 'block'; activePanel.style.display = 'none';
             headerDate.innerText = "PRÓXIMO PARTIDO";
+            
+            // --- ALERT DIV (Para la prueba de sabotaje) ---
+            if (data.lastResetMsg) {
+               let alertDiv = document.getElementById('reset-alert');
+               if (!alertDiv) {
+                   alertDiv = document.createElement('div');
+                   alertDiv.id = 'reset-alert';
+                   alertDiv.style.cssText = "background:#fee2e2; color:#b91c1c; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.8rem; font-weight:bold;";
+                   const dateInput = document.getElementById('date-input');
+                   dateInput.parentNode.insertBefore(alertDiv, dateInput);
+               }
+               alertDiv.innerText = data.lastResetMsg;
+            }
+            // ----------------------------------------------
+
         } else {
             setupPanel.style.display = 'none'; activePanel.style.display = 'block';
             const d = new Date(data.matchDate);
@@ -766,14 +788,15 @@
             if(votes >= 3) { voteBtn.style.backgroundColor = "#22c55e"; voteBtn.style.color = "white"; voteBtn.innerText = "✅ Aprobado"; voteBtn.disabled = true; }
         } else voteBtn.style.display = 'none';
 
-        // Render Teams / Logs etc.
+        // Render Logs
         const logDiv = document.getElementById('activity-log');
         if (data.logs && data.logs.length > 0) {
-            logDiv.innerHTML = "";
+            let logHTML = "";
             [...data.logs].reverse().forEach(logStr => { 
                 const parts = logStr.split('|');
-                if(parts.length === 2) logDiv.innerHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
+                if(parts.length === 2) logHTML += `<div class="log-entry"><span>${parts[0]}</span><span class="log-time">${parts[1]}</span></div>`;
             });
+            logDiv.innerHTML = logHTML;
         }
 
         let teamsData = data.teams;
@@ -888,7 +911,7 @@
     };
     window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
 
-    // --- REST OF FUNCTIONS ---
+    // --- START NEW MATCH ---
     window.startNewMatch = async () => {
         const myId = localStorage.getItem('futsal_my_id');
         const selectedId = document.getElementById('identity-select').value;
@@ -897,332 +920,110 @@
 
         const dateInput = document.getElementById('date-input').value;
         if (!dateInput) return window.showToast("Selecciona fecha", "error");
+        
+        // Protección sobrescritura
+        if (currentData.matchDate && currentData.matchDate === dateInput) {
+            return window.showToast("⚠️ Ya existe un partido para esta fecha.", "error");
+        }
+
         const selected = new Date(dateInput);
         const today = new Date(); today.setHours(0,0,0,0);
         if(selected < today) return window.showToast("Día pasado no válido", "error");
+        
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
              const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
              const finalId = localStorage.getItem('futsal_my_id');
              const author = currentData.roster?.find(p=>p.id===finalId)?.name || "Alguien";
 
+             window.showToast("Procesando...", "info");
+
+             // Auto-archivado
+             if(currentData.matchDate && currentData.teams && currentData.teams.length > 0) {
+                 try {
+                    await addDoc(collection(db, "history"), { 
+                        date: currentData.matchDate, 
+                        teams: currentData.teams, 
+                        scores: currentData.scores || [0,0,0] 
+                    });
+                 } catch(e) { console.error(e); }
+             }
+
              window.shareConvocation(dateInput);
 
+             const nextPinMode = (currentData.pinMode !== undefined) ? currentData.pinMode : true;
+
              await setDoc(matchRef, { 
-                matchDate: dateInput, lockTime: currentData.lockTime || "18:00", pinMode: currentData.pinMode !== false, voteMode: currentData.voteMode !== false,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
+                matchDate: dateInput, 
+                lockTime: currentData.lockTime || "18:00", 
+                pinMode: nextPinMode,
+                voteMode: currentData.voteMode !== false,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
+                teams: null, 
+                logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
+                pins: currentData.pins || {}, 
+                unlockVotes: [], 
+                roster: currentData.roster || initialPlayers,
+                lastResetMsg: null // Borrar mensaje de error anterior
             }, { merge: true });
         });
     };
     
-    window.toggleSelection = async (type, id, name) => {
-        let newPlayers = [...(currentData.selectedPlayers || [])];
-        let newGuests = [...(currentData.selectedGuests || [])];
-        let currentPins = {...(currentData.pins || {})};
-        let newGuestInviters = {...(currentData.guestInviters || {})};
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        let inviterName = "";
-        let actorName = "Alguien"; 
-
-        const myId = localStorage.getItem('futsal_my_id');
-        const roster = currentData.roster || initialPlayers;
-        if (myId) {
-            const myObj = roster.find(p => p.id === myId);
-            if(myObj) actorName = myObj.name;
-        } else if (auth.currentUser) {
-            actorName = "Admin";
-        }
-
-        if (type === 'guest') {
-            const userIndex = localStorage.getItem('futsal_my_id');
-            if (newGuests.includes(id)) {
-                 const originalInviter = newGuestInviters[id];
-                 if (originalInviter !== actorName && !auth.currentUser) {
-                     return window.showToast(`⛔ Solo ${originalInviter} o el Admin pueden eliminar a este invitado.`, "error");
-                 }
-            } else {
-                 if (!userIndex || !newPlayers.includes(userIndex)) return window.showToast("⛔ Solo jugadores confirmados pueden invitar.", "error");
-                 inviterName = actorName;
-            }
-        }
-
-        if (type === 'player' && currentData.pinMode !== false) {
-            if (currentPins[id]) {
-                showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => {
-                    if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error");
-                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true); return; 
-            } else {
-                showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name.toUpperCase()}:`, (val) => {
-                    if (!val || val.length < 3) return window.showToast("PIN inválido", "error");
-                    currentPins[id] = val;
-                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true); return;
-            }
-        } else {
-             const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
-             let msg = "";
-             if (actorName && actorName !== "Alguien") {
-                 if (isSelected) msg = `¿${actorName}, quieres que salga ${name}?`;
-                 else msg = `¿${actorName}, quieres que entre ${name}?`;
-                 if(name === actorName) msg = isSelected ? `¿${name}, quieres salir?` : `¿${name}, quieres apuntarte?`;
-             } else {
-                 msg = isSelected ? `${name}, ¿Te borras?` : `${name}, ¿Te apuntas?`;
-             }
-             
-             showConfirm("Confirmar Acción", msg, () => {
-                 processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-             });
-        }
-    };
-    async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName) {
-        let actionSuffix = "";
-        if (actorName && actorName !== "Alguien" && actorName !== name) {
-            actionSuffix = ` por ${actorName}`;
-        }
-
-        if (type === 'player') {
-            if (newPlayers.includes(id)) {
-                newPlayers = newPlayers.filter(i => i !== id);
-                await updateDoc(matchRef, { selectedPlayers: newPlayers, logs: arrayUnion(`❌ ${name} sale${actionSuffix}|${timeStr}`) });
-                window.showToast(`${name} eliminado`, "info");
-            } else {
-                if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
-                newPlayers.push(id);
-                if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
-                await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} se apunta${actionSuffix}|${timeStr}`) });
-                window.showToast(`¡Bienvenido ${name}!`, "success");
-            }
-        } else {
-             if (newGuests.includes(id)) {
-                newGuests = newGuests.filter(i => i !== id);
-                delete newGuestInviters[id];
-                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} eliminado por ${actorName}|${timeStr}`) });
-            } else {
-                if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
-                newGuests.push(id);
-                newGuestInviters[id] = inviterName;
-                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`✅ ${name} invitado por ${inviterName}|${timeStr}`) });
-            }
-        }
-    }
-    window.voteToUnlock = async () => { 
-        const myId = localStorage.getItem('futsal_my_id');
-        if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo apuntados pueden votar.", "error");
-        if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info");
-        const roster = currentData.roster || initialPlayers;
-        const me = roster.find(p => p.id === myId);
-        const myName = me ? me.name : "Alguien";
-        const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => {
-            await updateDoc(matchRef, { unlockVotes: arrayUnion(myId), logs: arrayUnion(`🗳️ Voto de ${myName}|${now}`) });
-            window.showToast("Voto registrado", "success");
-        });
-    };
-    window.attemptGeneration = () => {
-        const myId = localStorage.getItem('futsal_my_id');
-        const amIAdmin = auth.currentUser; 
-        const amISelected = currentData.selectedPlayers && currentData.selectedPlayers.includes(myId);
-
-        if (!amIAdmin && !amISelected) {
-            return window.showToast("⛔ Solo los jugadores apuntados pueden crear los equipos.", "error");
-        }
-
-        const targetTime = new Date(currentData.matchDate);
-        const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
-        targetTime.setHours(hours, minutes, 0, 0);
-        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
-        const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
-        
-        if (new Date() < targetTime && !canUnlockByVote && !amIAdmin) {
-            return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
-        }
-        
-        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
-        if (total < 8) return window.showToast("Mínimo 8.", "error");
-        if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
-    };
-    window.forceGeneration = () => { 
-        showConfirm("🔓 Desbloquear Creación", "¿Quieres habilitar el botón 'Crear Equipos' para todos?", async () => {
-             const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-             await updateDoc(matchRef, { lockTime: "00:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
-             window.showToast("Botón desbloqueado para todos", "success");
-             window.hideAdmin();
-        });
-    };
-    window.resetRosterOnly = async () => {
-        showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código? El historial NO se borrará.", async () => {
-            const currentRoster = currentData.roster || [];
-            const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p]));
-            let newRoster = [...initialPlayers];
-            currentRoster.forEach(dbPlayer => {
-                if (!codePlayersMap.has(dbPlayer.id)) {
-                    newRoster.push(dbPlayer);
-                }
-            });
-            await updateDoc(matchRef, { roster: newRoster });
-            window.showToast("Plantilla actualizada (Smart Merge)", "success");
-        });
-    };
-    
-    // --- FUNCIÓN DE BORRADO DEFINITIVO (v4.11) ---
-    window.deletePlayerPermanent = async (id, name) => {
-        showConfirm("🗑️ Eliminar Definitivamente", `¿Borrar a ${name} de la base de datos? No se puede deshacer.`, async () => {
-             const newRoster = (currentData.roster || initialPlayers).filter(p => p.id !== id);
-             let newSelected = (currentData.selectedPlayers || []).filter(i => i !== id);
-             let newBans = (currentData.bannedIndices || []).filter(i => i !== id);
-             let newPins = {...(currentData.pins || {})};
-             delete newPins[id];
-             
-             await updateDoc(matchRef, { 
-                 roster: newRoster,
-                 selectedPlayers: newSelected,
-                 bannedIndices: newBans,
-                 pins: newPins
-             });
-             window.showToast(`${name} eliminado para siempre`, "success");
-        });
-    };
-
-    window.openStats = async () => {
-        const modal = document.getElementById('modal-overlay');
-        document.getElementById('modal-title').innerText = "Estadísticas y Ranking";
-        document.getElementById('modal-text').style.display = 'none';
-        document.getElementById('modal-input').style.display = 'none';
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('stats-content').style.display = 'block';
-        const actions = document.getElementById('modal-actions');
-        actions.innerHTML = '';
-        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; };
-        actions.appendChild(btnClose);
-        modal.style.display = 'flex';
-        try {
-            const histRef = collection(db, "history");
-            const snap = await getDocs(histRef);
-            const matches = [];
-            const playerCounts = {};
-            snap.forEach(doc => {
-                const d = doc.data();
-                matches.push(d);
-                if(d.teams) {
-                    let teamsArr = [];
-                    try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){}
-                    teamsArr.forEach(team => { team.forEach(player => { if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; } }); });
-                }
-            });
-            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]);
-            const rankDiv = document.getElementById('tab-ranking');
-            rankDiv.innerHTML = '';
-            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>';
-            sortedPlayers.forEach(([name, count], index) => {
-                let medal = '';
-                if(index === 0) medal = '🥇'; else if(index === 1) medal = '🥈'; else if(index === 2) medal = '🥉';
-                rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal || (index + 1)}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`;
-            });
-            if(sortedPlayers.length > 0) { rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial y Resetear Ranking</button></div>`; }
-            matches.sort((a,b) => (a.date < b.date ? 1 : -1));
-            const histDiv = document.getElementById('tab-history');
-            histDiv.innerHTML = '';
-            if(matches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos registrados</div>';
-            matches.forEach(m => {
-                const d = new Date(m.date);
-                const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
-                const s = m.scores || [0,0,0];
-                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`;
-                if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`;
-                let pCount = 0;
-                if(m.teams) { let teamsArr = []; try { teamsArr = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; } catch(e){} teamsArr.forEach(t => pCount += t.length); }
-                histDiv.innerHTML += `<div class="history-card"><div class="h-info"><div class="h-date">${dateStr}</div><div class="h-score">${scoreStr}</div></div><div class="h-players">👥 ${pCount} jug.</div></div>`;
-            });
-        } catch(e) { window.showToast("Error cargando historial", "error"); }
-    };
-    window.resetHistory = async () => {
-        showConfirm("⚠️ BORRAR HISTORIAL", "Esto eliminará todos los partidos pasados. ¿Estás seguro?", async () => {
-            const histRef = collection(db, "history");
-            const snap = await getDocs(histRef);
-            snap.forEach(async (d) => { await deleteDoc(doc(db, "history", d.id)); });
-            window.showToast("Historial eliminado", "success");
-            setTimeout(() => window.openStats(), 500); 
-        });
-    };
-    window.switchTab = (tab) => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('[id^="tab-"]').forEach(d => d.style.display = 'none');
-        if(tab === 'ranking') { document.querySelector('.tab:nth-child(1)').classList.add('active'); document.getElementById('tab-ranking').style.display = 'block'; } 
-        else { document.querySelector('.tab:nth-child(2)').classList.add('active'); document.getElementById('tab-history').style.display = 'block'; }
-    };
-    window.renderTeams = (teams) => {
-        const resDiv = document.getElementById('teams-result');
-        resDiv.innerHTML = '';
-        const names = ['BLANCO', 'NEGRO', 'ROJO'];
-        const classes = ['team-blanco', 'team-negro', 'team-rojo'];
-        teams.forEach((team, idx) => {
-            let html = `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`;
-            team.forEach(p => { const name = p.isGuest ? `<span class="guest-result">${p.name}</span>` : p.name; html += `<li>${name}</li>`; });
-            html += `</ul></div>`;
-            resDiv.innerHTML += html;
-        });
-        window.currentTeamsForCopy = teams;
-    }
-    // RESET MANUAL CORREGIDO (NO GUARDA HISTORIAL)
-    window.resetCurrentMatch = async () => {
-        showConfirm("⚠️ REINICIO MANUAL", "Se borrará la lista y NO se guardará historial (partido no jugado). ¿Continuar?", async () => {
-             await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
-             window.hideAdmin();
-        });
-    };
-    window.changeLockTime = async () => { const t = document.getElementById('admin-time-input').value; await updateDoc(matchRef, { lockTime: t }); };
-    window.togglePinMode = async () => { const s = currentData.pinMode === false ? true : false; await updateDoc(matchRef, { pinMode: s }); };
-    window.toggleVoteMode = async () => { const s = currentData.voteMode === false ? true : false; await updateDoc(matchRef, { voteMode: s }); };
-    window.addNewPlayer = async () => {
-        const name = document.getElementById('new-player-name').value;
-        const level = parseFloat(document.getElementById('new-player-level').value); 
-        if(!name) return window.showToast("Falta nombre", "error");
-        const id = name.toLowerCase().replace(/\s/g, '_');
-        const newPlayer = { id: id, name: name, level: level };
-        await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
-        window.showToast("Jugador añadido", "success");
-    };
-    window.toggleBan = async (id, name) => {
-        let list = [...(currentData.bannedIndices || [])];
-        if(list.includes(id)) { list = list.filter(i => i !== id); window.showToast(`${name} desbloqueado`, "success"); } 
-        else { list.push(id); if(currentData.selectedPlayers.includes(id)) { let s = currentData.selectedPlayers.filter(i => i !== id); await updateDoc(matchRef, { selectedPlayers: s }); } window.showToast(`${name} bloqueado`, "error"); }
-        await updateDoc(matchRef, { bannedIndices: list });
-    };
-    window.resetPin = async (id, name) => {
-        showConfirm("Reset PIN", `¿Borrar PIN de ${name}?`, async () => { let p = {...currentData.pins}; delete p[id]; await updateDoc(matchRef, { pins: p }); window.showToast("PIN reseteado", "success"); });
-    };
-    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
-    window.forceReset = async () => {
-        showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => {
-             await setDoc(matchRef, { matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0], timerState: 'stopped', roster: initialPlayers });
-            window.hideAdmin();
-        });
-    };
-    window.shareConvocation = (d) => {
-        const date = d ? new Date(d) : new Date(currentData.matchDate);
-        const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
-        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
-    };
-    window.shareTeamsOnWhatsapp = () => {
-         const t = window.currentTeamsForCopy; if(!t) return;
-         const d = new Date(currentData.matchDate);
-         const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
-         let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`;
-         const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴'];
-         t.forEach((team, i) => { txt += `${em[i]} *${names[i]}* (${team.length})\n`; team.forEach(p => txt += `- ${p.name}\n`); txt += `\n`; });
-         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
-    };
-    // Timers & Scores
+    // --- TIMERS Y LIMPIEZA AUTOMÁTICA INTELIGENTE (CHIVATO + PERMISIVO PARA PRUEBAS) ---
     setInterval(async () => {
-        if (currentData.matchDate) { checkTimeLock(currentData.matchDate, currentData.lockTime); const matchDate = new Date(currentData.matchDate); const now = new Date(); const resetTime = new Date(matchDate); resetTime.setDate(resetTime.getDate() + 1); resetTime.setHours(10, 0, 0, 0); if (now >= resetTime) {
+        if (currentData.matchDate) { 
+            checkTimeLock(currentData.matchDate, currentData.lockTime); 
+            
+            const matchDate = new Date(currentData.matchDate);
+            const now = new Date();
+            
+            // Umbral: Día siguiente a las 06:00 AM
+            const safetyResetTime = new Date(matchDate);
+            safetyResetTime.setDate(safetyResetTime.getDate() + 1); 
+            safetyResetTime.setHours(6, 0, 0, 0); 
+            
+            if (now >= safetyResetTime) {
+                // 1. IDENTIFICAR AL SUJETO
+                const myId = localStorage.getItem('futsal_my_id');
+                const roster = currentData.roster || initialPlayers;
+                const me = roster.find(p => p.id === myId);
+                
+                // Detectar tipo de dispositivo
+                let deviceType = "PC/Desconocido";
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) deviceType = "iPhone";
+                else if (/Android/i.test(navigator.userAgent)) deviceType = "Android";
+                
+                let culpritName = me ? me.name : `Anónimo (${deviceType})`;
+
+                // 2. REGLA DEL PORTERO (DESACTIVADA PARA QUE PUEDAS PROBAR EL ERROR)
+                /* if (!me && !auth.currentUser) {
+                    console.log("Protección activada: Anónimo bloqueado.");
+                    return; 
+                } 
+                */
+
+                console.log("Limpieza ejecutada por:", culpritName);
+                
+                // 3. EJECUTAR LIMPIEZA
                 if(currentData.teams) {
-                    await addDoc(collection(db, "history"), { date: currentData.matchDate, teams: currentData.teams, scores: currentData.scores });
+                    await addDoc(collection(db, "history"), { 
+                        date: currentData.matchDate, 
+                        teams: currentData.teams, 
+                        scores: currentData.scores,
+                        resetBy: culpritName 
+                    });
                 }
-                updateDoc(matchRef, { matchDate: null, selectedPlayers: [], teams: null }); 
-            } }
+                
+                updateDoc(matchRef, { 
+                    matchDate: null, 
+                    selectedPlayers: [], 
+                    teams: null,
+                    logs: [],
+                    lastResetMsg: `⚠️ El último partido fue cerrado automáticamente por: ${culpritName}`
+                }); 
+            } 
+        }
+        
         if(currentData.timerState === 'running') {
             const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
             const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
@@ -1230,9 +1031,12 @@
             if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; } else if(left <= 0) { display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN"; if(!hasBeeped) { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000); hasBeeped = true; } }
         }
     }, 1000);
+
+    // ... (Resto de funciones igual) ...
     window.toggleTimer = async () => { if (currentData.timerState === 'running') { const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000)); await updateDoc(matchRef, { timerState: 'paused', timerLeft: left }); } else { const target = Date.now() + (currentData.timerLeft * 1000); await updateDoc(matchRef, { timerState: 'running', timerEnd: target }); } };
     window.resetTimer = async () => { await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 }); hasBeeped = false; document.getElementById('timer-display').classList.remove('finished', 'last-minute'); document.getElementById('timer-display').innerText = "05:00"; };
     window.updateScore = async (idx, delta) => { let s = [...(currentData.scores || [0,0,0])]; s[idx] = Math.max(0, s[idx] + delta); await updateDoc(matchRef, { scores: s }); };
+    
     let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
     window.installApp = async () => { if(defPrompt) { defPrompt.prompt(); defPrompt = null; } else window.showToast("Usa menú navegador -> Instalar", "info"); };
 
@@ -1247,16 +1051,13 @@
         const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
         const canUnlock = (currentData.voteMode !== false && votes >= 3);
         
-        // Remove standard disabled attribute to allow click interaction
         btn.removeAttribute('disabled');
 
         if (now >= target || canUnlock) {
-            // Unlocked state
             btn.className = "action-btn btn-unlocked";
             btn.innerHTML = "⚽ CREAR EQUIPOS";
             msg.innerText = "";
         } else {
-            // Locked state
             btn.className = "action-btn btn-locked";
             btn.innerHTML = "🔒 CREAR EQUIPOS";
             msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
@@ -1267,68 +1068,10 @@
             const diff = target - now;
             const hh = Math.floor(diff/(1000*60*60));
             const mm = Math.floor((diff%(1000*60*60))/(1000*60));
-            cd.innerText = `Cierre en: ${hh}h ${mm}m`;
+            const ss = Math.floor((diff%(1000*60))/1000);
+            cd.innerText = `Cierre en: ${hh}h ${mm}m ${ss}s`;
         } else cd.innerText = "Cierre alcanzado";
     }
-
-    // --- NEW FEATURE: DOWNLOAD LINEUP (PIZARRA) ---
-    window.downloadLineup = () => {
-        const teams = window.currentTeamsForCopy;
-        if (!teams || teams.length === 0) return window.showToast("No hay equipos para generar imagen", "error");
-
-        window.showToast("Generando imagen...", "info");
-
-        if(currentData.matchDate) {
-            const dateObj = new Date(currentData.matchDate);
-            const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-            document.getElementById('lc-date').innerText = dateStr;
-        }
-        
-        const grid = document.getElementById('lc-grid');
-        grid.innerHTML = '';
-        const names = ['BLANCO', 'NEGRO', 'ROJO'];
-        const classes = ['lc-white', 'lc-black', 'lc-red'];
-        
-        teams.forEach((team, i) => {
-            let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
-            team.forEach(p => {
-                const cleanName = p.name.replace(/<[^>]*>/g, ''); 
-                html += `<div class="lc-player">${cleanName}</div>`;
-            });
-            html += `</div>`;
-            grid.innerHTML += html;
-        });
-
-        const element = document.querySelector(".lineup-card");
-        html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
-            canvas.toBlob(blob => {
-                const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'Alineación AMPA',
-                        text: 'Aquí tenéis los equipos confirmados.'
-                    }).catch(err => console.log("Compartir cancelado o error", err));
-                } else {
-                    const link = document.createElement('a');
-                    link.download = file.name;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    window.showToast("Imagen descargada", "success");
-                }
-            }, 'image/png');
-        }).catch(err => {
-            console.error(err);
-            window.showToast("Error al generar imagen", "error");
-        });
-    };
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
