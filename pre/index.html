@@ -934,12 +934,26 @@ const firebaseConfig = {
              const author = currentData.roster?.find(p=>p.id===finalId)?.name || "Alguien";
 
              window.shareConvocation(dateInput);
-
+// --- GUARDADO DE NUEVA CONVOCATORIA (LIMPIANDO ERRORES VIEJOS) ---
              await setDoc(matchRef, { 
-                matchDate: dateInput, lockTime: currentData.lockTime || "18:00", pinMode: currentData.pinMode !== false, voteMode: currentData.voteMode !== false,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers
+                matchDate: dateInput, 
+                lockTime: currentData.lockTime || "18:00", 
+                pinMode: nextPinMode,
+                voteMode: currentData.voteMode !== false,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
+                teams: null, 
+                logs: [`📅 Convocatoria abierta por ${author}|${now}`], 
+                pins: currentData.pins || {}, 
+                unlockVotes: [], 
+                roster: currentData.roster || initialPlayers,
+                
+                // ⚠️ ESTO ES LO QUE BORRA EL MENSAJE ROJO CLAVADO:
+                adminLog: null,      // Borra la alerta del panel Admin
+                lastResetMsg: null,  // Borra la alerta pública (si la hubiera)
+                adminAlertMsg: null  // (Por si acaso usaste este nombre en otra versión)
             }, { merge: true });
+
         });
     };
     
@@ -1535,6 +1549,7 @@ window.switchTab = (tab) => {
 </script>
 </body>
 </html>
+
 
 
 
