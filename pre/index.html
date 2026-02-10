@@ -233,15 +233,22 @@
         <input type="text" id="modal-input" class="modal-input">
         
         <div id="stats-content" style="display:none;">
-            <div class="tabs">
-                <div class="tab active" onclick="window.switchTab('ranking')">🏆 Ranking</div>
-                <div class="tab" onclick="window.switchTab('history')">📅 Partidos</div>
+            <div class="tabs" style="display:flex; gap:5px;">
+                <div class="tab active" onclick="window.switchTab('ranking')">🏆 Rank</div>
+                <div class="tab" onclick="window.switchTab('history')">⚽ Partidos</div>
+                <div class="tab" onclick="window.switchTab('logs')" style="color:#e11d48;">⚠️ Cierres</div>
             </div>
+            
             <div id="tab-ranking" style="display:block;">
-                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando...</div>
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:20px;">Cargando...</div>
             </div>
+            
             <div id="tab-history" style="display:none;">
-                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando...</div>
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:20px;">Cargando...</div>
+            </div>
+
+            <div id="tab-logs" style="display:none;">
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:20px;">Cargando registros...</div>
             </div>
         </div>
 
@@ -1139,39 +1146,116 @@ if (!data.matchDate) {
         });
     };
 
-    window.openStats = async () => {
-        const modal = document.getElementById('modal-overlay'); 
-        document.getElementById('modal-title').innerText = "Estadísticas y Ranking"; 
-        document.getElementById('modal-text').style.display = 'none'; 
-        document.getElementById('modal-input').style.display = 'none'; 
-        document.getElementById('login-form').style.display = 'none'; 
-        document.getElementById('stats-content').style.display = 'block'; 
+window.openStats = async () => {
+        // Abrir modal
+        const modal = document.getElementById('modal-overlay');
+        document.getElementById('modal-title').innerText = "Estadísticas y Registros";
+        document.getElementById('modal-text').style.display = 'none';
+        document.getElementById('modal-input').style.display = 'none';
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('stats-content').style.display = 'block';
         
-        const actions = document.getElementById('modal-actions'); 
-        actions.innerHTML = ''; 
-        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; }; 
-        actions.appendChild(btnClose); 
-        modal.style.display = 'flex'; 
-        
+        // Resetear botones del modal
+        const actions = document.getElementById('modal-actions');
+        actions.innerHTML = '';
+        const btnClose = document.createElement('button'); 
+        btnClose.className = 'modal-btn cancel'; 
+        btnClose.innerText = 'Cerrar'; 
+        btnClose.onclick = () => { modal.style.display = 'none'; };
+        actions.appendChild(btnClose);
+        modal.style.display = 'flex';
+
         try {
-            const histRef = collection(db, "history"); 
-            const snap = await getDocs(histRef); 
-            const matches = []; 
-            const playerCounts = {}; 
+            const histRef = collection(db, "history");
+            const snap = await getDocs(histRef);
             
-            snap.forEach(doc => { 
-                const d = doc.data(); 
-                matches.push(d); 
-                if(d.teams) { 
-                    let teamsArr = []; 
-                    try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){} 
-                    teamsArr.forEach(team => { 
-                        team.forEach(player => { 
-                            if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; } 
-                        }); 
-                    }); 
-                } 
+            const realMatches = []; // Partidos jugados
+            const autoResets = [];  // Cierres automáticos
+            const playerCounts = {};
+
+            snap.forEach(doc => {
+                const d = doc.data();
+                
+                // CRITERIO: Si tiene 'resetBy' O los equipos no son un array válido, es un AUTO-RESET
+                if (d.resetBy || typeof d.teams === 'string' || !Array.isArray(d.teams)) {
+                    autoResets.push(d);
+                } else {
+                    // Es un partido real, calculamos ranking
+                    realMatches.push(d);
+                    d.teams.forEach(team => {
+                        team.forEach(player => {
+                            if (!player.isGuest) {
+                                playerCounts[player.name] = (playerCounts[player.name] || 0) + 1;
+                            }
+                        });
+                    });
+                }
             });
+
+            // 1. RENDERIZAR RANKING (Solo con realMatches)
+            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]);
+            const rankDiv = document.getElementById('tab-ranking');
+            rankDiv.innerHTML = '';
+            
+            if (sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos jugados aún</div>';
+            
+            sortedPlayers.forEach(([name, count], index) => {
+                let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1;
+                rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`;
+            });
+            
+            if(sortedPlayers.length > 0) { 
+                rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial Completo</button></div>`; 
+            }
+
+            // 2. RENDERIZAR PARTIDOS (Solo realMatches)
+            realMatches.sort((a,b) => (a.date < b.date ? 1 : -1));
+            const histDiv = document.getElementById('tab-history');
+            histDiv.innerHTML = '';
+            
+            if (realMatches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">No hay partidos finalizados</div>';
+            
+            realMatches.forEach(m => {
+                const d = new Date(m.date);
+                const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
+                const s = m.scores || [0,0,0];
+                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]} - 🔴 ${s[2]}`;
+                let pCount = 0;
+                m.teams.forEach(t => pCount += t.length);
+                
+                histDiv.innerHTML += `<div class="history-card">
+                    <div class="h-info"><div class="h-date">${dateStr}</div><div class="h-score">${scoreStr}</div></div>
+                    <div class="h-players">✅ Jugado (${pCount} pers.)</div>
+                </div>`;
+            });
+
+            // 3. RENDERIZAR LOGS DE CIERRE (Nueva pestaña)
+            autoResets.sort((a,b) => (a.date < b.date ? 1 : -1));
+            const logsDiv = document.getElementById('tab-logs');
+            logsDiv.innerHTML = '';
+
+            if (autoResets.length === 0) logsDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">No hay cierres automáticos registrados</div>';
+
+            autoResets.forEach(m => {
+                const d = new Date(m.date);
+                const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+                const culprit = m.resetBy || "Desconocido";
+                
+                logsDiv.innerHTML += `<div class="history-card" style="border-left:4px solid #ef4444;">
+                    <div class="h-info">
+                        <div class="h-date" style="color:#ef4444;">📅 ${dateStr}</div>
+                        <div class="h-score" style="font-size:0.7rem; color:#333;">Cierre ejecutado por:</div>
+                        <div style="font-weight:800; font-size:0.9rem;">${culprit}</div>
+                    </div>
+                    <div class="h-players" style="background:#fee2e2; color:#b91c1c;">⚠️ AUTO</div>
+                </div>`;
+            });
+
+        } catch(e) {
+            console.error(e);
+            window.showToast("Error cargando estadísticas: " + e.message, "error");
+        }
+    };
             
             // RANKING
             const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]); 
@@ -1221,11 +1305,26 @@ if (!data.matchDate) {
         } catch(e) { window.showToast("Error stats", "error"); }
     };
     window.switchTab = (tab) => {
+        // 1. Quitar clase active de todas
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('[id^="tab-"]').forEach(d => d.style.display = 'none');
-        if(tab === 'ranking') { document.querySelector('.tab:nth-child(1)').classList.add('active'); document.getElementById('tab-ranking').style.display = 'block'; } 
-        else { document.querySelector('.tab:nth-child(2)').classList.add('active'); document.getElementById('tab-history').style.display = 'block'; }
+        // 2. Ocultar todos los contenidos
+        document.getElementById('tab-ranking').style.display = 'none';
+        document.getElementById('tab-history').style.display = 'none';
+        document.getElementById('tab-logs').style.display = 'none';
+        
+        // 3. Activar la seleccionada
+        if(tab === 'ranking') { 
+            document.querySelectorAll('.tab')[0].classList.add('active'); 
+            document.getElementById('tab-ranking').style.display = 'block'; 
+        } else if(tab === 'history') { 
+            document.querySelectorAll('.tab')[1].classList.add('active'); 
+            document.getElementById('tab-history').style.display = 'block'; 
+        } else { // Logs
+            document.querySelectorAll('.tab')[2].classList.add('active'); 
+            document.getElementById('tab-logs').style.display = 'block'; 
+        }
     };
+    
     window.renderTeams = (teams) => {
         const resDiv = document.getElementById('teams-result');
         resDiv.innerHTML = '';
@@ -1404,6 +1503,7 @@ if (!data.matchDate) {
 </script>
 </body>
 </html>
+
 
 
 
