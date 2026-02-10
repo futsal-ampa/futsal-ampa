@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal 25/26</title>
+    <title>AMPA Futsal26</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -1135,31 +1135,43 @@ const firebaseConfig = {
             histDiv.innerHTML = '';
             if(matches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos registrados</div>';
             // --- BLOQUE ACTUALIZADO PARA PASO 3 ---
-            matches.forEach(m => { 
+matches.forEach(m => { 
                 const d = new Date(m.date); 
                 const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
                 const s = m.scores || [0,0,0]; 
                 let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`; 
                 if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`; 
                 
+                // --- CORRECCIÓN MATEMÁTICA PARA EVITAR EL CRASH ---
                 let pCount = 0; 
                 if(m.teams) { 
-                    let t = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; 
-                    t.forEach(g => pCount += g.length); 
+                    let t = m.teams;
+                    // Si es texto (JSON o mensaje de error), intentamos leerlo
+                    if (typeof t === 'string') {
+                        try { 
+                            t = JSON.parse(t); // Intentamos convertir a lista
+                        } catch(e) { 
+                            t = []; // Si falla (porque pone "Sin equipos"), decimos que hay 0 jugadores
+                        } 
+                    }
+                    // Solo contamos si conseguimos una lista válida
+                    if (Array.isArray(t)) {
+                        t.forEach(g => pCount += g.length); 
+                    }
                 } 
+                // --------------------------------------------------
 
-                // 1. DETECTAR CULPABLE (NUEVO)
+                // DETECTAR CULPABLE
                 let resetInfo = "";
                 if (m.resetBy) {
                     resetInfo = `<div style="font-size:0.65rem; color:#ef4444; font-weight:bold; margin-top:4px;">⚠️ Auto-cierre por: ${m.resetBy}</div>`;
                 }
 
-                // 2. MOSTRARLO EN LA TARJETA (NUEVO: ${resetInfo})
                 histDiv.innerHTML += `<div class="history-card">
                     <div class="h-info">
                         <div class="h-date">${dateStr}</div>
                         <div class="h-score">${scoreStr}</div>
-                        ${resetInfo} 
+                        ${resetInfo}
                     </div>
                     <div class="h-players">👥 ${pCount} jug.</div>
                 </div>`; 
