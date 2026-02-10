@@ -1273,7 +1273,9 @@ if (!data.matchDate) {
     };
     
     // --- ⚠️ 2. TIMERS Y LIMPIEZA AUTOMÁTICA SEGURA ⚠️ ---
+// --- TIMERS Y LIMPIEZA AUTOMÁTICA (CON CHIVATO) ---
     setInterval(async () => {
+        // 1. Verificar bloqueo horario UI
         if (currentData.matchDate) { 
             checkTimeLock(currentData.matchDate, currentData.lockTime); 
             
@@ -1285,36 +1287,42 @@ if (!data.matchDate) {
             safetyResetTime.setDate(safetyResetTime.getDate() + 1); 
             safetyResetTime.setHours(6, 0, 0, 0); 
             
+            // Si ya pasó la hora límite...
             if (now >= safetyResetTime) {
-                // 1. IDENTIFICAR AL SUJETO
+                // A. IDENTIFICAR AL DISPOSITIVO
                 const myId = localStorage.getItem('futsal_my_id');
                 const roster = currentData.roster || initialPlayers;
                 const me = roster.find(p => p.id === myId);
                 
-                // Detectar tipo de dispositivo (Detective)
                 let deviceType = "PC/Desconocido";
                 if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) deviceType = "iPhone";
                 else if (/Android/i.test(navigator.userAgent)) deviceType = "Android";
                 
+                // Nombre del culpable
                 let culpritName = me ? me.name : `Anónimo (${deviceType})`;
 
-                // 2. REGLA DEL PORTERO: ¿Tiene permiso para borrar?
-                // Si es anónimo (no sé quién es), NO permito que su móvil borre la base de datos.
+                // B. REGLA DE SEGURIDAD (IMPORTANTE)
+                // Si es un "Anónimo", IMPEDIMOS que borre nada.
+                // Esto evita que un móvil nuevo con la hora mal rompa la app.
+                // (Para tu prueba de hoy, puedes comentar estas 3 líneas siguientes si quieres que rompa)
                 if (!me && !auth.currentUser) {
-                    console.log("⚠️ Intento de borrado automático bloqueado por anónimo.");
-                    return; // <--- SE DETIENE AQUÍ Y NO BORRA NADA
+                    console.log("⚠️ Intento de borrado automático bloqueado por usuario anónimo.");
+                    return; // <--- EL CÓDIGO SE PARA AQUÍ Y NO BORRA NADA
                 }
-                
-                // 3. EJECUTAR LIMPIEZA (Solo si es un usuario identificado)
+
                 console.log("Limpieza ejecutada por:", culpritName);
+                
+                // C. GUARDAR EN HISTORIAL ANTES DE BORRAR
                 if(currentData.teams) {
                     await addDoc(collection(db, "history"), { 
                         date: currentData.matchDate, 
                         teams: currentData.teams, 
                         scores: currentData.scores,
-                        resetBy: culpritName 
+                        resetBy: culpritName // Guardamos quién fue
                     });
                 }
+                
+                // D. BORRAR DATOS Y DEJAR AVISO
                 updateDoc(matchRef, { 
                     matchDate: null, 
                     selectedPlayers: [], 
@@ -1325,11 +1333,33 @@ if (!data.matchDate) {
             } 
         }
         
+        // 2. Cronómetro del partido (sin cambios)
         if(currentData.timerState === 'running') {
-            const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
-            const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
-            const m = Math.floor(left / 60).toString().padStart(2, '0'); const s = (left % 60).toString().padStart(2, '0'); display.innerText = `${m}:${s}`; btn.innerText = "⏸ PAUSA"; btn.classList.add('t-stop');
-            if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; } else if(left <= 0) { display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN"; if(!hasBeeped) { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000); hasBeeped = true; } }
+            const display = document.getElementById('timer-display'); 
+            const btn = document.getElementById('timer-start-btn'); 
+            const txt = document.getElementById('timer-status-text');
+            
+            if(display && btn && txt) { // Protección por si no existen elementos
+                const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
+                const m = Math.floor(left / 60).toString().padStart(2, '0'); 
+                const s = (left % 60).toString().padStart(2, '0'); 
+                display.innerText = `${m}:${s}`; 
+                btn.innerText = "⏸ PAUSA"; 
+                btn.classList.add('t-stop');
+                
+                if(left <= 60 && left > 0) { 
+                    display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; 
+                } else if(left <= 0) { 
+                    display.classList.remove('last-minute'); display.classList.add('finished'); 
+                    display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; 
+                    btn.innerText = "FIN"; 
+                    if(!hasBeeped) { 
+                        const ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+                        const osc = ctx.createOscillator(); osc.connect(ctx.destination); 
+                        osc.start(); setTimeout(()=>osc.stop(), 1000); hasBeeped = true; 
+                    } 
+                }
+            }
         }
     }, 1000);
 
@@ -1375,5 +1405,6 @@ if (!data.matchDate) {
 </script>
 </body>
 </html>
+
 
 
