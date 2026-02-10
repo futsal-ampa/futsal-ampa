@@ -745,28 +745,38 @@
         const activePanel = document.getElementById('active-match-panel');
         const headerDate = document.getElementById('header-date');
 
-        if (!data.matchDate) {
-            setupPanel.style.display = 'block'; activePanel.style.display = 'none';
+if (!data.matchDate) {
+            // Mostrar panel de creación
+            setupPanel.style.display = 'block'; 
+            activePanel.style.display = 'none';
             headerDate.innerText = "PRÓXIMO PARTIDO";
 
-            // ⚠️ 1. MENSAJE DE ALERTA DE CULPABLE EN PANTALLA PRINCIPAL ⚠️
+            // --- NUEVO: MOSTRAR ALERTA DE CULPABLE ---
+            // Buscamos si ya existe la alerta para no duplicarla
+            let existingAlert = document.getElementById('reset-alert');
+            if (existingAlert) existingAlert.remove();
+
             if (data.lastResetMsg) {
-               let alertDiv = document.getElementById('reset-alert');
-               if (!alertDiv) {
-                   alertDiv = document.createElement('div');
-                   alertDiv.id = 'reset-alert';
-                   alertDiv.style.cssText = "background:#fee2e2; color:#b91c1c; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.8rem; font-weight:bold;";
-                   const dateInput = document.getElementById('date-input');
+               let alertDiv = document.createElement('div');
+               alertDiv.id = 'reset-alert';
+               alertDiv.style.cssText = "background:#fee2e2; color:#b91c1c; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.8rem; font-weight:bold; border: 1px solid #f87171;";
+               alertDiv.innerText = data.lastResetMsg;
+               
+               // Insertar justo antes del input de fecha
+               const dateInput = document.getElementById('date-input');
+               if(dateInput && dateInput.parentNode) {
                    dateInput.parentNode.insertBefore(alertDiv, dateInput);
                }
-               alertDiv.innerText = data.lastResetMsg;
             }
+            // -----------------------------------------
 
         } else {
-            setupPanel.style.display = 'none'; activePanel.style.display = 'block';
+            // (El resto del else déjalo como estaba en tu código original)
+            setupPanel.style.display = 'none'; 
+            activePanel.style.display = 'block';
             const d = new Date(data.matchDate);
             headerDate.innerText = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-            document.getElementById('res-date').innerText = headerDate.innerText;
+            if(document.getElementById('res-date')) document.getElementById('res-date').innerText = headerDate.innerText;
         }
 
         const total = (data.selectedPlayers?.length || 0) + (data.selectedGuests?.length || 0);
@@ -1365,4 +1375,5 @@
 </script>
 </body>
 </html>
+
 
