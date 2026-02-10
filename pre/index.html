@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal 25/26 PRO</title>
+    <title>AMPA Futsal 25/26 (Seguro)</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -66,7 +66,8 @@
         .status-count { font-size: 1.4rem; font-weight: 800; color: var(--brand-dark); }
         .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
-        
+        .countdown-text { font-size: 0.8rem; font-weight: bold; color: var(--reserve); text-align: right; margin-top: 5px; height: 16px; }
+
         /* BOTONES */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .action-btn:active { transform: scale(0.98); }
@@ -232,22 +233,15 @@
         <input type="text" id="modal-input" class="modal-input">
         
         <div id="stats-content" style="display:none;">
-            <div class="tabs" style="display:flex; gap:5px;">
-                <div class="tab active" onclick="window.switchTab('ranking')">🏆 Rank</div>
+            <div class="tabs">
+                <div class="tab active" onclick="window.switchTab('ranking')">🏆 Ranking</div>
                 <div class="tab" onclick="window.switchTab('history')">📅 Partidos</div>
-                <div class="tab" onclick="window.switchTab('logs')" style="color:#e11d48;">⚠️ Cierres</div>
             </div>
-            
             <div id="tab-ranking" style="display:block;">
-                <div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:20px;">Cargando...</div>
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando...</div>
             </div>
-            
             <div id="tab-history" style="display:none;">
-                <div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:20px;">Cargando...</div>
-            </div>
-
-            <div id="tab-logs" style="display:none;">
-                <div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:20px;">Cargando registros...</div>
+                <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">Cargando...</div>
             </div>
         </div>
 
@@ -305,9 +299,7 @@
         <h2 style="margin-top:0; color:var(--brand-dark)">⚽ Nuevo Partido</h2>
         <p style="color:#64748b; margin-bottom:20px;">Elige la fecha para abrir la convocatoria:</p>
         
-        <div id="reset-alert-container"></div> 
-
-        <select id="identity-select" style="display:none; width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; color: #334155; font-family: 'Montserrat', sans-serif;">
+        <div id="reset-alert-container"></div> <select id="identity-select" style="display:none; width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; color: #334155; font-family: 'Montserrat', sans-serif;">
             <option value="">¿Quién eres?</option>
         </select>
         
@@ -396,7 +388,7 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     // -------------------------------------------------------------
-    // ⚠️ CONFIGURACIÓN FIREBASE (TEST) ⚠️
+    // ⚠️ CONFIGURACIÓN FIREBASE (TEST - AMPA TEST FFF41) ⚠️
     // -------------------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyAVTxYarB7cZzrZcm2ns5DaDsRgf2VaDpA",
@@ -417,6 +409,7 @@
         configRef = doc(db, "config", "admin_settings"); 
     } catch (e) { console.error("Error init firebase", e); }
 
+    // --- LISTA PRO CON SUB-NIVELES ---
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3.2 },
         { id: "jhon", name: "Jhon", level: 3.0 },
@@ -472,6 +465,7 @@
         return array;
     };
     
+    // --- HELPER: RESET IDENTITY ---
     window.resetIdentity = () => {
         showConfirm("¿Cambiar de Usuario?", "¿Seguro que no eres tú? Se borrará tu identidad de este dispositivo.", () => {
             localStorage.removeItem('futsal_my_id');
@@ -479,6 +473,7 @@
         });
     };
     
+    // --- HELPER: CAPTURE LINEUP ---
     window.downloadLineup = () => {
         const teams = window.currentTeamsForCopy;
         if (!teams || teams.length === 0) return window.showToast("No hay equipos para generar imagen", "error");
@@ -513,20 +508,19 @@
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     navigator.share({
                         files: [file],
-                        title: 'Alineación AMPA',
-                        text: 'Aquí tenéis los equipos confirmados.'
-                    }).catch(err => console.log("Compartir cancelado o error", err));
+                        title: 'Alineación AMPA Futsal',
+                        text: 'Aquí están los equipos confirmados.'
+                    }).catch(err => {
+                        console.error("Error compartiendo", err);
+                    });
                 } else {
                     const link = document.createElement('a');
                     link.download = file.name;
                     link.href = canvas.toDataURL();
                     link.click();
-                    window.showToast("Imagen descargada", "success");
+                    window.showToast("Imagen descargada (PC)", "success");
                 }
             }, 'image/png');
-        }).catch(err => {
-            console.error(err);
-            window.showToast("Error al generar imagen", "error");
         });
     };
 
@@ -535,20 +529,6 @@
         if (user) {
             document.getElementById('admin-zone').style.display = 'block';
             window.showToast("Modo Admin Activo", "success");
-            
-            // --- MOSTRAR ALERTA SOLO AL ADMIN ---
-            if (currentData && currentData.adminAlertMsg) {
-                let alertDiv = document.getElementById('admin-alert-box');
-                if (!alertDiv) {
-                     alertDiv = document.createElement('div');
-                     alertDiv.id = 'admin-alert-box';
-                     alertDiv.style.cssText = "background:#fee2e2; color:#b91c1c; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.8rem; font-weight:bold; border: 1px solid #f87171; text-align:center;";
-                     const adminZone = document.getElementById('admin-zone');
-                     adminZone.insertBefore(alertDiv, adminZone.firstChild);
-                }
-                alertDiv.innerText = currentData.adminAlertMsg;
-            }
-
         } else {
             document.getElementById('admin-zone').style.display = 'none';
         }
@@ -607,7 +587,7 @@
             signInWithEmailAndPassword(auth, email, pass)
                 .then(() => { 
                     modal.style.display = 'none'; 
-                    document.getElementById('admin-zone').style.display = 'block'; 
+                    document.getElementById('admin-zone').style.display = 'block'; // FORCE SHOW
                 })
                 .catch((e) => { window.showToast("Error de acceso: " + e.message, "error"); });
         };
@@ -626,6 +606,7 @@
         document.getElementById('loader').style.display = 'none';
         if (docSnap.exists()) {
             currentData = docSnap.data();
+            // AUTO FIX ROSTER
             if (!currentData.roster || currentData.roster.length === 0 || !currentData.roster[0].id) {
                 updateDoc(matchRef, { roster: initialPlayers });
             }
@@ -643,6 +624,7 @@
     function updateUI(data) {
         const activeRoster = [...(data.roster || initialPlayers)].sort((a, b) => a.name.localeCompare(b.name));
         
+        // --- IDENTITY SELECTOR (v4.11): Ocultar si baneado ---
         const selector = document.getElementById('identity-select');
         if(selector.options.length <= 1) {
              activeRoster.forEach(p => {
@@ -669,13 +651,18 @@
             let banHTML = ""; let pinHTML = ""; let delHTML = "";
             activeRoster.forEach(p => {
                  const isBanned = data.bannedIndices?.includes(p.id);
+                 
+                 // BLOQUEAR/DESBLOQUEAR (Admin)
                  const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
                  const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
                  banHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
                  
+                 // RESET PINS (Admin)
                  if(data.pins && data.pins[p.id]) {
                      pinHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
                  }
+
+                 // DELETE PERMANENT (Admin) - v4.11
                  delHTML += `<div class="chip chip-ban" style="border-color:black; color:black;" onclick="window.deletePlayerPermanent('${p.id}', '${p.name}')">❌ ${p.name}</div>`;
             });
             banList.innerHTML = banHTML;
@@ -694,7 +681,7 @@
                 const greet = document.getElementById('user-greeting');
                 greet.innerHTML = `👋 Hola, ${me.name} <span class="reset-id-btn" onclick="window.resetIdentity()">¿NO ERES TÚ?</span>`;
                 greet.style.display = 'block';
-                selector.style.display = 'none'; 
+                selector.style.display = 'none'; // Hide if identified
 
                 if (data.matchDate && !data.teams) {
                     actionBar.style.display = 'flex';
@@ -716,6 +703,7 @@
              if (!data.matchDate) selector.style.display = 'block';
         }
 
+        // OPTIMIZACIÓN DE DOM: Construir HTML en string antes de inyectar
         let playersHTML = "";
         activeRoster.forEach((p) => {
             const isBanned = data.bannedIndices?.includes(p.id);
@@ -760,20 +748,18 @@
         if (!data.matchDate) {
             setupPanel.style.display = 'block'; activePanel.style.display = 'none';
             headerDate.innerText = "PRÓXIMO PARTIDO";
-            
-            // --- ALERT DIV (SOLO SE VE SI EL ADMIN LO HABILITA EN CODIGO O LOGICA) ---
+
+            // ⚠️ 1. MENSAJE DE ALERTA DE CULPABLE EN PANTALLA PRINCIPAL ⚠️
             if (data.lastResetMsg) {
                let alertDiv = document.getElementById('reset-alert');
                if (!alertDiv) {
                    alertDiv = document.createElement('div');
                    alertDiv.id = 'reset-alert';
-                   // Oculto por CSS por defecto, solo visible si decides activarlo
-                   // Pero como querias privacidad, este mensaje en la pantalla principal 
-                   // lo ve todo el mundo. Si quieres que SOLO lo vea el admin,
-                   // se maneja en onAuthStateChanged. Aquí lo dejo visible para test.
-                   alertDiv.style.cssText = "display:none;"; 
+                   alertDiv.style.cssText = "background:#fee2e2; color:#b91c1c; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.8rem; font-weight:bold;";
+                   const dateInput = document.getElementById('date-input');
+                   dateInput.parentNode.insertBefore(alertDiv, dateInput);
                }
-               // Nota: La alerta real para el admin está en onAuthStateChanged
+               alertDiv.innerText = data.lastResetMsg;
             }
 
         } else {
@@ -834,7 +820,7 @@
         }
     }
 
-    // --- ALGORITMO GREEDY BALANCE ---
+    // --- ALGORITMO GREEDY BALANCE (RESTAURADO) ---
     window.triggerGeneration = async (numTeams) => {
         try {
             document.getElementById('loader').style.display = 'flex';
@@ -925,7 +911,7 @@
     };
     window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
 
-    // --- START NEW MATCH (MODIFICADO: Borra alerta y guarda Log) ---
+    // --- REST OF FUNCTIONS ---
     window.startNewMatch = async () => {
         const myId = localStorage.getItem('futsal_my_id');
         const selectedId = document.getElementById('identity-select').value;
@@ -934,62 +920,349 @@
 
         const dateInput = document.getElementById('date-input').value;
         if (!dateInput) return window.showToast("Selecciona fecha", "error");
-        
-        if (currentData.matchDate && currentData.matchDate === dateInput) {
-            return window.showToast("⚠️ Ya existe un partido para esta fecha.", "error");
-        }
-
         const selected = new Date(dateInput);
         const today = new Date(); today.setHours(0,0,0,0);
         if(selected < today) return window.showToast("Día pasado no válido", "error");
-        
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
              const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
              const finalId = localStorage.getItem('futsal_my_id');
              const author = currentData.roster?.find(p=>p.id===finalId)?.name || "Alguien";
 
-             window.showToast("Procesando...", "info");
-
-             // 1. AUTO-ARCHIVADO (Si había partido abierto)
-             if(currentData.matchDate && currentData.teams && currentData.teams.length > 0) {
-                 try {
-                    await addDoc(collection(db, "history"), { 
-                        date: currentData.matchDate, 
-                        teams: currentData.teams, 
-                        scores: currentData.scores || [0,0,0] 
-                    });
-                 } catch(e) { console.error(e); }
-             }
-
              window.shareConvocation(dateInput);
 
-             const nextPinMode = (currentData.pinMode !== undefined) ? currentData.pinMode : true;
-
-             // 2. LOGS INICIALES + ALERTA CULPABLE (Si hubo)
-             let initialLogs = [`📅 Convocatoria abierta por ${author}|${now}`];
-             if (currentData.lastResetMsg) {
-                 initialLogs.push(`${currentData.lastResetMsg}|⚠️ AUTO-RESET`);
-             }
-
              await setDoc(matchRef, { 
-                matchDate: dateInput, 
-                lockTime: currentData.lockTime || "18:00", 
-                pinMode: nextPinMode,
-                voteMode: currentData.voteMode !== false,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
-                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, 
-                logs: initialLogs, 
-                pins: currentData.pins || {}, 
-                unlockVotes: [], 
-                roster: currentData.roster || initialPlayers,
-                adminAlertMsg: null, // Borramos alerta admin
-                lastResetMsg: null  // Borramos mensaje global
+                matchDate: dateInput, lockTime: currentData.lockTime || "18:00", pinMode: currentData.pinMode !== false, voteMode: currentData.voteMode !== false,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
+                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers,
+                lastResetMsg: null // BORRAR MENSAJE DE ERROR ANTIGUO AL ABRIR NUEVO
             }, { merge: true });
         });
     };
     
-    // --- TIMERS Y LIMPIEZA AUTOMÁTICA INTELIGENTE ---
+    window.toggleSelection = async (type, id, name) => {
+        let newPlayers = [...(currentData.selectedPlayers || [])];
+        let newGuests = [...(currentData.selectedGuests || [])];
+        let currentPins = {...(currentData.pins || {})};
+        let newGuestInviters = {...(currentData.guestInviters || {})};
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        let inviterName = "";
+        let actorName = "Alguien"; 
+
+        const myId = localStorage.getItem('futsal_my_id');
+        const roster = currentData.roster || initialPlayers;
+        if (myId) {
+            const myObj = roster.find(p => p.id === myId);
+            if(myObj) actorName = myObj.name;
+        } else if (auth.currentUser) {
+            actorName = "Admin";
+        }
+
+        if (type === 'guest') {
+            const userIndex = localStorage.getItem('futsal_my_id');
+            if (newGuests.includes(id)) {
+                 const originalInviter = newGuestInviters[id];
+                 if (originalInviter !== actorName && !auth.currentUser) {
+                     return window.showToast(`⛔ Solo ${originalInviter} o el Admin pueden eliminar a este invitado.`, "error");
+                 }
+            } else {
+                 if (!userIndex || !newPlayers.includes(userIndex)) return window.showToast("⛔ Solo jugadores confirmados pueden invitar.", "error");
+                 inviterName = actorName;
+            }
+        }
+
+        if (type === 'player' && currentData.pinMode !== false) {
+            if (currentPins[id]) {
+                showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => {
+                    if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error");
+                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
+                }, true); return; 
+            } else {
+                showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name.toUpperCase()}:`, (val) => {
+                    if (!val || val.length < 3) return window.showToast("PIN inválido", "error");
+                    currentPins[id] = val;
+                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
+                }, true); return;
+            }
+        } else {
+             const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
+             let msg = "";
+             if (actorName && actorName !== "Alguien") {
+                 if (isSelected) msg = `¿${actorName}, quieres que salga ${name}?`;
+                 else msg = `¿${actorName}, quieres que entre ${name}?`;
+                 if(name === actorName) msg = isSelected ? `¿${name}, quieres salir?` : `¿${name}, quieres apuntarte?`;
+             } else {
+                 msg = isSelected ? `${name}, ¿Te borras?` : `${name}, ¿Te apuntas?`;
+             }
+             
+             showConfirm("Confirmar Acción", msg, () => {
+                 processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
+             });
+        }
+    };
+    async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName) {
+        let actionSuffix = "";
+        if (actorName && actorName !== "Alguien" && actorName !== name) {
+            actionSuffix = ` por ${actorName}`;
+        }
+
+        if (type === 'player') {
+            if (newPlayers.includes(id)) {
+                newPlayers = newPlayers.filter(i => i !== id);
+                await updateDoc(matchRef, { selectedPlayers: newPlayers, logs: arrayUnion(`❌ ${name} sale${actionSuffix}|${timeStr}`) });
+                window.showToast(`${name} eliminado`, "info");
+            } else {
+                if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
+                newPlayers.push(id);
+                if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
+                await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} se apunta${actionSuffix}|${timeStr}`) });
+                window.showToast(`¡Bienvenido ${name}!`, "success");
+            }
+        } else {
+             if (newGuests.includes(id)) {
+                newGuests = newGuests.filter(i => i !== id);
+                delete newGuestInviters[id];
+                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} eliminado por ${actorName}|${timeStr}`) });
+            } else {
+                if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
+                newGuests.push(id);
+                newGuestInviters[id] = inviterName;
+                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`✅ ${name} invitado por ${inviterName}|${timeStr}`) });
+            }
+        }
+    }
+    window.voteToUnlock = async () => { 
+        const myId = localStorage.getItem('futsal_my_id');
+        if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo apuntados pueden votar.", "error");
+        if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info");
+        const roster = currentData.roster || initialPlayers;
+        const me = roster.find(p => p.id === myId);
+        const myName = me ? me.name : "Alguien";
+        const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => {
+            await updateDoc(matchRef, { unlockVotes: arrayUnion(myId), logs: arrayUnion(`🗳️ Voto de ${myName}|${now}`) });
+            window.showToast("Voto registrado", "success");
+        });
+    };
+    window.attemptGeneration = () => {
+        const myId = localStorage.getItem('futsal_my_id');
+        const amIAdmin = auth.currentUser; 
+        const amISelected = currentData.selectedPlayers && currentData.selectedPlayers.includes(myId);
+
+        if (!amIAdmin && !amISelected) {
+            return window.showToast("⛔ Solo los jugadores apuntados pueden crear los equipos.", "error");
+        }
+
+        const targetTime = new Date(currentData.matchDate);
+        const [hours, minutes] = (currentData.lockTime || "18:00").split(':');
+        targetTime.setHours(hours, minutes, 0, 0);
+        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
+        const canUnlockByVote = (currentData.voteMode !== false && votes >= 3);
+        
+        if (new Date() < targetTime && !canUnlockByVote && !amIAdmin) {
+            return window.showToast(`Espera a las ${currentData.lockTime} o votad 3 personas.`, "error");
+        }
+        
+        const total = (currentData.selectedPlayers?.length || 0) + (currentData.selectedGuests?.length || 0);
+        if (total < 8) return window.showToast("Mínimo 8.", "error");
+        if (total <= 12) window.triggerGeneration(2); else window.triggerGeneration(3);
+    };
+    window.forceGeneration = () => { 
+        showConfirm("🔓 Desbloquear Creación", "¿Quieres habilitar el botón 'Crear Equipos' para todos?", async () => {
+             const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+             await updateDoc(matchRef, { lockTime: "00:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) });
+             window.showToast("Botón desbloqueado para todos", "success");
+             window.hideAdmin();
+        });
+    };
+    window.resetRosterOnly = async () => {
+        showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código? El historial NO se borrará.", async () => {
+            const currentRoster = currentData.roster || [];
+            const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p]));
+            let newRoster = [...initialPlayers];
+            currentRoster.forEach(dbPlayer => {
+                if (!codePlayersMap.has(dbPlayer.id)) {
+                    newRoster.push(dbPlayer);
+                }
+            });
+            await updateDoc(matchRef, { roster: newRoster });
+            window.showToast("Plantilla actualizada (Smart Merge)", "success");
+        });
+    };
+    
+    // --- FUNCIÓN DE BORRADO DEFINITIVO (v4.11) ---
+    window.deletePlayerPermanent = async (id, name) => {
+        showConfirm("🗑️ Eliminar Definitivamente", `¿Borrar a ${name} de la base de datos? No se puede deshacer.`, async () => {
+             const newRoster = (currentData.roster || initialPlayers).filter(p => p.id !== id);
+             let newSelected = (currentData.selectedPlayers || []).filter(i => i !== id);
+             let newBans = (currentData.bannedIndices || []).filter(i => i !== id);
+             let newPins = {...(currentData.pins || {})};
+             delete newPins[id];
+             
+             await updateDoc(matchRef, { 
+                 roster: newRoster,
+                 selectedPlayers: newSelected,
+                 bannedIndices: newBans,
+                 pins: newPins
+             });
+             window.showToast(`${name} eliminado para siempre`, "success");
+        });
+    };
+
+    window.openStats = async () => {
+        const modal = document.getElementById('modal-overlay'); 
+        document.getElementById('modal-title').innerText = "Estadísticas y Ranking"; 
+        document.getElementById('modal-text').style.display = 'none'; 
+        document.getElementById('modal-input').style.display = 'none'; 
+        document.getElementById('login-form').style.display = 'none'; 
+        document.getElementById('stats-content').style.display = 'block'; 
+        
+        const actions = document.getElementById('modal-actions'); 
+        actions.innerHTML = ''; 
+        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; }; 
+        actions.appendChild(btnClose); 
+        modal.style.display = 'flex'; 
+        
+        try {
+            const histRef = collection(db, "history"); 
+            const snap = await getDocs(histRef); 
+            const matches = []; 
+            const playerCounts = {}; 
+            
+            snap.forEach(doc => { 
+                const d = doc.data(); 
+                matches.push(d); 
+                if(d.teams) { 
+                    let teamsArr = []; 
+                    try { teamsArr = typeof d.teams === 'string' ? JSON.parse(d.teams) : d.teams; } catch(e){} 
+                    teamsArr.forEach(team => { 
+                        team.forEach(player => { 
+                            if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; } 
+                        }); 
+                    }); 
+                } 
+            });
+            
+            // RANKING
+            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]); 
+            const rankDiv = document.getElementById('tab-ranking'); 
+            rankDiv.innerHTML = ''; 
+            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>'; 
+            sortedPlayers.forEach(([name, count], index) => { 
+                let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index+1; 
+                rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`; 
+            });
+            if(sortedPlayers.length > 0) { rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Todo</button></div>`; }
+            
+            // HISTORIAL (Aquí añadimos el chivato)
+            matches.sort((a,b) => (a.date < b.date ? 1 : -1)); 
+            const histDiv = document.getElementById('tab-history'); 
+            histDiv.innerHTML = ''; 
+            if(matches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos registrados</div>'; 
+            
+            matches.forEach(m => { 
+                const d = new Date(m.date); 
+                const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
+                const s = m.scores || [0,0,0]; 
+                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]}`; 
+                if(s.length > 2) scoreStr += ` - 🔴 ${s[2]}`; 
+                
+                let pCount = 0; 
+                if(m.teams) { 
+                    let t = typeof m.teams === 'string' ? JSON.parse(m.teams) : m.teams; 
+                    t.forEach(g => pCount += g.length); 
+                } 
+                
+                // ⚠️ 3. DETECTAR CULPABLE EN HISTORIAL ⚠️
+                let resetInfo = '';
+                if (m.resetBy) {
+                    resetInfo = `<div style="font-size:0.65rem; color:#ef4444; font-weight:bold; margin-top:4px;">⚠️ Auto-cierre por: ${m.resetBy}</div>`;
+                }
+
+                histDiv.innerHTML += `<div class="history-card">
+                    <div class="h-info">
+                        <div class="h-date">${dateStr}</div>
+                        <div class="h-score">${scoreStr}</div>
+                        ${resetInfo}
+                    </div>
+                    <div class="h-players">👥 ${pCount} jug.</div>
+                </div>`; 
+            }); 
+        } catch(e) { window.showToast("Error stats", "error"); }
+    };
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('[id^="tab-"]').forEach(d => d.style.display = 'none');
+        if(tab === 'ranking') { document.querySelector('.tab:nth-child(1)').classList.add('active'); document.getElementById('tab-ranking').style.display = 'block'; } 
+        else { document.querySelector('.tab:nth-child(2)').classList.add('active'); document.getElementById('tab-history').style.display = 'block'; }
+    };
+    window.renderTeams = (teams) => {
+        const resDiv = document.getElementById('teams-result');
+        resDiv.innerHTML = '';
+        const names = ['BLANCO', 'NEGRO', 'ROJO'];
+        const classes = ['team-blanco', 'team-negro', 'team-rojo'];
+        
+        let html = '';
+        teams.forEach((team, idx) => {
+            html += `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`;
+            team.forEach(p => { const name = p.isGuest ? `<span class="guest-result">${p.name}</span>` : p.name; html += `<li>${name}</li>`; });
+            html += `</ul></div>`;
+        });
+        resDiv.innerHTML = html;
+        window.currentTeamsForCopy = teams;
+    }
+    // RESET MANUAL CORREGIDO (NO GUARDA HISTORIAL)
+    window.resetCurrentMatch = async () => {
+        showConfirm("⚠️ REINICIO MANUAL", "Se borrará la lista y NO se guardará historial (partido no jugado). ¿Continuar?", async () => {
+             await updateDoc(matchRef, { matchDate: null, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], unlockVotes: [], scores: [0,0,0] });
+             window.hideAdmin();
+        });
+    };
+    window.changeLockTime = async () => { const t = document.getElementById('admin-time-input').value; await updateDoc(matchRef, { lockTime: t }); };
+    window.togglePinMode = async () => { const s = currentData.pinMode === false ? true : false; await updateDoc(matchRef, { pinMode: s }); };
+    window.toggleVoteMode = async () => { const s = currentData.voteMode === false ? true : false; await updateDoc(matchRef, { voteMode: s }); };
+    window.addNewPlayer = async () => {
+        const name = document.getElementById('new-player-name').value;
+        const level = parseFloat(document.getElementById('new-player-level').value); 
+        if(!name) return window.showToast("Falta nombre", "error");
+        const id = name.toLowerCase().replace(/\s/g, '_');
+        const newPlayer = { id: id, name: name, level: level };
+        await updateDoc(matchRef, { roster: arrayUnion(newPlayer) });
+        window.showToast("Jugador añadido", "success");
+    };
+    window.toggleBan = async (id, name) => {
+        let list = [...(currentData.bannedIndices || [])];
+        if(list.includes(id)) { list = list.filter(i => i !== id); window.showToast(`${name} desbloqueado`, "success"); } 
+        else { list.push(id); if(currentData.selectedPlayers.includes(id)) { let s = currentData.selectedPlayers.filter(i => i !== id); await updateDoc(matchRef, { selectedPlayers: s }); } window.showToast(`${name} bloqueado`, "error"); }
+        await updateDoc(matchRef, { bannedIndices: list });
+    };
+    window.resetPin = async (id, name) => {
+        showConfirm("Reset PIN", `¿Borrar PIN de ${name}?`, async () => { let p = {...currentData.pins}; delete p[id]; await updateDoc(matchRef, { pins: p }); window.showToast("PIN reseteado", "success"); });
+    };
+    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
+    window.forceReset = async () => {
+        showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => {
+             await setDoc(matchRef, { matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0], timerState: 'stopped', roster: initialPlayers });
+            window.hideAdmin();
+        });
+    };
+    window.shareConvocation = (d) => {
+        const date = d ? new Date(d) : new Date(currentData.matchDate);
+        const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+        const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    };
+    window.shareTeamsOnWhatsapp = () => {
+         const t = window.currentTeamsForCopy; if(!t) return;
+         const d = new Date(currentData.matchDate);
+         const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'});
+         let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`;
+         const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴'];
+         t.forEach((team, i) => { txt += `${em[i]} *${names[i]}* (${team.length})\n`; team.forEach(p => txt += `- ${p.name}\n`); txt += `\n`; });
+         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    };
+    
+    // --- ⚠️ 2. TIMERS Y LIMPIEZA AUTOMÁTICA SEGURA ⚠️ ---
     setInterval(async () => {
         if (currentData.matchDate) { 
             checkTimeLock(currentData.matchDate, currentData.lockTime); 
@@ -1003,41 +1276,41 @@
             safetyResetTime.setHours(6, 0, 0, 0); 
             
             if (now >= safetyResetTime) {
-                // 1. IDENTIFICAR
+                // 1. IDENTIFICAR AL SUJETO
                 const myId = localStorage.getItem('futsal_my_id');
                 const roster = currentData.roster || initialPlayers;
                 const me = roster.find(p => p.id === myId);
                 
+                // Detectar tipo de dispositivo (Detective)
                 let deviceType = "PC/Desconocido";
                 if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) deviceType = "iPhone";
                 else if (/Android/i.test(navigator.userAgent)) deviceType = "Android";
                 
                 let culpritName = me ? me.name : `Anónimo (${deviceType})`;
 
-                // 2. SEGURIDAD: SI ES ANÓNIMO, NO BORRA
+                // 2. REGLA DEL PORTERO: ¿Tiene permiso para borrar?
+                // Si es anónimo (no sé quién es), NO permito que su móvil borre la base de datos.
                 if (!me && !auth.currentUser) {
-                    console.log("⚠️ Auto-reset bloqueado: Usuario anónimo.");
-                    return; 
+                    console.log("⚠️ Intento de borrado automático bloqueado por anónimo.");
+                    return; // <--- SE DETIENE AQUÍ Y NO BORRA NADA
                 }
                 
-                // 3. GUARDAR EN HISTORIAL (Aunque no haya equipos)
+                // 3. EJECUTAR LIMPIEZA (Solo si es un usuario identificado)
                 console.log("Limpieza ejecutada por:", culpritName);
-                
-                await addDoc(collection(db, "history"), { 
-                    date: currentData.matchDate, 
-                    teams: currentData.teams || "Sin equipos (Convocatoria abierta)", 
-                    scores: currentData.scores || [0,0,0],
-                    resetBy: culpritName 
-                });
-                
-                // 4. BORRAR
+                if(currentData.teams) {
+                    await addDoc(collection(db, "history"), { 
+                        date: currentData.matchDate, 
+                        teams: currentData.teams, 
+                        scores: currentData.scores,
+                        resetBy: culpritName 
+                    });
+                }
                 updateDoc(matchRef, { 
                     matchDate: null, 
                     selectedPlayers: [], 
                     teams: null,
                     logs: [],
-                    adminAlertMsg: `⚠️ El último partido fue cerrado automáticamente por: ${culpritName}`,
-                    lastResetMsg: `⚠️ Cierre automático ejecutado por: ${culpritName}`
+                    lastResetMsg: `⚠️ El último partido fue cerrado automáticamente por: ${culpritName}`
                 }); 
             } 
         }
@@ -1050,7 +1323,6 @@
         }
     }, 1000);
 
-    // ... (Resto de funciones igual) ...
     window.toggleTimer = async () => { if (currentData.timerState === 'running') { const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000)); await updateDoc(matchRef, { timerState: 'paused', timerLeft: left }); } else { const target = Date.now() + (currentData.timerLeft * 1000); await updateDoc(matchRef, { timerState: 'running', timerEnd: target }); } };
     window.resetTimer = async () => { await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 }); hasBeeped = false; document.getElementById('timer-display').classList.remove('finished', 'last-minute'); document.getElementById('timer-display').innerText = "05:00"; };
     window.updateScore = async (idx, delta) => { let s = [...(currentData.scores || [0,0,0])]; s[idx] = Math.max(0, s[idx] + delta); await updateDoc(matchRef, { scores: s }); };
@@ -1090,131 +1362,7 @@
             cd.innerText = `Cierre en: ${hh}h ${mm}m ${ss}s`;
         } else cd.innerText = "Cierre alcanzado";
     }
-
-    // --- OTHER ACTIONS ---
-    window.toggleSelection = async (type, id, name) => {
-        let newPlayers = [...(currentData.selectedPlayers || [])]; let newGuests = [...(currentData.selectedGuests || [])];
-        let currentPins = {...(currentData.pins || {})}; let newGuestInviters = {...(currentData.guestInviters || {})};
-        const now = new Date(); const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        let inviterName = ""; let actorName = "Alguien"; 
-        const myId = localStorage.getItem('futsal_my_id'); const roster = currentData.roster || initialPlayers;
-        if (myId) { const myObj = roster.find(p => p.id === myId); if(myObj) actorName = myObj.name; } else if (auth.currentUser) { actorName = "Admin"; }
-        if (type === 'guest') {
-            const userIndex = localStorage.getItem('futsal_my_id');
-            if (newGuests.includes(id)) { const originalInviter = newGuestInviters[id]; if (originalInviter !== actorName && !auth.currentUser) return window.showToast(`⛔ Solo ${originalInviter} o el Admin pueden eliminar a este invitado.`, "error"); } 
-            else { if (!userIndex || !newPlayers.includes(userIndex)) return window.showToast("⛔ Solo jugadores confirmados pueden invitar.", "error"); inviterName = actorName; }
-        }
-        if (type === 'player' && currentData.pinMode !== false) {
-            if (currentPins[id]) { showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => { if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error"); processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName); }, true); return; } 
-            else { showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name.toUpperCase()}:`, (val) => { if (!val || val.length < 3) return window.showToast("PIN inválido", "error"); currentPins[id] = val; processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName); }, true); return; }
-        } else {
-             const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id)); let msg = "";
-             if (actorName && actorName !== "Alguien") { if (isSelected) msg = `¿${actorName}, quieres que salga ${name}?`; else msg = `¿${actorName}, quieres que entre ${name}?`; if(name === actorName) msg = isSelected ? `¿${name}, quieres salir?` : `¿${name}, quieres apuntarte?`; } else { msg = isSelected ? `${name}, ¿Te borras?` : `${name}, ¿Te apuntas?`; }
-             showConfirm("Confirmar Acción", msg, () => { processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName); });
-        }
-    };
-    async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName) {
-        let actionSuffix = ""; if (actorName && actorName !== "Alguien" && actorName !== name) { actionSuffix = ` por ${actorName}`; }
-        if (type === 'player') {
-            if (newPlayers.includes(id)) {
-                newPlayers = newPlayers.filter(i => i !== id);
-                await updateDoc(matchRef, { selectedPlayers: newPlayers, logs: arrayUnion(`❌ ${name} sale${actionSuffix}|${timeStr}`) });
-                window.showToast(`${name} eliminado`, "info");
-            } else {
-                if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
-                newPlayers.push(id); if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
-                await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} se apunta${actionSuffix}|${timeStr}`) });
-                window.showToast(`¡Bienvenido ${name}!`, "success");
-            }
-        } else {
-             if (newGuests.includes(id)) {
-                newGuests = newGuests.filter(i => i !== id); delete newGuestInviters[id];
-                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} eliminado por ${actorName}|${timeStr}`) });
-            } else {
-                if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
-                newGuests.push(id); newGuestInviters[id] = inviterName;
-                await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`✅ ${name} invitado por ${inviterName}|${timeStr}`) });
-            }
-        }
-    }
-    window.voteToUnlock = async () => { const myId = localStorage.getItem('futsal_my_id'); if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo apuntados pueden votar.", "error"); if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info"); const roster = currentData.roster || initialPlayers; const me = roster.find(p => p.id === myId); const myName = me ? me.name : "Alguien"; const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => { await updateDoc(matchRef, { unlockVotes: arrayUnion(myId), logs: arrayUnion(`🗳️ Voto de ${myName}|${now}`) }); window.showToast("Voto registrado", "success"); }); };
-    window.forceGeneration = () => { showConfirm("🔓 Desbloquear Creación", "¿Quieres habilitar el botón 'Crear Equipos' para todos?", async () => { const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); await updateDoc(matchRef, { lockTime: "00:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) }); window.showToast("Botón desbloqueado para todos", "success"); window.hideAdmin(); }); };
-    window.resetRosterOnly = async () => { showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código?", async () => { const currentRoster = currentData.roster || []; const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p])); let newRoster = [...initialPlayers]; currentRoster.forEach(dbPlayer => { if (!codePlayersMap.has(dbPlayer.id)) { newRoster.push(dbPlayer); } }); await updateDoc(matchRef, { roster: newRoster }); window.showToast("Plantilla actualizada", "success"); }); };
-    window.deletePlayerPermanent = async (id, name) => { showConfirm("🗑️ Eliminar Definitivamente", `¿Borrar a ${name}?`, async () => { const newRoster = (currentData.roster || initialPlayers).filter(p => p.id !== id); let newSelected = (currentData.selectedPlayers || []).filter(i => i !== id); let newBans = (currentData.bannedIndices || []).filter(i => i !== id); let newPins = {...(currentData.pins || {})}; delete newPins[id]; await updateDoc(matchRef, { roster: newRoster, selectedPlayers: newSelected, bannedIndices: newBans, pins: newPins }); window.showToast(`${name} eliminado para siempre`, "success"); }); };
-    
-    // --- ESTADÍSTICAS MEJORADAS (3 PESTAÑAS) ---
-    window.openStats = async () => {
-        const modal = document.getElementById('modal-overlay'); document.getElementById('modal-title').innerText = "Estadísticas y Registros"; document.getElementById('modal-text').style.display = 'none'; document.getElementById('modal-input').style.display = 'none'; document.getElementById('login-form').style.display = 'none'; document.getElementById('stats-content').style.display = 'block';
-        const actions = document.getElementById('modal-actions'); actions.innerHTML = ''; const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; }; actions.appendChild(btnClose); modal.style.display = 'flex';
-        try {
-            const histRef = collection(db, "history"); const snap = await getDocs(histRef); 
-            const realMatches = []; // Solo partidos reales
-            const autoResets = [];  // Solo cierres automáticos
-            const playerCounts = {};
-            
-            snap.forEach(doc => { 
-                const d = doc.data(); 
-                // CRITERIO: Si tiene 'resetBy' es un cierre automático
-                if(d.resetBy) {
-                    autoResets.push(d);
-                } else if(d.teams && Array.isArray(d.teams)) {
-                    realMatches.push(d); 
-                    d.teams.forEach(team => { team.forEach(player => { if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; } }); });
-                }
-            });
-
-            // 1. RANKING (Solo partidos reales)
-            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]); const rankDiv = document.getElementById('tab-ranking'); rankDiv.innerHTML = ''; 
-            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>';
-            sortedPlayers.forEach(([name, count], index) => { let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index+1; rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`; });
-            if(sortedPlayers.length > 0) { rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial</button></div>`; }
-            
-            // 2. PARTIDOS (Solo partidos reales)
-            realMatches.sort((a,b) => (a.date < b.date ? 1 : -1)); 
-            const histDiv = document.getElementById('tab-history'); 
-            histDiv.innerHTML = ''; 
-            if(realMatches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos jugados</div>'; 
-            realMatches.forEach(m => { 
-                const d = new Date(m.date); const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'}); const s = m.scores || [0,0,0]; let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]} - 🔴 ${s[2]}`; let pCount = 0; if(m.teams) m.teams.forEach(t => pCount += t.length); 
-                histDiv.innerHTML += `<div class="history-card"><div class="h-info"><div class="h-date">${dateStr}</div><div class="h-score">${scoreStr}</div></div><div class="h-players">👥 ${pCount} jug.</div></div>`; 
-            });
-
-            // 3. LOGS (NUEVO: Lista de Culpables)
-            autoResets.sort((a,b) => (a.date < b.date ? 1 : -1)); 
-            const logsDiv = document.getElementById('tab-logs'); 
-            logsDiv.innerHTML = '';
-            if(autoResets.length === 0) logsDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Sin cierres automáticos</div>';
-            autoResets.forEach(m => {
-                 const d = new Date(m.date); 
-                 const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
-                 logsDiv.innerHTML += `<div class="history-card" style="border-left:4px solid #ef4444;"><div class="h-info"><div class="h-date" style="color:#ef4444;">📅 ${dateStr}</div><div class="h-score" style="font-size:0.7rem;">Cierre por: <b>${m.resetBy}</b></div></div><div class="h-players" style="background:#fee2e2; color:#b91c1c;">⚠️ AUTO</div></div>`;
-            });
-        } catch(e) { window.showToast("Error stats", "error"); }
-    };
-    
-    // --- FUNCIÓN TABS ---
-    window.switchTab = (tab) => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('tab-ranking').style.display = 'none';
-        document.getElementById('tab-history').style.display = 'none';
-        document.getElementById('tab-logs').style.display = 'none';
-        if(tab === 'ranking') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-ranking').style.display = 'block'; } 
-        else if(tab === 'history') { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-history').style.display = 'block'; }
-        else { document.querySelectorAll('.tab')[2].classList.add('active'); document.getElementById('tab-logs').style.display = 'block'; }
-    };
-
-    window.resetHistory = async () => { showConfirm("⚠️ BORRAR HISTORIAL", "Esto eliminará todos los partidos pasados. ¿Estás seguro?", async () => { const histRef = collection(db, "history"); const snap = await getDocs(histRef); snap.forEach(async (d) => { await deleteDoc(doc(db, "history", d.id)); }); window.showToast("Historial eliminado", "success"); setTimeout(() => window.openStats(), 500); }); };
-    window.renderTeams = (teams) => { const resDiv = document.getElementById('teams-result'); resDiv.innerHTML = ''; const names = ['BLANCO', 'NEGRO', 'ROJO']; const classes = ['team-blanco', 'team-negro', 'team-rojo']; let html = ''; teams.forEach((team, idx) => { html += `<div class="team-card ${classes[idx]}"><div class="team-header">EQUIPO ${names[idx]}</div><ul class="team-list">`; team.forEach(p => { const name = p.isGuest ? `<span class="guest-result">${p.name}</span>` : p.name; html += `<li>${name}</li>`; }); html += `</ul></div>`; }); resDiv.innerHTML = html; window.currentTeamsForCopy = teams; }
-    window.changeLockTime = async () => { const t = document.getElementById('admin-time-input').value; await updateDoc(matchRef, { lockTime: t }); };
-    window.togglePinMode = async () => { const s = currentData.pinMode === false ? true : false; await updateDoc(matchRef, { pinMode: s }); };
-    window.toggleVoteMode = async () => { const s = currentData.voteMode === false ? true : false; await updateDoc(matchRef, { voteMode: s }); };
-    window.addNewPlayer = async () => { const name = document.getElementById('new-player-name').value; const level = parseFloat(document.getElementById('new-player-level').value); if(!name) return window.showToast("Falta nombre", "error"); const id = name.toLowerCase().replace(/\s/g, '_'); const newPlayer = { id: id, name: name, level: level }; await updateDoc(matchRef, { roster: arrayUnion(newPlayer) }); window.showToast("Jugador añadido", "success"); };
-    window.toggleBan = async (id, name) => { let list = [...(currentData.bannedIndices || [])]; if(list.includes(id)) { list = list.filter(i => i !== id); window.showToast(`${name} desbloqueado`, "success"); } else { list.push(id); if(currentData.selectedPlayers.includes(id)) { let s = currentData.selectedPlayers.filter(i => i !== id); await updateDoc(matchRef, { selectedPlayers: s }); } window.showToast(`${name} bloqueado`, "error"); } await updateDoc(matchRef, { bannedIndices: list }); };
-    window.resetPin = async (id, name) => { showConfirm("Reset PIN", `¿Borrar PIN de ${name}?`, async () => { let p = {...currentData.pins}; delete p[id]; await updateDoc(matchRef, { pins: p }); window.showToast("PIN reseteado", "success"); }); };
-    window.undoTeams = async () => { await updateDoc(matchRef, { teams: null }); window.hideAdmin(); };
-    window.forceReset = async () => { showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => { await setDoc(matchRef, { matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0], timerState: 'stopped', roster: initialPlayers }); window.hideAdmin(); }); };
-    window.shareConvocation = (d) => { const date = d ? new Date(d) : new Date(currentData.matchDate); const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'}); const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`; window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank'); };
-    window.shareTeamsOnWhatsapp = () => { const t = window.currentTeamsForCopy; if(!t) return; const d = new Date(currentData.matchDate); const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'}); let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`; const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴']; t.forEach((team, i) => { txt += `${em[i]} *${names[i]}* (${team.length})\n`; team.forEach(p => txt += `- ${p.name}\n`); txt += `\n`; }); window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank'); };
 </script>
 </body>
 </html>
+
