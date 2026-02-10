@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal 6</title>
+    <title>AMPA Futsal 88</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -1488,38 +1488,54 @@ window.switchTab = (tab) => {
             window.showToast("Error al generar imagen", "error");
         });
     };
-// --- FUNCIÓN PARA BORRAR SOLO LOS LOGS DE ERROR ---
+// --- FUNCIÓN DE BORRADO DE LOGS CORREGIDA ---
     window.clearAutoResets = async () => {
-        showConfirm("Limpiar Registros", "¿Borrar solo la lista de cierres automáticos? (No afecta a partidos jugados)", async () => {
-            const histRef = collection(db, "history");
-            const snap = await getDocs(histRef);
-            let count = 0;
-            
-            const deletePromises = [];
-            
-            snap.forEach((docSnap) => {
-                const d = docSnap.data();
-                // Borramos si tiene marca de culpable O si no tiene equipos válidos
-                let isAuto = false;
-                if (d.resetBy) isAuto = true;
-                if (typeof d.teams === 'string') isAuto = true;
-                if (!d.teams) isAuto = true;
-                if (Array.isArray(d.teams) && d.teams.length === 0) isAuto = true;
+        showConfirm("Limpiar Registros", "¿Borrar todos los avisos de cierre automático? (Los partidos jugados se mantienen)", async () => {
+            try {
+                const histRef = collection(db, "history");
+                const snap = await getDocs(histRef);
+                let count = 0;
+                const deletePromises = [];
+                
+                snap.forEach((docSnap) => {
+                    const d = docSnap.data();
+                    
+                    // CRITERIO DE BORRADO (Igual que el de visualización)
+                    let isAuto = false;
+                    if (d.resetBy) isAuto = true; // Tiene firma de culpable
+                    if (typeof d.teams === 'string') isAuto = true; // Error antiguo
+                    if (!d.teams || (Array.isArray(d.teams) && d.teams.length === 0)) isAuto = true; // Sin equipos
 
-                if (isAuto) {
-                    deletePromises.push(deleteDoc(doc(db, "history", docSnap.id)));
-                    count++;
+                    if (isAuto) {
+                        // Importante: Usamos docSnap.ref para borrar la referencia exacta
+                        deletePromises.push(deleteDoc(docSnap.ref));
+                        count++;
+                    }
+                });
+                
+                if(count === 0) {
+                    window.showToast("No hay registros para borrar", "info");
+                    return;
                 }
-            });
-            
-            await Promise.all(deletePromises);
-            window.showToast(`${count} registros eliminados`, "success");
-            setTimeout(() => window.openStats(), 500); // Recargar la tabla
+
+                await Promise.all(deletePromises);
+                window.showToast(`${count} registros eliminados`, "success");
+                
+                // Recargamos la tabla para que se vea limpio al instante
+                setTimeout(() => window.openStats(), 500);
+                // Forzamos click en la pestaña logs para volver a ella
+                setTimeout(() => window.switchTab('logs'), 600);
+
+            } catch(e) {
+                console.error(e);
+                window.showToast("Error al borrar: " + e.message, "error");
+            }
         });
     };
 </script>
 </body>
 </html>
+
 
 
 
