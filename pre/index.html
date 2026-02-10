@@ -831,77 +831,96 @@
         }
     }
 
-    // --- ALGORITMO GREEDY BALANCE (RESTAURADO) ---
+// --- ALGORITMO GREEDY BALANCE (CORREGIDO Y BLINDADO) ---
     window.triggerGeneration = async (numTeams) => {
         try {
-            document.getElementById('loader').style.display = 'flex';
-            const roster = currentData.roster || initialPlayers;
+            document.getElementById('loader').style.display = 'flex'; // Mostrar "Cargando..."
             
-            // 1. Obtener jugadores seleccionados y asignarles su nivel decimal + JITTER
+            // 1. Obtener datos y asegurar que existen
+            const roster = currentData.roster || initialPlayers;
             const pool = [];
+
+            // 2. Procesar JUGADORES (Con corrección de números)
             (currentData.selectedPlayers || []).forEach(id => {
                 const p = roster.find(x => x.id === id);
                 if(p) {
+                    // FORZAMOS QUE EL NIVEL SEA UN NÚMERO
+                    const numericLevel = parseFloat(p.level) || 1.0; 
                     const jitter = (Math.random() * 0.5) - 0.25; 
                     pool.push({ 
                         ...p, 
+                        level: numericLevel, // Guardamos el nivel limpio
                         isGuest: false,
-                        sortLevel: p.level + jitter 
+                        sortLevel: numericLevel + jitter 
                     });
                 }
             });
+
+            // 3. Procesar INVITADOS (Con corrección de números)
             (currentData.selectedGuests || []).forEach(id => {
                 const g = guestsDB.find(x => x.id === id);
                 if(g) { 
+                    const numericLevel = parseFloat(g.level) || 1.5; // Nivel base invitados
                     const jitter = (Math.random() * 0.5) - 0.25;
-                    const baseLevel = g.level || 1.5;
                     pool.push({ 
                         ...g, 
-                        level: baseLevel, 
+                        level: numericLevel, 
                         isGuest: true,
-                        sortLevel: baseLevel + jitter 
+                        sortLevel: numericLevel + jitter 
                     });
                 }
             });
 
-            // 2. Ordenar por nivel con JITTER
+            // Verificar si hay gente suficiente (por si acaso)
+            if (pool.length < numTeams) {
+                throw new Error("No hay suficientes jugadores seleccionados.");
+            }
+
+            // 4. Ordenar por nivel (de mayor a menor)
             pool.sort((a, b) => b.sortLevel - a.sortLevel);
 
-            // 3. Crear equipos vacios
+            // 5. Crear equipos vacíos
             let teams = Array.from({ length: numTeams }, () => ({ players: [], totalScore: 0 }));
 
-            // 4. Reparto Greedy
+            // 6. Reparto tipo serpiente (Greedy)
             pool.forEach(player => {
+                // Ordenamos los equipos: primero el que tenga menos jugadores, luego el que tenga menos puntuación
                 teams.sort((a, b) => {
                     if (a.players.length !== b.players.length) return a.players.length - b.players.length; 
                     return a.totalScore - b.totalScore; 
                 });
                 
+                // Asignamos al jugador
                 teams[0].players.push(player);
                 teams[0].totalScore += player.level;
             });
 
-            // 5. Extraer y Barajar
+            // 7. Extraer solo los jugadores y barajar el orden visual dentro del equipo
             const finalTeams = teams.map(t => t.players);
             finalTeams.forEach(team => window.shuffle(team));
 
+            // 8. Preparar datos para guardar
             const teamsString = JSON.stringify(finalTeams);
             const myId = localStorage.getItem('futsal_my_id');
             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
             const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
+            // 9. ENVIAR A FIREBASE
             await updateDoc(matchRef, { 
                 teams: teamsString,
                 logs: arrayUnion(`⚽ Equipos equilibrados creados por ${author}|${now}`)
             });
+            
+            // Éxito: Ocultar loader
             document.getElementById('loader').style.display = 'none';
+
         } catch (e) {
-            console.error(e);
+            console.error("ERROR CREANDO EQUIPOS:", e);
             document.getElementById('loader').style.display = 'none';
-            window.showToast("Error generando equipos: " + e.message, "error");
+            // Usamos ALERT para que lo veas sí o sí en el móvil
+            alert("Error al crear equipos: " + e.message); 
         }
     };
-
     // --- AUTH LOGIN TRIGGER ---
     let taps = 0;
     let tapTimer = null;
@@ -1316,3 +1335,4 @@
 </script>
 </body>
 </html>
+
