@@ -1101,10 +1101,9 @@ const firebaseConfig = {
         });
     };
 
-// --- ESTADÍSTICAS MEJORADAS (CON LIMPIEZA DE LOGS) ---
-    window.openStats = async () => {
+window.openStats = async () => {
         const modal = document.getElementById('modal-overlay'); 
-        document.getElementById('modal-title').innerText = "Panel de Datos"; 
+        document.getElementById('modal-title').innerText = "Estadísticas y Registros"; 
         document.getElementById('modal-text').style.display = 'none'; 
         document.getElementById('modal-input').style.display = 'none'; 
         document.getElementById('login-form').style.display = 'none'; 
@@ -1124,99 +1123,127 @@ const firebaseConfig = {
             const snap = await getDocs(histRef); 
             
             const realMatches = []; 
-            const autoResets = []; 
+            const autoResets = [];  
             const playerCounts = {}; 
             
             snap.forEach(doc => { 
                 const d = doc.data(); 
-                // Añadimos el ID del documento para poder borrarlo luego
-                d.docId = doc.id;
+                
+                // CRITERIO DE FILTRADO MEJORADO
+                // Si tiene 'resetBy' O los equipos no son una lista válida -> Es un LOG DE CIERRE
+                // También si no tiene jugadores (para limpiar la pestaña de Partidos)
+                let isAuto = false;
+                if (d.resetBy) isAuto = true;
+                if (typeof d.teams === 'string') isAuto = true;
+                if (Array.isArray(d.teams) && d.teams.length === 0) isAuto = true; // Array vacio
+                if (!d.teams) isAuto = true;
 
-                if (d.resetBy) {
+                if (isAuto) {
                     autoResets.push(d);
                 } else {
-                    // Es un partido real si tiene equipos válidos
-                    if(d.teams && Array.isArray(d.teams)) {
-                        realMatches.push(d); 
-                        d.teams.forEach(team => { 
-                            team.forEach(player => { 
-                                if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; } 
-                            }); 
-                        });
-                    }
+                    // Es un partido real JUGADO
+                    realMatches.push(d); 
+                    d.teams.forEach(team => { 
+                        team.forEach(player => { 
+                            if(!player.isGuest) { playerCounts[player.name] = (playerCounts[player.name] || 0) + 1; } 
+                        }); 
+                    }); 
                 }
             });
-
-            // 1. RANKING
+            
+            // --- 1. PESTAÑA RANKING ---
             const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]); 
             const rankDiv = document.getElementById('tab-ranking'); 
             rankDiv.innerHTML = ''; 
-            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos</div>'; 
+            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos jugados aún</div>'; 
+            
             sortedPlayers.forEach(([name, count], index) => { 
                 let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index+1; 
                 rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`; 
             });
-            // Botón borrar TODO (peligroso)
+            // Botón con margen para no solapar
             if(sortedPlayers.length > 0) { 
-                rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial COMPLETO</button></div>`; 
+                rankDiv.innerHTML += `<div class="stats-footer" style="margin-bottom:20px;"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial JUGADO</button></div>`; 
             }
             
-            // 2. PARTIDOS
-            realMatches.sort((a,b) => (a.date < b.date ? 1 : -1)); 
+            // --- 2. PESTAÑA PARTIDOS (Solo reales) ---
+            // Ordenar: Más reciente primero
+            realMatches.sort((a,b) => new Date(b.date) - new Date(a.date)); 
             const histDiv = document.getElementById('tab-history'); 
             histDiv.innerHTML = ''; 
-            if(realMatches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Vacío</div>'; 
+            
+            if(realMatches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">No hay partidos finalizados</div>'; 
+            
             realMatches.forEach(m => { 
                 const d = new Date(m.date); 
                 const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
                 const s = m.scores || [0,0,0]; 
-                let pCount = 0; if(m.teams) m.teams.forEach(t => pCount += t.length); 
-                histDiv.innerHTML += `<div class="history-card"><div class="h-info"><div class="h-date">${dateStr}</div><div class="h-score">⚪${s[0]} ⚫${s[1]} 🔴${s[2]}</div></div><div class="h-players">✅ ${pCount} jug.</div></div>`; 
-            });
-
-            // 3. LOGS (MEJORADO)
-            // Ordenar por fecha de creación real (si existe) o fecha de dispositivo
-            autoResets.sort((a,b) => {
-                const timeA = a.realTimestamp || a.deviceTime || a.date;
-                const timeB = b.realTimestamp || b.deviceTime || b.date;
-                return timeA < timeB ? 1 : -1; // Más recientes primero
-            });
-
-            const logsDiv = document.getElementById('tab-logs'); 
-            logsDiv.innerHTML = '';
-            
-            if(autoResets.length === 0) logsDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Limpio ✨</div>';
-
-            autoResets.forEach(m => {
-                 // Formatear la "Hora del delito"
-                 let timeInfo = "Hora desconocida";
-                 if (m.deviceTime) {
-                     const badDate = new Date(m.deviceTime);
-                     timeInfo = badDate.toLocaleString('es-ES', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
-                 }
-
-                 logsDiv.innerHTML += `<div class="history-card" style="border-left:4px solid #ef4444; background: #fff1f2; flex-direction:column; align-items:flex-start;">
-                    <div style="display:flex; justify-content:space-between; width:100%;">
-                        <div style="font-weight:800; color:#b91c1c;">${m.resetBy || 'Anónimo'}</div>
-                        <div style="font-size:0.7rem; background:#fee2e2; padding:2px 6px; border-radius:4px; color:#b91c1c;">AUTO</div>
+                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]} - 🔴 ${s[2]}`; 
+                let pCount = 0; 
+                if(m.teams && Array.isArray(m.teams)) m.teams.forEach(t => pCount += t.length); 
+                
+                histDiv.innerHTML += `<div class="history-card">
+                    <div class="h-info">
+                        <div class="h-date">${dateStr}</div>
+                        <div class="h-score">${scoreStr}</div>
                     </div>
-                    <div style="font-size:0.75rem; color:#666; margin-top:5px;">
-                        📅 Su fecha: <b>${timeInfo}</b>
-                    </div>
-                    <div style="font-size:0.65rem; color:#999; margin-top:2px;">
-                        Partido afectado: ${new Date(m.date).toLocaleDateString()}
-                    </div>
+                    <div class="h-players">✅ ${pCount} jug.</div>
                 </div>`; 
             });
+
+            // --- 3. PESTAÑA CIERRES (Logs del Chivato) ---
+            const logsDiv = document.getElementById('tab-logs'); 
+            logsDiv.innerHTML = '';
+
+            // ORDENAR: El más reciente ARRIBA
+            // Usamos 'realTimestamp' si existe (nuevo código), si no 'date' (viejo)
+            autoResets.sort((a,b) => {
+                const timeA = a.realTimestamp || new Date(a.date).getTime();
+                const timeB = b.realTimestamp || new Date(b.date).getTime();
+                return timeB - timeA; // Descendente (B - A)
+            });
             
-            // BOTÓN DE LIMPIEZA SOLO PARA LOGS
+            if(autoResets.length === 0) logsDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Historial limpio</div>';
+
+            autoResets.forEach(m => {
+                 // Formatear la fecha del dispositivo (la fecha "falsa" o futura)
+                 let deviceDateStr = "Fecha desconocida";
+                 let timeStr = "";
+                 
+                 if (m.deviceTime) {
+                     const badDate = new Date(m.deviceTime);
+                     deviceDateStr = badDate.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' });
+                     timeStr = badDate.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+                 } else {
+                     // Fallback para logs antiguos
+                     const d = new Date(m.date);
+                     deviceDateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' });
+                 }
+
+                 const culpable = m.resetBy || "Sistema/Antiguo";
+
+                 logsDiv.innerHTML += `<div class="history-card" style="border-left:4px solid #ef4444; background: #fff1f2; flex-direction:column; align-items:flex-start; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:5px;">
+                        <div style="font-weight:800; color:#b91c1c; font-size:0.9rem;">${culpable}</div>
+                        <div style="font-size:0.65rem; background:#fee2e2; padding:2px 6px; border-radius:4px; color:#b91c1c; height:fit-content;">AUTO</div>
+                    </div>
+                    <div style="font-size:0.75rem; color:#333;">
+                        📅 Su móvil decía: <b>${deviceDateStr}</b> ${timeStr ? 'a las ' + timeStr : ''}
+                    </div>
+                </div>`; 
+            }); 
+            
+            // BOTÓN DE LIMPIEZA (Con margen extra para que no se solape)
             if(autoResets.length > 0) {
-                logsDiv.innerHTML += `<div class="stats-footer" style="border-top:1px solid #fecaca;">
-                    <button class="reset-stats-btn" style="background:#ef4444; color:white; border:none;" onclick="window.clearAutoResets()">🗑️ Limpiar solo esta lista</button>
+                logsDiv.innerHTML += `<div class="stats-footer" style="margin-top:20px; padding-bottom:20px; border-top:1px solid #fecaca;">
+                    <button class="reset-stats-btn" style="background:#ef4444; color:white; border:none; width:100%; padding:15px;" onclick="window.clearAutoResets()">🗑️ BORRAR LOGS DE CIERRE</button>
                 </div>`;
             }
 
-        } catch(e) { window.showToast("Error stats", "error"); }
+        } catch(e) { 
+            console.error(e);
+            window.showToast("Error stats", "error"); 
+        }
     };
     
     window.resetHistory = async () => {
@@ -1479,13 +1506,18 @@ window.switchTab = (tab) => {
             const snap = await getDocs(histRef);
             let count = 0;
             
-            // Usamos Promise.all para borrar más rápido
             const deletePromises = [];
             
             snap.forEach((docSnap) => {
                 const d = docSnap.data();
-                // Borramos solo si tiene la marca de 'resetBy'
-                if (d.resetBy) {
+                // Borramos si tiene marca de culpable O si no tiene equipos válidos
+                let isAuto = false;
+                if (d.resetBy) isAuto = true;
+                if (typeof d.teams === 'string') isAuto = true;
+                if (!d.teams) isAuto = true;
+                if (Array.isArray(d.teams) && d.teams.length === 0) isAuto = true;
+
+                if (isAuto) {
                     deletePromises.push(deleteDoc(doc(db, "history", docSnap.id)));
                     count++;
                 }
@@ -1496,10 +1528,10 @@ window.switchTab = (tab) => {
             setTimeout(() => window.openStats(), 500); // Recargar la tabla
         });
     };
-    
 </script>
 </body>
 </html>
+
 
 
 
