@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AMPA Futsal 25/26 (TEST)</title>
+    <title>AMPA Futsal 25/26 PRO</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        /* ESTILOS (Optimizados - Originales conservados) */
+        /* ESTILOS (Optimizados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -66,8 +66,7 @@
         .status-count { font-size: 1.4rem; font-weight: 800; color: var(--brand-dark); }
         .progress-track { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
-        .countdown-text { font-size: 0.8rem; font-weight: bold; color: var(--reserve); text-align: right; margin-top: 5px; height: 16px; }
-
+        
         /* BOTONES */
         .action-btn { width: 100%; background-color: var(--brand-dark); color: white; border: none; padding: 20px; font-size: 1.2rem; border-radius: 12px; margin-top: 30px; margin-bottom: 5px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .action-btn:active { transform: scale(0.98); }
@@ -235,7 +234,7 @@
         <div id="stats-content" style="display:none;">
             <div class="tabs" style="display:flex; gap:5px;">
                 <div class="tab active" onclick="window.switchTab('ranking')">🏆 Rank</div>
-                <div class="tab" onclick="window.switchTab('history')">⚽ Partidos</div>
+                <div class="tab" onclick="window.switchTab('history')">📅 Partidos</div>
                 <div class="tab" onclick="window.switchTab('logs')" style="color:#e11d48;">⚠️ Cierres</div>
             </div>
             
@@ -306,6 +305,8 @@
         <h2 style="margin-top:0; color:var(--brand-dark)">⚽ Nuevo Partido</h2>
         <p style="color:#64748b; margin-bottom:20px;">Elige la fecha para abrir la convocatoria:</p>
         
+        <div id="reset-alert-container"></div> 
+
         <select id="identity-select" style="display:none; width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; color: #334155; font-family: 'Montserrat', sans-serif;">
             <option value="">¿Quién eres?</option>
         </select>
@@ -395,7 +396,7 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     // -------------------------------------------------------------
-    // ⚠️ CONFIGURACIÓN FIREBASE ⚠️
+    // ⚠️ CONFIGURACIÓN FIREBASE (TEST) ⚠️
     // -------------------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyAVTxYarB7cZzrZcm2ns5DaDsRgf2VaDpA",
@@ -405,7 +406,6 @@
       messagingSenderId: "966954997542",
       appId: "1:966954997542:web:0db03a4a88d14ac96453e7"
     };
-    // -------------------------------------------------------------
 
     let app, db, matchRef, configRef, auth;
     
@@ -417,7 +417,6 @@
         configRef = doc(db, "config", "admin_settings"); 
     } catch (e) { console.error("Error init firebase", e); }
 
-    // --- LISTA PRO CON SUB-NIVELES ---
     const initialPlayers = [
         { id: "willi", name: "Willi", level: 3.2 },
         { id: "jhon", name: "Jhon", level: 3.0 },
@@ -473,7 +472,6 @@
         return array;
     };
     
-    // --- HELPER: RESET IDENTITY (MEJORADO CON MODAL) ---
     window.resetIdentity = () => {
         showConfirm("¿Cambiar de Usuario?", "¿Seguro que no eres tú? Se borrará tu identidad de este dispositivo.", () => {
             localStorage.removeItem('futsal_my_id');
@@ -481,16 +479,17 @@
         });
     };
     
-    // --- HELPER: CAPTURE LINEUP (V4.1) ---
     window.downloadLineup = () => {
         const teams = window.currentTeamsForCopy;
-        if (!teams) return window.showToast("No hay equipos", "error");
+        if (!teams || teams.length === 0) return window.showToast("No hay equipos para generar imagen", "error");
 
         window.showToast("Generando imagen...", "info");
 
-        // 1. Populate Hidden Card
-        const dateStr = new Date(currentData.matchDate).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-        document.getElementById('lc-date').innerText = dateStr;
+        if(currentData.matchDate) {
+            const dateObj = new Date(currentData.matchDate);
+            const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+            document.getElementById('lc-date').innerText = dateStr;
+        }
         
         const grid = document.getElementById('lc-grid');
         grid.innerHTML = '';
@@ -500,62 +499,58 @@
         teams.forEach((team, i) => {
             let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
             team.forEach(p => {
-                const cleanName = p.name.replace(/<[^>]*>/g, '');
+                const cleanName = p.name.replace(/<[^>]*>/g, ''); 
                 html += `<div class="lc-player">${cleanName}</div>`;
             });
             html += `</div>`;
             grid.innerHTML += html;
         });
 
-        // 2. Capture and Share
         const element = document.querySelector(".lineup-card");
         html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
             canvas.toBlob(blob => {
                 const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
-
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     navigator.share({
                         files: [file],
-                        title: 'Alineación AMPA Futsal',
-                        text: 'Aquí están los equipos confirmados.'
-                    }).catch(err => {
-                        console.error("Error compartiendo", err);
-                    });
+                        title: 'Alineación AMPA',
+                        text: 'Aquí tenéis los equipos confirmados.'
+                    }).catch(err => console.log("Compartir cancelado o error", err));
                 } else {
                     const link = document.createElement('a');
                     link.download = file.name;
                     link.href = canvas.toDataURL();
                     link.click();
-                    window.showToast("Imagen descargada (PC)", "success");
+                    window.showToast("Imagen descargada", "success");
                 }
             }, 'image/png');
+        }).catch(err => {
+            console.error(err);
+            window.showToast("Error al generar imagen", "error");
         });
     };
 
-    // --- AUTHENTICATION STATE (CON ALERTA ADMIN PRIVADA) ---
+    // --- AUTHENTICATION STATE ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.getElementById('admin-zone').style.display = 'block';
             window.showToast("Modo Admin Activo", "success");
             
-            // VERIFICAR SI HAY ALERTA PENDIENTE (SOLO PARA ADMIN)
+            // --- MOSTRAR ALERTA SOLO AL ADMIN ---
             if (currentData && currentData.adminAlertMsg) {
                 let alertDiv = document.getElementById('admin-alert-box');
                 if (!alertDiv) {
                      alertDiv = document.createElement('div');
                      alertDiv.id = 'admin-alert-box';
                      alertDiv.style.cssText = "background:#fee2e2; color:#b91c1c; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.8rem; font-weight:bold; border: 1px solid #f87171; text-align:center;";
-                     // Lo ponemos dentro de la zona de admin
                      const adminZone = document.getElementById('admin-zone');
                      adminZone.insertBefore(alertDiv, adminZone.firstChild);
                 }
                 alertDiv.innerText = currentData.adminAlertMsg;
             }
+
         } else {
             document.getElementById('admin-zone').style.display = 'none';
-            // Si hubiera una alerta visible, la quitamos
-            const alertDiv = document.getElementById('admin-alert-box');
-            if(alertDiv) alertDiv.remove();
         }
     });
 
@@ -612,7 +607,7 @@
             signInWithEmailAndPassword(auth, email, pass)
                 .then(() => { 
                     modal.style.display = 'none'; 
-                    document.getElementById('admin-zone').style.display = 'block'; // FORCE SHOW
+                    document.getElementById('admin-zone').style.display = 'block'; 
                 })
                 .catch((e) => { window.showToast("Error de acceso: " + e.message, "error"); });
         };
@@ -631,7 +626,6 @@
         document.getElementById('loader').style.display = 'none';
         if (docSnap.exists()) {
             currentData = docSnap.data();
-            // AUTO FIX ROSTER
             if (!currentData.roster || currentData.roster.length === 0 || !currentData.roster[0].id) {
                 updateDoc(matchRef, { roster: initialPlayers });
             }
@@ -649,7 +643,6 @@
     function updateUI(data) {
         const activeRoster = [...(data.roster || initialPlayers)].sort((a, b) => a.name.localeCompare(b.name));
         
-        // --- IDENTITY SELECTOR (v4.11): Ocultar si baneado ---
         const selector = document.getElementById('identity-select');
         if(selector.options.length <= 1) {
              activeRoster.forEach(p => {
@@ -676,18 +669,13 @@
             let banHTML = ""; let pinHTML = ""; let delHTML = "";
             activeRoster.forEach(p => {
                  const isBanned = data.bannedIndices?.includes(p.id);
-                 
-                 // BLOQUEAR/DESBLOQUEAR (Admin)
                  const banClass = isBanned ? "chip chip-ban is-banned" : "chip chip-ban";
                  const text = isBanned ? `🔓 Desbloquear ${p.name}` : `🚫 Bloquear ${p.name}`;
                  banHTML += `<div class="${banClass}" onclick="window.toggleBan('${p.id}', '${p.name}')">${text}</div>`;
                  
-                 // RESET PINS (Admin)
                  if(data.pins && data.pins[p.id]) {
                      pinHTML += `<div class="chip chip-reset" onclick="window.resetPin('${p.id}', '${p.name}')">🔐 Reset ${p.name}</div>`;
                  }
-
-                 // DELETE PERMANENT (Admin) - v4.11
                  delHTML += `<div class="chip chip-ban" style="border-color:black; color:black;" onclick="window.deletePlayerPermanent('${p.id}', '${p.name}')">❌ ${p.name}</div>`;
             });
             banList.innerHTML = banHTML;
@@ -706,7 +694,7 @@
                 const greet = document.getElementById('user-greeting');
                 greet.innerHTML = `👋 Hola, ${me.name} <span class="reset-id-btn" onclick="window.resetIdentity()">¿NO ERES TÚ?</span>`;
                 greet.style.display = 'block';
-                selector.style.display = 'none'; // Hide if identified
+                selector.style.display = 'none'; 
 
                 if (data.matchDate && !data.teams) {
                     actionBar.style.display = 'flex';
@@ -728,7 +716,6 @@
              if (!data.matchDate) selector.style.display = 'block';
         }
 
-        // OPTIMIZACIÓN DE DOM: Construir HTML en string antes de inyectar
         let playersHTML = "";
         activeRoster.forEach((p) => {
             const isBanned = data.bannedIndices?.includes(p.id);
@@ -773,6 +760,22 @@
         if (!data.matchDate) {
             setupPanel.style.display = 'block'; activePanel.style.display = 'none';
             headerDate.innerText = "PRÓXIMO PARTIDO";
+            
+            // --- ALERT DIV (SOLO SE VE SI EL ADMIN LO HABILITA EN CODIGO O LOGICA) ---
+            if (data.lastResetMsg) {
+               let alertDiv = document.getElementById('reset-alert');
+               if (!alertDiv) {
+                   alertDiv = document.createElement('div');
+                   alertDiv.id = 'reset-alert';
+                   // Oculto por CSS por defecto, solo visible si decides activarlo
+                   // Pero como querias privacidad, este mensaje en la pantalla principal 
+                   // lo ve todo el mundo. Si quieres que SOLO lo vea el admin,
+                   // se maneja en onAuthStateChanged. Aquí lo dejo visible para test.
+                   alertDiv.style.cssText = "display:none;"; 
+               }
+               // Nota: La alerta real para el admin está en onAuthStateChanged
+            }
+
         } else {
             setupPanel.style.display = 'none'; activePanel.style.display = 'block';
             const d = new Date(data.matchDate);
@@ -831,96 +834,77 @@
         }
     }
 
-// --- ALGORITMO GREEDY BALANCE (CORREGIDO Y BLINDADO) ---
+    // --- ALGORITMO GREEDY BALANCE ---
     window.triggerGeneration = async (numTeams) => {
         try {
-            document.getElementById('loader').style.display = 'flex'; // Mostrar "Cargando..."
-            
-            // 1. Obtener datos y asegurar que existen
+            document.getElementById('loader').style.display = 'flex';
             const roster = currentData.roster || initialPlayers;
+            
+            // 1. Obtener jugadores seleccionados y asignarles su nivel decimal + JITTER
             const pool = [];
-
-            // 2. Procesar JUGADORES (Con corrección de números)
             (currentData.selectedPlayers || []).forEach(id => {
                 const p = roster.find(x => x.id === id);
                 if(p) {
-                    // FORZAMOS QUE EL NIVEL SEA UN NÚMERO
-                    const numericLevel = parseFloat(p.level) || 1.0; 
                     const jitter = (Math.random() * 0.5) - 0.25; 
                     pool.push({ 
                         ...p, 
-                        level: numericLevel, // Guardamos el nivel limpio
                         isGuest: false,
-                        sortLevel: numericLevel + jitter 
+                        sortLevel: p.level + jitter 
                     });
                 }
             });
-
-            // 3. Procesar INVITADOS (Con corrección de números)
             (currentData.selectedGuests || []).forEach(id => {
                 const g = guestsDB.find(x => x.id === id);
                 if(g) { 
-                    const numericLevel = parseFloat(g.level) || 1.5; // Nivel base invitados
                     const jitter = (Math.random() * 0.5) - 0.25;
+                    const baseLevel = g.level || 1.5;
                     pool.push({ 
                         ...g, 
-                        level: numericLevel, 
+                        level: baseLevel, 
                         isGuest: true,
-                        sortLevel: numericLevel + jitter 
+                        sortLevel: baseLevel + jitter 
                     });
                 }
             });
 
-            // Verificar si hay gente suficiente (por si acaso)
-            if (pool.length < numTeams) {
-                throw new Error("No hay suficientes jugadores seleccionados.");
-            }
-
-            // 4. Ordenar por nivel (de mayor a menor)
+            // 2. Ordenar por nivel con JITTER
             pool.sort((a, b) => b.sortLevel - a.sortLevel);
 
-            // 5. Crear equipos vacíos
+            // 3. Crear equipos vacios
             let teams = Array.from({ length: numTeams }, () => ({ players: [], totalScore: 0 }));
 
-            // 6. Reparto tipo serpiente (Greedy)
+            // 4. Reparto Greedy
             pool.forEach(player => {
-                // Ordenamos los equipos: primero el que tenga menos jugadores, luego el que tenga menos puntuación
                 teams.sort((a, b) => {
                     if (a.players.length !== b.players.length) return a.players.length - b.players.length; 
                     return a.totalScore - b.totalScore; 
                 });
                 
-                // Asignamos al jugador
                 teams[0].players.push(player);
                 teams[0].totalScore += player.level;
             });
 
-            // 7. Extraer solo los jugadores y barajar el orden visual dentro del equipo
+            // 5. Extraer y Barajar
             const finalTeams = teams.map(t => t.players);
             finalTeams.forEach(team => window.shuffle(team));
 
-            // 8. Preparar datos para guardar
             const teamsString = JSON.stringify(finalTeams);
             const myId = localStorage.getItem('futsal_my_id');
             const author = currentData.roster?.find(p=>p.id===myId)?.name || "Sistema";
             const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-            // 9. ENVIAR A FIREBASE
             await updateDoc(matchRef, { 
                 teams: teamsString,
                 logs: arrayUnion(`⚽ Equipos equilibrados creados por ${author}|${now}`)
             });
-            
-            // Éxito: Ocultar loader
             document.getElementById('loader').style.display = 'none';
-
         } catch (e) {
-            console.error("ERROR CREANDO EQUIPOS:", e);
+            console.error(e);
             document.getElementById('loader').style.display = 'none';
-            // Usamos ALERT para que lo veas sí o sí en el móvil
-            alert("Error al crear equipos: " + e.message); 
+            window.showToast("Error generando equipos: " + e.message, "error");
         }
     };
+
     // --- AUTH LOGIN TRIGGER ---
     let taps = 0;
     let tapTimer = null;
@@ -941,7 +925,7 @@
     };
     window.hideAdmin = () => document.getElementById('admin-zone').style.display = 'none';
 
-    // --- START NEW MATCH (MODIFICADO: Limpiar Alerta Admin) ---
+    // --- START NEW MATCH (MODIFICADO: Borra alerta y guarda Log) ---
     window.startNewMatch = async () => {
         const myId = localStorage.getItem('futsal_my_id');
         const selectedId = document.getElementById('identity-select').value;
@@ -950,92 +934,187 @@
 
         const dateInput = document.getElementById('date-input').value;
         if (!dateInput) return window.showToast("Selecciona fecha", "error");
+        
+        if (currentData.matchDate && currentData.matchDate === dateInput) {
+            return window.showToast("⚠️ Ya existe un partido para esta fecha.", "error");
+        }
+
         const selected = new Date(dateInput);
         const today = new Date(); today.setHours(0,0,0,0);
         if(selected < today) return window.showToast("Día pasado no válido", "error");
+        
         showConfirm("¿Abrir convocatoria?", `Fecha: ${dateInput}`, async () => {
              const now = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
              const finalId = localStorage.getItem('futsal_my_id');
              const author = currentData.roster?.find(p=>p.id===finalId)?.name || "Alguien";
 
+             window.showToast("Procesando...", "info");
+
+             // 1. AUTO-ARCHIVADO (Si había partido abierto)
+             if(currentData.matchDate && currentData.teams && currentData.teams.length > 0) {
+                 try {
+                    await addDoc(collection(db, "history"), { 
+                        date: currentData.matchDate, 
+                        teams: currentData.teams, 
+                        scores: currentData.scores || [0,0,0] 
+                    });
+                 } catch(e) { console.error(e); }
+             }
+
              window.shareConvocation(dateInput);
 
+             const nextPinMode = (currentData.pinMode !== undefined) ? currentData.pinMode : true;
+
+             // 2. LOGS INICIALES + ALERTA CULPABLE (Si hubo)
+             let initialLogs = [`📅 Convocatoria abierta por ${author}|${now}`];
+             if (currentData.lastResetMsg) {
+                 initialLogs.push(`${currentData.lastResetMsg}|⚠️ AUTO-RESET`);
+             }
+
              await setDoc(matchRef, { 
-                matchDate: dateInput, lockTime: currentData.lockTime || "18:00", pinMode: currentData.pinMode !== false, voteMode: currentData.voteMode !== false,
-                selectedPlayers: [], selectedGuests: [], guestInviters: {}, scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
-                teams: null, logs: [`📅 Convocatoria abierta por ${author}|${now}`], pins: currentData.pins || {}, unlockVotes: [], roster: currentData.roster || initialPlayers,
-                adminAlertMsg: null // LIMPIAR ALERTA DE CULPABLE
+                matchDate: dateInput, 
+                lockTime: currentData.lockTime || "18:00", 
+                pinMode: nextPinMode,
+                voteMode: currentData.voteMode !== false,
+                selectedPlayers: [], selectedGuests: [], guestInviters: {}, 
+                scores: [0,0,0], timerState: 'stopped', timerLeft: 300,
+                teams: null, 
+                logs: initialLogs, 
+                pins: currentData.pins || {}, 
+                unlockVotes: [], 
+                roster: currentData.roster || initialPlayers,
+                adminAlertMsg: null, // Borramos alerta admin
+                lastResetMsg: null  // Borramos mensaje global
             }, { merge: true });
         });
     };
     
-    window.toggleSelection = async (type, id, name) => {
-        let newPlayers = [...(currentData.selectedPlayers || [])];
-        let newGuests = [...(currentData.selectedGuests || [])];
-        let currentPins = {...(currentData.pins || {})};
-        let newGuestInviters = {...(currentData.guestInviters || {})};
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        let inviterName = "";
-        let actorName = "Alguien"; 
+    // --- TIMERS Y LIMPIEZA AUTOMÁTICA INTELIGENTE ---
+    setInterval(async () => {
+        if (currentData.matchDate) { 
+            checkTimeLock(currentData.matchDate, currentData.lockTime); 
+            
+            const matchDate = new Date(currentData.matchDate);
+            const now = new Date();
+            
+            // Umbral: Día siguiente a las 06:00 AM
+            const safetyResetTime = new Date(matchDate);
+            safetyResetTime.setDate(safetyResetTime.getDate() + 1); 
+            safetyResetTime.setHours(6, 0, 0, 0); 
+            
+            if (now >= safetyResetTime) {
+                // 1. IDENTIFICAR
+                const myId = localStorage.getItem('futsal_my_id');
+                const roster = currentData.roster || initialPlayers;
+                const me = roster.find(p => p.id === myId);
+                
+                let deviceType = "PC/Desconocido";
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) deviceType = "iPhone";
+                else if (/Android/i.test(navigator.userAgent)) deviceType = "Android";
+                
+                let culpritName = me ? me.name : `Anónimo (${deviceType})`;
 
-        const myId = localStorage.getItem('futsal_my_id');
-        const roster = currentData.roster || initialPlayers;
-        if (myId) {
-            const myObj = roster.find(p => p.id === myId);
-            if(myObj) actorName = myObj.name;
-        } else if (auth.currentUser) {
-            actorName = "Admin";
+                // 2. SEGURIDAD: SI ES ANÓNIMO, NO BORRA
+                if (!me && !auth.currentUser) {
+                    console.log("⚠️ Auto-reset bloqueado: Usuario anónimo.");
+                    return; 
+                }
+                
+                // 3. GUARDAR EN HISTORIAL (Aunque no haya equipos)
+                console.log("Limpieza ejecutada por:", culpritName);
+                
+                await addDoc(collection(db, "history"), { 
+                    date: currentData.matchDate, 
+                    teams: currentData.teams || "Sin equipos (Convocatoria abierta)", 
+                    scores: currentData.scores || [0,0,0],
+                    resetBy: culpritName 
+                });
+                
+                // 4. BORRAR
+                updateDoc(matchRef, { 
+                    matchDate: null, 
+                    selectedPlayers: [], 
+                    teams: null,
+                    logs: [],
+                    adminAlertMsg: `⚠️ El último partido fue cerrado automáticamente por: ${culpritName}`,
+                    lastResetMsg: `⚠️ Cierre automático ejecutado por: ${culpritName}`
+                }); 
+            } 
         }
+        
+        if(currentData.timerState === 'running') {
+            const display = document.getElementById('timer-display'); const btn = document.getElementById('timer-start-btn'); const txt = document.getElementById('timer-status-text');
+            const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
+            const m = Math.floor(left / 60).toString().padStart(2, '0'); const s = (left % 60).toString().padStart(2, '0'); display.innerText = `${m}:${s}`; btn.innerText = "⏸ PAUSA"; btn.classList.add('t-stop');
+            if(left <= 60 && left > 0) { display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; } else if(left <= 0) { display.classList.remove('last-minute'); display.classList.add('finished'); display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; btn.innerText = "FIN"; if(!hasBeeped) { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.connect(ctx.destination); osc.start(); setTimeout(()=>osc.stop(), 1000); hasBeeped = true; } }
+        }
+    }, 1000);
 
+    // ... (Resto de funciones igual) ...
+    window.toggleTimer = async () => { if (currentData.timerState === 'running') { const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000)); await updateDoc(matchRef, { timerState: 'paused', timerLeft: left }); } else { const target = Date.now() + (currentData.timerLeft * 1000); await updateDoc(matchRef, { timerState: 'running', timerEnd: target }); } };
+    window.resetTimer = async () => { await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 }); hasBeeped = false; document.getElementById('timer-display').classList.remove('finished', 'last-minute'); document.getElementById('timer-display').innerText = "05:00"; };
+    window.updateScore = async (idx, delta) => { let s = [...(currentData.scores || [0,0,0])]; s[idx] = Math.max(0, s[idx] + delta); await updateDoc(matchRef, { scores: s }); };
+    
+    let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
+    window.installApp = async () => { if(defPrompt) { defPrompt.prompt(); defPrompt = null; } else window.showToast("Usa menú navegador -> Instalar", "info"); };
+
+    function checkTimeLock(dateStr, lockTimeStr) {
+        const btn = document.getElementById('btn-create');
+        const msg = document.getElementById('time-lock-msg');
+        const now = new Date();
+        const target = new Date(dateStr);
+        const [h, m] = (lockTimeStr || "18:00").split(':');
+        target.setHours(h, m, 0, 0);
+        
+        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
+        const canUnlock = (currentData.voteMode !== false && votes >= 3);
+        
+        btn.removeAttribute('disabled');
+
+        if (now >= target || canUnlock) {
+            btn.className = "action-btn btn-unlocked";
+            btn.innerHTML = "⚽ CREAR EQUIPOS";
+            msg.innerText = "";
+        } else {
+            btn.className = "action-btn btn-locked";
+            btn.innerHTML = "🔒 CREAR EQUIPOS";
+            msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
+        }
+        
+        const cd = document.getElementById('countdown-display');
+        if(now < target) {
+            const diff = target - now;
+            const hh = Math.floor(diff/(1000*60*60));
+            const mm = Math.floor((diff%(1000*60*60))/(1000*60));
+            const ss = Math.floor((diff%(1000*60))/1000);
+            cd.innerText = `Cierre en: ${hh}h ${mm}m ${ss}s`;
+        } else cd.innerText = "Cierre alcanzado";
+    }
+
+    // --- OTHER ACTIONS ---
+    window.toggleSelection = async (type, id, name) => {
+        let newPlayers = [...(currentData.selectedPlayers || [])]; let newGuests = [...(currentData.selectedGuests || [])];
+        let currentPins = {...(currentData.pins || {})}; let newGuestInviters = {...(currentData.guestInviters || {})};
+        const now = new Date(); const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        let inviterName = ""; let actorName = "Alguien"; 
+        const myId = localStorage.getItem('futsal_my_id'); const roster = currentData.roster || initialPlayers;
+        if (myId) { const myObj = roster.find(p => p.id === myId); if(myObj) actorName = myObj.name; } else if (auth.currentUser) { actorName = "Admin"; }
         if (type === 'guest') {
             const userIndex = localStorage.getItem('futsal_my_id');
-            if (newGuests.includes(id)) {
-                 const originalInviter = newGuestInviters[id];
-                 if (originalInviter !== actorName && !auth.currentUser) {
-                     return window.showToast(`⛔ Solo ${originalInviter} o el Admin pueden eliminar a este invitado.`, "error");
-                 }
-            } else {
-                 if (!userIndex || !newPlayers.includes(userIndex)) return window.showToast("⛔ Solo jugadores confirmados pueden invitar.", "error");
-                 inviterName = actorName;
-            }
+            if (newGuests.includes(id)) { const originalInviter = newGuestInviters[id]; if (originalInviter !== actorName && !auth.currentUser) return window.showToast(`⛔ Solo ${originalInviter} o el Admin pueden eliminar a este invitado.`, "error"); } 
+            else { if (!userIndex || !newPlayers.includes(userIndex)) return window.showToast("⛔ Solo jugadores confirmados pueden invitar.", "error"); inviterName = actorName; }
         }
-
         if (type === 'player' && currentData.pinMode !== false) {
-            if (currentPins[id]) {
-                showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => {
-                    if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error");
-                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true); return; 
-            } else {
-                showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name.toUpperCase()}:`, (val) => {
-                    if (!val || val.length < 3) return window.showToast("PIN inválido", "error");
-                    currentPins[id] = val;
-                    processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-                }, true); return;
-            }
+            if (currentPins[id]) { showConfirm("🔐 Seguridad", `Introduce PIN para gestionar a ${name.toUpperCase()}:`, (val) => { if (val !== currentPins[id]) return window.showToast("⛔ PIN Incorrecto", "error"); processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName); }, true); return; } 
+            else { showConfirm("🛡️ Crear PIN", `Crea un PIN para ${name.toUpperCase()}:`, (val) => { if (!val || val.length < 3) return window.showToast("PIN inválido", "error"); currentPins[id] = val; processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName); }, true); return; }
         } else {
-             const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id));
-             let msg = "";
-             if (actorName && actorName !== "Alguien") {
-                 if (isSelected) msg = `¿${actorName}, quieres que salga ${name}?`;
-                 else msg = `¿${actorName}, quieres que entre ${name}?`;
-                 if(name === actorName) msg = isSelected ? `¿${name}, quieres salir?` : `¿${name}, quieres apuntarte?`;
-             } else {
-                 msg = isSelected ? `${name}, ¿Te borras?` : `${name}, ¿Te apuntas?`;
-             }
-             
-             showConfirm("Confirmar Acción", msg, () => {
-                 processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName);
-             });
+             const isSelected = (type === 'player' && newPlayers.includes(id)) || (type === 'guest' && newGuests.includes(id)); let msg = "";
+             if (actorName && actorName !== "Alguien") { if (isSelected) msg = `¿${actorName}, quieres que salga ${name}?`; else msg = `¿${actorName}, quieres que entre ${name}?`; if(name === actorName) msg = isSelected ? `¿${name}, quieres salir?` : `¿${name}, quieres apuntarte?`; } else { msg = isSelected ? `${name}, ¿Te borras?` : `${name}, ¿Te apuntas?`; }
+             showConfirm("Confirmar Acción", msg, () => { processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName); });
         }
     };
     async function processSelection(type, id, name, newPlayers, newGuests, currentPins, newGuestInviters, inviterName, timeStr, actorName) {
-        let actionSuffix = "";
-        if (actorName && actorName !== "Alguien" && actorName !== name) {
-            actionSuffix = ` por ${actorName}`;
-        }
-
+        let actionSuffix = ""; if (actorName && actorName !== "Alguien" && actorName !== name) { actionSuffix = ` por ${actorName}`; }
         if (type === 'player') {
             if (newPlayers.includes(id)) {
                 newPlayers = newPlayers.filter(i => i !== id);
@@ -1043,49 +1122,34 @@
                 window.showToast(`${name} eliminado`, "info");
             } else {
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
-                newPlayers.push(id);
-                if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
+                newPlayers.push(id); if(!actionSuffix) localStorage.setItem('futsal_my_id', id);
                 await updateDoc(matchRef, { selectedPlayers: newPlayers, pins: currentPins, logs: arrayUnion(`✅ ${name} se apunta${actionSuffix}|${timeStr}`) });
                 window.showToast(`¡Bienvenido ${name}!`, "success");
             }
         } else {
              if (newGuests.includes(id)) {
-                newGuests = newGuests.filter(i => i !== id);
-                delete newGuestInviters[id];
+                newGuests = newGuests.filter(i => i !== id); delete newGuestInviters[id];
                 await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`❌ ${name} eliminado por ${actorName}|${timeStr}`) });
             } else {
                 if ((newPlayers.length + newGuests.length) >= 18) return window.showToast("⛔ CUPOS COMPLETOS", "error");
-                newGuests.push(id);
-                newGuestInviters[id] = inviterName;
+                newGuests.push(id); newGuestInviters[id] = inviterName;
                 await updateDoc(matchRef, { selectedGuests: newGuests, guestInviters: newGuestInviters, logs: arrayUnion(`✅ ${name} invitado por ${inviterName}|${timeStr}`) });
             }
         }
     }
     window.voteToUnlock = async () => { const myId = localStorage.getItem('futsal_my_id'); if (!myId || !currentData.selectedPlayers.includes(myId)) return window.showToast("Solo apuntados pueden votar.", "error"); if (currentData.unlockVotes && currentData.unlockVotes.includes(myId)) return window.showToast("Ya has votado.", "info"); const roster = currentData.roster || initialPlayers; const me = roster.find(p => p.id === myId); const myName = me ? me.name : "Alguien"; const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); showConfirm("Votar Desbloqueo", "¿Adelantar la hora de equipos?", async () => { await updateDoc(matchRef, { unlockVotes: arrayUnion(myId), logs: arrayUnion(`🗳️ Voto de ${myName}|${now}`) }); window.showToast("Voto registrado", "success"); }); };
     window.forceGeneration = () => { showConfirm("🔓 Desbloquear Creación", "¿Quieres habilitar el botón 'Crear Equipos' para todos?", async () => { const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); await updateDoc(matchRef, { lockTime: "00:00", logs: arrayUnion(`🔓 El Admin desbloqueó la creación|${now}`) }); window.showToast("Botón desbloqueado para todos", "success"); window.hideAdmin(); }); };
-    window.resetRosterOnly = async () => { showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código? El historial NO se borrará.", async () => { const currentRoster = currentData.roster || []; const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p])); let newRoster = [...initialPlayers]; currentRoster.forEach(dbPlayer => { if (!codePlayersMap.has(dbPlayer.id)) { newRoster.push(dbPlayer); } }); await updateDoc(matchRef, { roster: newRoster }); window.showToast("Plantilla actualizada", "success"); }); };
+    window.resetRosterOnly = async () => { showConfirm("Actualizar Plantilla", "¿Sobrescribir jugadores y niveles con el código?", async () => { const currentRoster = currentData.roster || []; const codePlayersMap = new Map(initialPlayers.map(p => [p.id, p])); let newRoster = [...initialPlayers]; currentRoster.forEach(dbPlayer => { if (!codePlayersMap.has(dbPlayer.id)) { newRoster.push(dbPlayer); } }); await updateDoc(matchRef, { roster: newRoster }); window.showToast("Plantilla actualizada", "success"); }); };
     window.deletePlayerPermanent = async (id, name) => { showConfirm("🗑️ Eliminar Definitivamente", `¿Borrar a ${name}?`, async () => { const newRoster = (currentData.roster || initialPlayers).filter(p => p.id !== id); let newSelected = (currentData.selectedPlayers || []).filter(i => i !== id); let newBans = (currentData.bannedIndices || []).filter(i => i !== id); let newPins = {...(currentData.pins || {})}; delete newPins[id]; await updateDoc(matchRef, { roster: newRoster, selectedPlayers: newSelected, bannedIndices: newBans, pins: newPins }); window.showToast(`${name} eliminado para siempre`, "success"); }); };
     
     // --- ESTADÍSTICAS MEJORADAS (3 PESTAÑAS) ---
     window.openStats = async () => {
-        const modal = document.getElementById('modal-overlay'); 
-        document.getElementById('modal-title').innerText = "Estadísticas y Registros"; 
-        document.getElementById('modal-text').style.display = 'none'; 
-        document.getElementById('modal-input').style.display = 'none'; 
-        document.getElementById('login-form').style.display = 'none'; 
-        document.getElementById('stats-content').style.display = 'block'; 
-        
-        const actions = document.getElementById('modal-actions'); 
-        actions.innerHTML = ''; 
-        const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; }; 
-        actions.appendChild(btnClose); 
-        modal.style.display = 'flex'; 
-        
+        const modal = document.getElementById('modal-overlay'); document.getElementById('modal-title').innerText = "Estadísticas y Registros"; document.getElementById('modal-text').style.display = 'none'; document.getElementById('modal-input').style.display = 'none'; document.getElementById('login-form').style.display = 'none'; document.getElementById('stats-content').style.display = 'block';
+        const actions = document.getElementById('modal-actions'); actions.innerHTML = ''; const btnClose = document.createElement('button'); btnClose.className = 'modal-btn cancel'; btnClose.innerText = 'Cerrar'; btnClose.onclick = () => { modal.style.display = 'none'; }; actions.appendChild(btnClose); modal.style.display = 'flex';
         try {
-            const histRef = collection(db, "history"); 
-            const snap = await getDocs(histRef); 
-            const realMatches = []; // Partidos jugados
-            const autoResets = [];  // Cierres automáticos
+            const histRef = collection(db, "history"); const snap = await getDocs(histRef); 
+            const realMatches = []; // Solo partidos reales
+            const autoResets = [];  // Solo cierres automáticos
             const playerCounts = {};
             
             snap.forEach(doc => { 
@@ -1100,10 +1164,8 @@
             });
 
             // 1. RANKING (Solo partidos reales)
-            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]); 
-            const rankDiv = document.getElementById('tab-ranking'); 
-            rankDiv.innerHTML = ''; 
-            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos jugados</div>'; 
+            const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]); const rankDiv = document.getElementById('tab-ranking'); rankDiv.innerHTML = ''; 
+            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin datos aún</div>';
             sortedPlayers.forEach(([name, count], index) => { let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index+1; rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`; });
             if(sortedPlayers.length > 0) { rankDiv.innerHTML += `<div class="stats-footer"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial</button></div>`; }
             
@@ -1153,186 +1215,6 @@
     window.forceReset = async () => { showConfirm("PELIGRO", "Esto borra toda la base de datos", async () => { await setDoc(matchRef, { matchDate: null, lockTime: "18:00", pinMode: true, voteMode: true, selectedPlayers: [], selectedGuests: [], guestInviters: {}, teams: null, logs: [], pins: {}, unlockVotes: [], scores: [0,0,0], timerState: 'stopped', roster: initialPlayers }); window.hideAdmin(); }); };
     window.shareConvocation = (d) => { const date = d ? new Date(d) : new Date(currentData.matchDate); const str = date.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'}); const txt = `⚽ *CONVOCATORIA ABIERTA* ⚽\n\n📅 ${str.toUpperCase()}\n⏰ Cierre: ${currentData.lockTime || '18:00'}h\n\n👇 *APÚNTATE:* ${window.location.href}`; window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank'); };
     window.shareTeamsOnWhatsapp = () => { const t = window.currentTeamsForCopy; if(!t) return; const d = new Date(currentData.matchDate); const str = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long'}); let txt = `*⚽ EQUIPOS CONFIRMADOS ⚽*\n📅 ${str.toUpperCase()} - 20:30h\n📍 Pabellón Virgen de la Vega\n\n`; const names = ['BLANCO','NEGRO','ROJO']; const em = ['⚪','⚫','🔴']; t.forEach((team, i) => { txt += `${em[i]} *${names[i]}* (${team.length})\n`; team.forEach(p => txt += `- ${p.name}\n`); txt += `\n`; }); window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank'); };
-    
-    // --- TIMERS Y LIMPIEZA AUTOMÁTICA (CON CHIVATO) ---
-    setInterval(async () => {
-        if (currentData.matchDate) { 
-            checkTimeLock(currentData.matchDate, currentData.lockTime); 
-            
-            const matchDate = new Date(currentData.matchDate);
-            const now = new Date();
-            
-            // Umbral: Día siguiente a las 06:00 AM
-            const safetyResetTime = new Date(matchDate);
-            safetyResetTime.setDate(safetyResetTime.getDate() + 1); 
-            safetyResetTime.setHours(6, 0, 0, 0); 
-            
-            // Si ya pasó la hora límite...
-            if (now >= safetyResetTime) {
-                // A. IDENTIFICAR AL DISPOSITIVO
-                const myId = localStorage.getItem('futsal_my_id');
-                const roster = currentData.roster || initialPlayers;
-                const me = roster.find(p => p.id === myId);
-                
-                let deviceType = "PC/Desconocido";
-                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) deviceType = "iPhone";
-                else if (/Android/i.test(navigator.userAgent)) deviceType = "Android";
-                
-                // Nombre del culpable
-                let culpritName = me ? me.name : `Anónimo (${deviceType})`;
-
-                // B. REGLA DE SEGURIDAD (IMPORTANTE)
-                // Si es un "Anónimo", IMPEDIMOS que borre nada.
-                if (!me && !auth.currentUser) {
-                    console.log("⚠️ Intento de borrado automático bloqueado por usuario anónimo.");
-                    return; // <--- EL CÓDIGO SE PARA AQUÍ Y NO BORRA NADA
-                }
-
-                console.log("Limpieza ejecutada por:", culpritName);
-                
-                // C. GUARDADO SEGURO (Aunque no haya equipos)
-                // Guardamos el estado actual en el historial antes de borrar, haya equipos o no.
-                await addDoc(collection(db, "history"), { 
-                    date: currentData.matchDate, 
-                    teams: currentData.teams || "Sin equipos generados", // Guarda nota si no había equipos
-                    scores: currentData.scores || [0,0,0],
-                    resetBy: culpritName // EL CHIVATO (Solo visible para Admin en historial)
-                });
-                
-                // D. BORRAR DATOS (SIN MENSAJE EN EL CHAT PÚBLICO)
-                updateDoc(matchRef, { 
-                    matchDate: null, 
-                    selectedPlayers: [], 
-                    teams: null,
-                    logs: [], // Borramos el chat para limpiar
-                    // Guardamos el mensaje "secreto" para que solo lo vea el Admin luego
-                    adminAlertMsg: `⚠️ El último partido fue cerrado automáticamente por: ${culpritName}`
-                }); 
-            } 
-        }
-        
-        // 2. Cronómetro del partido (sin cambios)
-        if(currentData.timerState === 'running') {
-            const display = document.getElementById('timer-display'); 
-            const btn = document.getElementById('timer-start-btn'); 
-            const txt = document.getElementById('timer-status-text');
-            
-            if(display && btn && txt) { 
-                const left = Math.max(0, Math.ceil((currentData.timerEnd - Date.now()) / 1000));
-                const m = Math.floor(left / 60).toString().padStart(2, '0'); 
-                const s = (left % 60).toString().padStart(2, '0'); 
-                display.innerText = `${m}:${s}`; 
-                btn.innerText = "⏸ PAUSA"; 
-                btn.classList.add('t-stop');
-                
-                if(left <= 60 && left > 0) { 
-                    display.classList.add('last-minute'); txt.innerText = "¡ÚLTIMO MINUTO!"; 
-                } else if(left <= 0) { 
-                    display.classList.remove('last-minute'); display.classList.add('finished'); 
-                    display.innerText = "ÚLTIMA JUGADA"; txt.innerText = "TIEMPO CUMPLIDO"; 
-                    btn.innerText = "FIN"; 
-                    if(!hasBeeped) { 
-                        const ctx = new (window.AudioContext || window.webkitAudioContext)(); 
-                        const osc = ctx.createOscillator(); osc.connect(ctx.destination); 
-                        osc.start(); setTimeout(()=>osc.stop(), 1000); hasBeeped = true; 
-                    } 
-                }
-            }
-        }
-    }, 1000);
-    
-    window.toggleTimer = async () => { if (currentData.timerState === 'running') { const left = Math.max(0, Math.floor((currentData.timerEnd - Date.now()) / 1000)); await updateDoc(matchRef, { timerState: 'paused', timerLeft: left }); } else { const target = Date.now() + (currentData.timerLeft * 1000); await updateDoc(matchRef, { timerState: 'running', timerEnd: target }); } };
-    window.resetTimer = async () => { await updateDoc(matchRef, { timerState: 'stopped', timerLeft: 300 }); hasBeeped = false; document.getElementById('timer-display').classList.remove('finished', 'last-minute'); document.getElementById('timer-display').innerText = "05:00"; };
-    window.updateScore = async (idx, delta) => { let s = [...(currentData.scores || [0,0,0])]; s[idx] = Math.max(0, s[idx] + delta); await updateDoc(matchRef, { scores: s }); };
-    
-    let defPrompt; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); defPrompt = e; });
-    window.installApp = async () => { if(defPrompt) { defPrompt.prompt(); defPrompt = null; } else window.showToast("Usa menú navegador -> Instalar", "info"); };
-
-    function checkTimeLock(dateStr, lockTimeStr) {
-        const btn = document.getElementById('btn-create');
-        const msg = document.getElementById('time-lock-msg');
-        const now = new Date();
-        const target = new Date(dateStr);
-        const [h, m] = (lockTimeStr || "18:00").split(':');
-        target.setHours(h, m, 0, 0);
-        
-        const votes = currentData.unlockVotes ? currentData.unlockVotes.length : 0;
-        const canUnlock = (currentData.voteMode !== false && votes >= 3);
-        
-        btn.removeAttribute('disabled');
-
-        if (now >= target || canUnlock) {
-            btn.className = "action-btn btn-unlocked";
-            btn.innerHTML = "⚽ CREAR EQUIPOS";
-            msg.innerText = "";
-        } else {
-            btn.className = "action-btn btn-locked";
-            btn.innerHTML = "🔒 CREAR EQUIPOS";
-            msg.innerText = `Disponible a las ${lockTimeStr} (o con 3 votos)`;
-        }
-        
-        const cd = document.getElementById('countdown-display');
-        if(now < target) {
-            const diff = target - now;
-            const hh = Math.floor(diff/(1000*60*60));
-            const mm = Math.floor((diff%(1000*60*60))/(1000*60));
-            const ss = Math.floor((diff%(1000*60))/1000);
-            cd.innerText = `Cierre en: ${hh}h ${mm}m`;
-        } else cd.innerText = "Cierre alcanzado";
-    }
-
-    // --- NEW FEATURE: DOWNLOAD LINEUP (PIZARRA) ---
-    window.downloadLineup = () => {
-        const teams = window.currentTeamsForCopy;
-        if (!teams || teams.length === 0) return window.showToast("No hay equipos para generar imagen", "error");
-
-        window.showToast("Generando imagen...", "info");
-
-        if(currentData.matchDate) {
-            const dateObj = new Date(currentData.matchDate);
-            const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-            document.getElementById('lc-date').innerText = dateStr;
-        }
-        
-        const grid = document.getElementById('lc-grid');
-        grid.innerHTML = '';
-        const names = ['BLANCO', 'NEGRO', 'ROJO'];
-        const classes = ['lc-white', 'lc-black', 'lc-red'];
-        
-        teams.forEach((team, i) => {
-            let html = `<div class="lc-col ${classes[i]}"><div class="lc-team-title">${names[i]}</div>`;
-            team.forEach(p => {
-                const cleanName = p.name.replace(/<[^>]*>/g, ''); 
-                html += `<div class="lc-player">${cleanName}</div>`;
-            });
-            html += `</div>`;
-            grid.innerHTML += html;
-        });
-
-        const element = document.querySelector(".lineup-card");
-        html2canvas(element, { backgroundColor: null, scale: 2 }).then(canvas => {
-            canvas.toBlob(blob => {
-                const file = new File([blob], `Alineacion_${new Date().toISOString().split('T')[0]}.png`, { type: 'image/png' });
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'Alineación AMPA',
-                        text: 'Aquí tenéis los equipos confirmados.'
-                    }).catch(err => console.log("Compartir cancelado o error", err));
-                } else {
-                    const link = document.createElement('a');
-                    link.download = file.name;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    window.showToast("Imagen descargada", "success");
-                }
-            }, 'image/png');
-        }).catch(err => {
-            console.error(err);
-            window.showToast("Error al generar imagen", "error");
-        });
-    };
 </script>
 </body>
 </html>
-
