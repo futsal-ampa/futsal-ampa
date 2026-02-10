@@ -13,6 +13,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
+        /* CORRECCIÓN DE SCROLL PARA ESTADÍSTICAS */
+        #stats-content {
+            display: none;
+            flex: 1;             /* Ocupa el espacio disponible */
+            overflow-y: auto;    /* ⚠️ ESTO ACTIVA EL SCROLL VERTICAL */
+            width: 100%;
+            max-height: 60vh;    /* Limita la altura para que no se salga de la pantalla */
+            padding-bottom: 20px;
+        }
+        /* Para que la barra de scroll sea bonita */
+        #stats-content::-webkit-scrollbar { width: 5px; }
+        #stats-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; }
         /* ESTILOS (Optimizados) */
         :root { --brand-dark: #1e293b; --brand-blue: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #334155; --accent: #f59e0b; --whatsapp: #25d366; --danger: #ef4444; --disabled: #94a3b8; --gold: #fbbf24; --reserve: #f97316; --success: #22c55e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1103,7 +1115,7 @@ const firebaseConfig = {
 
 window.openStats = async () => {
         const modal = document.getElementById('modal-overlay'); 
-        document.getElementById('modal-title').innerText = "Estadísticas y Registros"; 
+        document.getElementById('modal-title').innerText = "Panel de Datos"; 
         document.getElementById('modal-text').style.display = 'none'; 
         document.getElementById('modal-input').style.display = 'none'; 
         document.getElementById('login-form').style.display = 'none'; 
@@ -1123,25 +1135,22 @@ window.openStats = async () => {
             const snap = await getDocs(histRef); 
             
             const realMatches = []; 
-            const autoResets = [];  
+            const autoResets = []; 
             const playerCounts = {}; 
             
             snap.forEach(doc => { 
                 const d = doc.data(); 
-                
-                // CRITERIO DE FILTRADO MEJORADO
-                // Si tiene 'resetBy' O los equipos no son una lista válida -> Es un LOG DE CIERRE
-                // También si no tiene jugadores (para limpiar la pestaña de Partidos)
+                d.docId = doc.id; // Guardamos ID para borrar
+
+                // CRITERIO DE FILTRADO
                 let isAuto = false;
                 if (d.resetBy) isAuto = true;
                 if (typeof d.teams === 'string') isAuto = true;
-                if (Array.isArray(d.teams) && d.teams.length === 0) isAuto = true; // Array vacio
-                if (!d.teams) isAuto = true;
+                if (!d.teams || (Array.isArray(d.teams) && d.teams.length === 0)) isAuto = true;
 
                 if (isAuto) {
                     autoResets.push(d);
                 } else {
-                    // Es un partido real JUGADO
                     realMatches.push(d); 
                     d.teams.forEach(team => { 
                         team.forEach(player => { 
@@ -1150,100 +1159,80 @@ window.openStats = async () => {
                     }); 
                 }
             });
-            
-            // --- 1. PESTAÑA RANKING ---
+
+            // 1. RANKING
             const sortedPlayers = Object.entries(playerCounts).sort((a,b) => b[1] - a[1]); 
             const rankDiv = document.getElementById('tab-ranking'); 
             rankDiv.innerHTML = ''; 
-            if(sortedPlayers.length === 0) rankDiv.innerHTML = '<div style="text-align:center; padding:20px;">Sin partidos jugados aún</div>'; 
+            
+            // Botón Borrar Todo (Arriba también, por si acaso)
+            if(sortedPlayers.length > 0) { 
+                rankDiv.innerHTML += `<div style="margin-bottom:15px;"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial COMPLETO</button></div>`; 
+            }
+            
+            if(sortedPlayers.length === 0) rankDiv.innerHTML += '<div style="text-align:center; padding:20px;">Sin datos</div>';
             
             sortedPlayers.forEach(([name, count], index) => { 
                 let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index+1; 
                 rankDiv.innerHTML += `<div class="ranking-row"><div class="rank-pos">${medal}</div><div class="rank-name">${name}</div><div class="rank-val">${count}</div></div>`; 
             });
-            // Botón con margen para no solapar
-            if(sortedPlayers.length > 0) { 
-                rankDiv.innerHTML += `<div class="stats-footer" style="margin-bottom:20px;"><button class="reset-stats-btn" onclick="window.resetHistory()">🗑️ Borrar Historial JUGADO</button></div>`; 
-            }
             
-            // --- 2. PESTAÑA PARTIDOS (Solo reales) ---
-            // Ordenar: Más reciente primero
-            realMatches.sort((a,b) => new Date(b.date) - new Date(a.date)); 
+            // 2. PARTIDOS
+            realMatches.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()); 
             const histDiv = document.getElementById('tab-history'); 
             histDiv.innerHTML = ''; 
-            
-            if(realMatches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">No hay partidos finalizados</div>'; 
-            
+            if(realMatches.length === 0) histDiv.innerHTML = '<div style="text-align:center; padding:20px;">Vacío</div>'; 
             realMatches.forEach(m => { 
                 const d = new Date(m.date); 
                 const dateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric'});
                 const s = m.scores || [0,0,0]; 
-                let scoreStr = `⚪ ${s[0]} - ⚫ ${s[1]} - 🔴 ${s[2]}`; 
-                let pCount = 0; 
-                if(m.teams && Array.isArray(m.teams)) m.teams.forEach(t => pCount += t.length); 
-                
-                histDiv.innerHTML += `<div class="history-card">
-                    <div class="h-info">
-                        <div class="h-date">${dateStr}</div>
-                        <div class="h-score">${scoreStr}</div>
-                    </div>
-                    <div class="h-players">✅ ${pCount} jug.</div>
-                </div>`; 
+                let pCount = 0; if(m.teams) m.teams.forEach(t => pCount += t.length); 
+                histDiv.innerHTML += `<div class="history-card"><div class="h-info"><div class="h-date">${dateStr}</div><div class="h-score">⚪${s[0]} ⚫${s[1]} 🔴${s[2]}</div></div><div class="h-players">✅ ${pCount} jug.</div></div>`; 
             });
 
-            // --- 3. PESTAÑA CIERRES (Logs del Chivato) ---
+            // 3. LOGS (ORDENADO + BOTÓN ARRIBA)
+            // Ordenar: Prioridad a fecha de dispositivo (futura) o fecha real.
+            autoResets.sort((a,b) => {
+                // Obtenemos milisegundos, si falla usamos 0
+                const tA = new Date(a.deviceTime || a.realTimestamp || a.date).getTime() || 0;
+                const tB = new Date(b.deviceTime || b.realTimestamp || b.date).getTime() || 0;
+                return tB - tA; // De mayor (más nuevo/futuro) a menor
+            });
+
             const logsDiv = document.getElementById('tab-logs'); 
             logsDiv.innerHTML = '';
 
-            // ORDENAR: El más reciente ARRIBA
-            // Usamos 'realTimestamp' si existe (nuevo código), si no 'date' (viejo)
-            autoResets.sort((a,b) => {
-                const timeA = a.realTimestamp || new Date(a.date).getTime();
-                const timeB = b.realTimestamp || new Date(b.date).getTime();
-                return timeB - timeA; // Descendente (B - A)
-            });
-            
-            if(autoResets.length === 0) logsDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Historial limpio</div>';
+            // ⚠️ BOTÓN DE LIMPIEZA AHORA ESTÁ ARRIBA ⚠️
+            if(autoResets.length > 0) {
+                logsDiv.innerHTML += `<div style="margin-bottom:15px; text-align:center;">
+                    <button class="reset-stats-btn" style="background:#ef4444; color:white; border:none; width:100%; padding:12px;" onclick="window.clearAutoResets()">🗑️ LIMPIAR REGISTROS</button>
+                </div>`;
+            } else {
+                logsDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Limpio ✨</div>';
+            }
 
             autoResets.forEach(m => {
-                 // Formatear la fecha del dispositivo (la fecha "falsa" o futura)
-                 let deviceDateStr = "Fecha desconocida";
-                 let timeStr = "";
-                 
+                 let timeInfo = "Fecha antigua/desconocida";
+                 // Intentamos mostrar la fecha del móvil culpable
                  if (m.deviceTime) {
-                     const badDate = new Date(m.deviceTime);
-                     deviceDateStr = badDate.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' });
-                     timeStr = badDate.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
-                 } else {
-                     // Fallback para logs antiguos
-                     const d = new Date(m.date);
-                     deviceDateStr = d.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' });
+                     try {
+                        const badDate = new Date(m.deviceTime);
+                        timeInfo = badDate.toLocaleString('es-ES', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+                     } catch(e) {}
                  }
 
-                 const culpable = m.resetBy || "Sistema/Antiguo";
-
                  logsDiv.innerHTML += `<div class="history-card" style="border-left:4px solid #ef4444; background: #fff1f2; flex-direction:column; align-items:flex-start; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:5px;">
-                        <div style="font-weight:800; color:#b91c1c; font-size:0.9rem;">${culpable}</div>
+                    <div style="display:flex; justify-content:space-between; width:100%;">
+                        <div style="font-weight:800; color:#b91c1c;">${m.resetBy || 'Anónimo'}</div>
                         <div style="font-size:0.65rem; background:#fee2e2; padding:2px 6px; border-radius:4px; color:#b91c1c; height:fit-content;">AUTO</div>
                     </div>
-                    <div style="font-size:0.75rem; color:#333;">
-                        📅 Su móvil decía: <b>${deviceDateStr}</b> ${timeStr ? 'a las ' + timeStr : ''}
+                    <div style="font-size:0.75rem; color:#666; margin-top:5px;">
+                        📅 Su móvil decía: <b>${timeInfo}</b>
                     </div>
                 </div>`; 
             }); 
-            
-            // BOTÓN DE LIMPIEZA (Con margen extra para que no se solape)
-            if(autoResets.length > 0) {
-                logsDiv.innerHTML += `<div class="stats-footer" style="margin-top:20px; padding-bottom:20px; border-top:1px solid #fecaca;">
-                    <button class="reset-stats-btn" style="background:#ef4444; color:white; border:none; width:100%; padding:15px;" onclick="window.clearAutoResets()">🗑️ BORRAR LOGS DE CIERRE</button>
-                </div>`;
-            }
 
-        } catch(e) { 
-            console.error(e);
-            window.showToast("Error stats", "error"); 
-        }
+        } catch(e) { window.showToast("Error stats", "error"); }
     };
     
     window.resetHistory = async () => {
@@ -1531,6 +1520,7 @@ window.switchTab = (tab) => {
 </script>
 </body>
 </html>
+
 
 
 
